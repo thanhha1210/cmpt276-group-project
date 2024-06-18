@@ -1,5 +1,9 @@
 package cmpt276.group.demo.models.schedule;
 
+import java.sql.Time;
+import java.util.Date;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,14 +17,30 @@ public class Schedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int pid;
+
+    @Column(name = "doctor_name")
     private String doctorName;
+
+    @Column(name = "doctor_username")
     private String doctorUsername;
-    private String patientName;
-    private String date;
-    private String startTime;
+
+    private Date date;
+
+    @Column(name = "start_time")
+    private Time startTime;
+    
     private int duration;
 
     public Schedule() { }
+
+    
+    public Schedule(String doctorName, String doctorUsername, Date date, Time startTime, int duration) {
+        this.doctorName = doctorName;
+        this.doctorUsername = doctorUsername;
+        this.date = date;
+        this.startTime = startTime;
+        this.duration = duration;
+    }
 
     public String getDoctorName() {
         return doctorName;
@@ -38,27 +58,19 @@ public class Schedule {
         this.doctorUsername = doctorUsername;
     }
 
-    public String getPatientName() {
-        return patientName;
-    }
-
-    public void setPatientName(String patientName) {
-        this.patientName = patientName;
-    }
-
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
-    public String getStartTime() {
+    public Time getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(String startTime) {
+    public void setStartTime(Time startTime) {
         this.startTime = startTime;
     }
 

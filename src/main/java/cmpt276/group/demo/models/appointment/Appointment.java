@@ -1,5 +1,9 @@
 package cmpt276.group.demo.models.appointment;
 
+import java.sql.Time;
+import java.util.Date;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,19 +14,30 @@ import jakarta.persistence.Table;
 @Table(name = "appointments")
 
 public class Appointment {
-    @Id
+       @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int pid;
+
+    @Column(name = "doctor_name")
     private String doctorName;
+
+    @Column(name = "doctor_username")
     private String doctorUsername;
+
+    @Column(name = "patient_name")
     private String patientName;
-    private String date;
-    private String startTime;
+
+    private Date date;
+
+    @Column(name = "start_time")
+    private Time startTime;
+    
     private int duration;
 
     public Appointment() { }
     
-    public Appointment(String doctorName, String doctorUsername, String patientName, String date, String startTime, int duration) {
+
+    public Appointment(String doctorName, String doctorUsername, String patientName, Date date, Time startTime, int duration) {
         this.doctorName = doctorName;
         this.doctorUsername = doctorUsername;
         this.patientName = patientName;
@@ -31,40 +46,52 @@ public class Appointment {
         this.duration = duration;
     }
 
+
     public String getDoctorName() {
         return doctorName;
     }
+
     public void setDoctorName(String doctorName) {
         this.doctorName = doctorName;
     }
+
     public String getDoctorUsername() {
         return doctorUsername;
     }
+
     public void setDoctorUsername(String doctorUsername) {
         this.doctorUsername = doctorUsername;
     }
+
     public String getPatientName() {
         return patientName;
     }
+
     public void setPatientName(String patientName) {
         this.patientName = patientName;
     }
-    public String getDate() {
+
+    public Date getDate() {
         return date;
     }
-    public void setDate(String date) {
+
+    public void setDate(Date date) {
         this.date = date;
     }
-    public String getStartTime() {
+
+    public Time getStartTime() {
         return startTime;
     }
-    public void setStartTime(String startTime) {
+
+    public void setStartTime(Time startTime) {
         this.startTime = startTime;
     }
+
     public int getDuration() {
         return duration;
     }
+
     public void setDuration(int duration) {
         this.duration = duration;
-    }   
+    }
 }
