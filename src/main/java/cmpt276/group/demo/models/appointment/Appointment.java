@@ -1,7 +1,8 @@
 package cmpt276.group.demo.models.appointment;
 
+
 import java.sql.Time;
-import java.util.Date;
+import java.sql.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,9 +13,8 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "appointments")
-
-public class Appointment {
-       @Id
+public class Appointment implements Comparable<Appointment>{
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int pid;
 
@@ -45,6 +45,17 @@ public class Appointment {
         this.startTime = startTime;
         this.duration = duration;
     }
+
+    @Override
+    public int compareTo(Appointment o) {
+        if (o.getDate() != this.date) {
+            return this.date.compareTo(o.getDate());
+        }
+        else {
+            return this.startTime.compareTo(o.getStartTime());
+        }
+    }
+
 
 
     public String getDoctorName() {

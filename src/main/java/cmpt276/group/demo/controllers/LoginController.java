@@ -34,14 +34,12 @@ public class LoginController {
             model.addAttribute("patient", patient);
             return "patients/mainPage";
         }
-
         Admin admin = (Admin) session.getAttribute("session_admin");
         if (admin != null) {
             model.addAttribute("admin", admin);
             return "admins/mainPage";
             //return "patients/mainPage";
         }
-
         Doctor doctor = (Doctor) session.getAttribute("session_doctor");
         if (doctor != null) {
             model.addAttribute("doctor", doctor);

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>addDoctorPage</title>
+    <title>view Doctor Page</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
@@ -45,6 +45,7 @@
         }
         th {
             padding: 24px;
+            font-weight: bold;
             font-size: 1.3em;
             text-align: center;
         }
@@ -93,6 +94,34 @@
     </style>
 </head>
 <body>
+    <!-- <header class="fix-header" style="padding-top: 26px; position: sticky; top: -26px; z-index: 1;">
+        <div class="content">
+            <nav class="navbar" style="display: flex; align-items: center; padding: 12px;">
+                <div class="home">
+                    <form action="/admins/home" method="get" >
+                        <button class="btn home-btn">Dashboard</button>
+                    </form>
+                </div>
+                <div class="feature" style="display: flex; justify-content: center;">
+                    <form action="/admins/viewDoctor" method="get">
+                        <button class="btn schedule-btn">Manage doctor</button>
+                    </form>
+                    <form action="/admins/viewAppointment" method="get">
+                        <button class="btn schedule-btn">View booked appointment</button>
+                    </form>
+                    <form action="/admins/viewSchedule" method="get">
+                        <button class="btn schedule-btn">Add schedule</button>
+                    </form>
+                    
+                </div>
+                <div class="actions" style="display: flex; justify-content: center; margin-left: auto; gap: 30px;">
+                    <form action="/users/logout" method="get">
+                        <button class="btn logout-btn" >Log out</button>
+                    </form>
+                </div>
+            </nav>
+        </div>
+    </header> -->
     <header class="content" style="display: flex; justify-content: center; text-align: center; gap: 40px; margin-top: 40px;position: relative;">
         <form action="/admins/getDashboard" method="get" style="position: absolute; top: 0; left: 50px;">
             <input type="submit" value="HOME" class="exit-btn">

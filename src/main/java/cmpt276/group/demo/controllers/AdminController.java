@@ -1,5 +1,9 @@
 package cmpt276.group.demo.controllers;
 
+import java.sql.Date;
+import java.sql.Time;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +14,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import cmpt276.group.demo.models.admin.AdminRepository;
+import cmpt276.group.demo.models.appointment.Appointment;
+import cmpt276.group.demo.models.appointment.AppointmentRepository;
 import cmpt276.group.demo.models.doctor.Doctor;
 import cmpt276.group.demo.models.doctor.DoctorRepository;
 import cmpt276.group.demo.models.record.RecordRepository;
+import cmpt276.group.demo.models.schedule.ScheduleRepository;
 import jakarta.servlet.http.HttpServletResponse;
 
 
@@ -25,12 +32,14 @@ public class AdminController {
     private DoctorRepository doctorRepo;
     @Autowired
     private RecordRepository recordRepo;
-    // @Autowired
-    // private ScheduleRepository scheduleRepo;
-    // @Autowired
-    // private AppointmentRepository appointmentRepo;
 
-    // View & add doctor
+    @Autowired
+    private ScheduleRepository scheduleRepo;
+
+    @Autowired
+    private AppointmentRepository appointmentRepo;
+
+    //------------------------------------------------------------View & add doctor-------------------------------------------------------------------------
     @GetMapping("/admins/viewDoctor")
     public String viewDoctor(Model model) {
         model.addAttribute("doctors", doctorRepo.findAll());
@@ -80,9 +89,9 @@ public class AdminController {
         return "admins/addDoctorPage";
     }
 
-    // Deletes a rectangle by name.
+    //------------------------------------------------------ Deletes a doctor------------------------------------------------------
     @PostMapping("/admins/deleteDoctor")
-    public String deleteRectangle(@RequestParam String username, Model model) {
+    public String deleteDoctor(@RequestParam String username, Model model) {
         Doctor temp = doctorRepo.findByUsername(username);
         if (temp != null) {
             doctorRepo.delete(temp);
@@ -103,25 +112,33 @@ public class AdminController {
         return "admins/mainPage";
     }
     
-
-    // View & add schedule
-    // @GetMapping("/admins/viewSchedule")
-    // public String getViewSchedulePage(Model model) {
-    //      // Replace with actual logic to retrieve schedule information
-    //     Timestamp startTime = new Timestamp(System.currentTimeMillis());  // Replace with actual start time logic
-    //     Timestamp endTime = new Timestamp(startTime.getTime() + 3600000);  // Adding 1 hour to start time
-        
-    //     Schedule sche = new Schedule("Dr. Smith", startTime, endTime);
-        
-    //     model.addAttribute("sche", sche);
-    //     return "admins/viewSchedulePage";
-    // }
-
-  
-   
-   
-    
     
 
-    // View & delete appointment
+    //------------------------------------------------------ View & delete appointment----------------------------------------------------
+    // view appointment
+    @GetMapping("/admins/viewAppointment")
+    public String viewAppointment(Model model) {
+        List<Appointment> appointments = appointmentRepo.findAll();
+        Collections.sort(appointments);
+        model.addAttribute("appointments", appointments);
+        return "admins/viewAppointmentPage";
+    }
+    
+   @PostMapping("/admins/deleteAppointment")
+    public String deleteAppointment(@RequestParam Map<String, String> apt, Model model, HttpServletResponse response) {
+        String doctorUsername = apt.get("doctorUsername");
+        Date date = Date.valueOf(apt.get("date"));
+        Time startTime = Time.valueOf(apt.get("startTime"));
+        Appointment deleteApt = appointmentRepo.findByDoctorUsernameAndDateAndStartTime(doctorUsername, date, startTime);
+        List<Appointment> appointments;
+        if (deleteApt != null) {
+            appointmentRepo.delete(deleteApt);
+            appointments = appointmentRepo.findAll();
+            Collections.sort(appointments);
+            model.addAttribute("appointments", appointments);
+        } 
+
+        return "admins/viewAppointmentPage";
+   }
+
 }
