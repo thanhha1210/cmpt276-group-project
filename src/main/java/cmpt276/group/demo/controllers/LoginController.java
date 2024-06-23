@@ -27,6 +27,7 @@ public class LoginController {
     @Autowired
     private DoctorRepository doctorRepo;
     
+
     @GetMapping("/users/login")
     public String getLogin(Model model, HttpServletRequest request, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");
@@ -96,7 +97,7 @@ public class LoginController {
     @GetMapping("/users/logout")
     public String destroySession(HttpServletRequest request) {
         request.getSession().invalidate();
-        return "redirect:/index.html";
+        return "loginPage";
     }
 
 }
