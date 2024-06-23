@@ -1,7 +1,7 @@
 package cmpt276.group.demo.models.schedule;
 
+import java.sql.Date;
 import java.sql.Time;
-import java.util.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
