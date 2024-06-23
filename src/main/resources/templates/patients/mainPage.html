@@ -70,21 +70,23 @@
         <div class="content">
             <nav class="navbar" style="display: flex; align-items: center; padding: 12px;">
                 <div class="home">
-                    <form action="/admins/home" method="get" >
+                    <form action="/patients/getDashboard" method="get" >
                         <button class="btn home-btn">Dashboard</button>
                     </form>
                 </div>
                 <div class="feature" style="display: flex; justify-content: center;">
-                    <form action="/admins/viewDoctor" method="get">
-                        <button class="btn schedule-btn">Manage doctor</button>
+                    <form action="/patients/viewSchedule" method="get">
+                        <button class="btn schedule-btn">Book appointment</button>
                     </form>
-                    <form action="/admins/viewSchedule" method="get">
-                        <button class="btn schedule-btn">View booked appointment</button>
+                    <form action="/patients/viewRecord" method="get">
+                        <button class="btn schedule-btn">Health record</button>
                     </form>
-                    <form action="/admins/addSchedule" method="get">
-                        <button class="btn schedule-btn">Add schedule</button>
-                    </form>
-                    
+                    <form action="/patients/viewFeedback" method="get">
+                        <button class="btn schedule-btn">Feedback</button>
+                    </form> 
+                    <form action="/patients/viewForum" method="get">
+                        <button class="btn schedule-btn">Forum</button>
+                    </form> 
                 </div>
                 <div class="actions" style="display: flex; justify-content: center; margin-left: auto; gap: 30px;">
                     <form action="/users/logout" method="get">
