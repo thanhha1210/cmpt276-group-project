@@ -1,19 +1,29 @@
 package cmpt276.group.demo.controllers;
 
+import java.sql.Date;
+import java.sql.Time;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import cmpt276.group.demo.models.admin.AdminRepository;
+import cmpt276.group.demo.models.appointment.Appointment;
 import cmpt276.group.demo.models.doctor.DoctorRepository;
 import cmpt276.group.demo.models.patient.Patient;
 import cmpt276.group.demo.models.patient.PatientRepository;
 import cmpt276.group.demo.models.record.Record;
 import cmpt276.group.demo.models.record.RecordRepository;
+import cmpt276.group.demo.models.schedule.Schedule;
+import cmpt276.group.demo.models.schedule.ScheduleRepository;
 import jakarta.servlet.http.HttpSession;
+
+
 
 @Controller
 public class PatientController {
@@ -26,6 +36,10 @@ public class PatientController {
     private DoctorRepository doctorRepo;
     @Autowired
     private RecordRepository recordRepo;
+    @Autowired 
+    private ScheduleRepository scheduleRepo;
+    @Autowired
+    private ScheduleRepository appointmentRepo;
    
 
     @GetMapping("/login")
@@ -33,7 +47,6 @@ public class PatientController {
         return "loginPage";
     }
     
-  
     
     @GetMapping("/patients/signup")
     public String getSignupPage() {
@@ -50,29 +63,53 @@ public class PatientController {
         return "patients/mainPage";
     }
 
-    @GetMapping("/patients/schedule")
+    @GetMapping("/patients/getDashboard")
+    public String getDashBoard(Model model, HttpSession session) {
+        Patient patient = (Patient) session.getAttribute("session_patient");
+        model.addAttribute("patient", patient);
+        return "patients/mainPage";
+    }
+    
+
+    @GetMapping("/patients/viewSchedule")
     public String getSchedule(Model model, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");
-        if (patient == null) {
-            return "loginPage";
-        }
-        model.addAttribute("patient", patient);
+        
+        List<Schedule> schedules = scheduleRepo.findAll();
+        model.addAttribute("schedules", schedules);
         return "patients/schedulePage";
     }
 
-    @GetMapping("/patients/record")
+    // @PostMapping("/patients/bookAppointment")
+    // public String bookAppointment(@RequestParam Map<String, String> sche, Model model, HttpSession session) {
+    //     Patient patient = (Patient) session.getAttribute("session_patient");
+    //     String doctorName = sche.get("doctorName");
+    //     String doctorUsername = sche.get("doctorUsername");
+    //     Date date = Date.valueOf(sche.get("date"));
+    //     Time startTime = Time.valueOf(sche.get("startTime"));
+    //     int duration = Integer.parseInt(sche.get("duration"));
+        
+    //     Appointment apt = new Appointment(doctorName, doctorUsername, patient.getName(), date, startTime, duration);
+    //     appointmentRepo.save(apt);
+
+        
+
+    //     return "patients/schedulePage";
+    // }
+    
+
+
+
+    @GetMapping("/patients/viewRecord")
     public String getRecord(Model model, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");
-        if (patient == null) {
-            return "loginPage";
-        }
         List<Record> records = recordRepo.findByUsername(patient.getUsername());
         model.addAttribute("patient", patient);
         model.addAttribute("records", records);
         return "patients/recordPage";
     }
 
-    @GetMapping("/patients/feedback")
+    @GetMapping("/patients/viewFeedback")
     public String getFeedback(Model model, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");
         if (patient == null) {
