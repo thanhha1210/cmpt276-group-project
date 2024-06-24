@@ -100,10 +100,11 @@
             <input type="submit" value="HOME" class="exit-btn">
         </form>
         <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Schedule List</h1>
-        <!-- <form action="/admins/addDoctor" method="get">
-            <input type="submit" value="ADD" class="add-btn">
-        </form> -->
     </header>
+    <!-- Test session -->
+    <!-- <div class="heading">
+        <p th:text="${patient.name}"></p>
+    </div> -->
     <main class="content">
         <table class="table-container">
             <thead>
@@ -144,6 +145,47 @@
                 </tr>
             </tbody>
         </table>
+        <div th:if="${appointment}">
+            <div class="content" style="display: flex; justify-content: center; text-align: center; gap: 40px; margin-top: 40px;position: relative;">
+                <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Appointment</h1>
+            </div>
+            <table class="table-container">
+                <thead>
+                    <th>Doctor Name</th>
+                    <th>Date</th>
+                    <th>Start time</th>
+                    <th>Duration</th>
+                    <th></th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <span th:text="${appointment.doctorName}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${appointment.date}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${appointment.startTime}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${appointment.duration}"></span>
+                        </td>
+                        <td>    
+                            <form action="/patients/deleteAppointment" method="post">
+                                <input type="hidden" name="doctorUsername" th:value="${appointment.doctorUsername}">
+                                <input type="hidden" name="doctorName" th:value="${appointment.doctorName}">
+                                <input type="hidden" name="date" th:value="${appointment.date}">
+                                <input type="hidden" name="startTime" th:value="${appointment.startTime}">
+                                <input type="hidden" name="duration" th:value="${appointment.duration}">
+                                <input type="submit" class="btn" value="DELETE" style="color:red">
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+        </div>
     </main>
 
 </body>

@@ -3,6 +3,7 @@ package cmpt276.group.demo.models.schedule;
 import java.sql.Date;
 import java.sql.Time;
 
+import cmpt276.group.demo.models.appointment.Appointment;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,7 +13,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "schedules")
-public class Schedule {
+public class Schedule implements Comparable<Schedule>{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,6 +41,16 @@ public class Schedule {
         this.date = date;
         this.startTime = startTime;
         this.duration = duration;
+    }
+
+    @Override
+    public int compareTo(Schedule o) {
+        if (o.getDate() != this.date) {
+            return this.date.compareTo(o.getDate());
+        }
+        else {
+            return this.startTime.compareTo(o.getStartTime());
+        }
     }
 
     public String getDoctorName() {
