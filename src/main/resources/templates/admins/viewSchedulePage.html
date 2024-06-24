@@ -94,13 +94,12 @@
     </style>
 </head>
 <body>
-
     <header class="content" style="display: flex; justify-content: center; text-align: center; gap: 40px; margin-top: 40px;position: relative;">
         <form action="/admins/getDashboard" method="get" style="position: absolute; top: 0; left: 50px;">
             <input type="submit" value="HOME" class="exit-btn">
         </form>
-        <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Doctor List</h1>
-        <form action="/admins/addDoctor" method="get">      <!--get to navigate to addDoctorPage-->
+        <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Schedule List</h1>
+        <form action="/admins/addSchedule" method="get">
             <input type="submit" value="ADD" class="add-btn">
         </form>
     </header>
@@ -108,11 +107,13 @@
         <table class="table-container">
             <thead>
                 <th>#</th>
-                <th>Name</th>
-                <th>Username</th>
+                <th>Doctor Name</th>
+                <th>Date</th>
+                <th>Starting Time</th>
+                <th>Duration</th>
                 <th></th>
             </thead>
-            <tbody>
+            <!-- <tbody>
                 <tr th:each="doc, cnt:${doctors}">
                     <td>
                         <span th:text="${cnt.count}"></span>
@@ -130,7 +131,7 @@
                         </form>
                     </td>
                 </tr>
-            </tbody>
+            </tbody> -->
         </table>
     </main>
    

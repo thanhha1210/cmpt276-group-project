@@ -34,10 +34,8 @@ public class AdminController {
     private DoctorRepository doctorRepo;
     @Autowired
     private RecordRepository recordRepo;
-
     @Autowired
     private ScheduleRepository scheduleRepo;
-
     @Autowired
     private AppointmentRepository appointmentRepo;
 
@@ -101,6 +99,8 @@ public class AdminController {
         return "admins/addDoctorPage";
     }
 
+
+
     //------------------------------------------------------ Deletes a doctor------------------------------------------------------
     @PostMapping("/admins/deleteDoctor")
     public String deleteDoctor(@RequestParam String username, Model model) {
@@ -112,7 +112,7 @@ public class AdminController {
         return "admins/viewDoctorPage";
     }
 
-    // Return display page
+    // Return doctor display page
     @GetMapping("/admins/exitDoctorAdd")
     public String exitAddDoctorPage(Model model) {
         model.addAttribute("doctors", doctorRepo.findAll());
@@ -145,5 +145,15 @@ public class AdminController {
         } 
         return "admins/viewAppointmentPage";
    }
+
+
+
+    //------------------------------------------------------ View, add & delete schedule----------------------------------------------------
+    @GetMapping("/admins/viewSchedule")
+    public String viewSchedule(Model model) {
+        model.addAttribute("schedules", scheduleRepo.findAll());
+        return "admins/viewSchedulePage";
+    }
+   
 
 }

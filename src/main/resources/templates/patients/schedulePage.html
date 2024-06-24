@@ -103,7 +103,7 @@
     </header>
     <!-- Test session -->
     <!-- <div class="heading">
-        <p th:if="${appointment}" th:text="${appointment.patientName}"></p>
+        <p th:text="${patient.name}"></p>
     </div> -->
     <main class="content">
         <table class="table-container">
@@ -170,6 +170,16 @@
                         </td>
                         <td>
                             <span th:text="${appointment.duration}"></span>
+                        </td>
+                        <td>    
+                            <form action="/patients/deleteAppointment" method="post">
+                                <input type="hidden" name="doctorUsername" th:value="${appointment.doctorUsername}">
+                                <input type="hidden" name="doctorName" th:value="${appointment.doctorName}">
+                                <input type="hidden" name="date" th:value="${appointment.date}">
+                                <input type="hidden" name="startTime" th:value="${appointment.startTime}">
+                                <input type="hidden" name="duration" th:value="${appointment.duration}">
+                                <input type="submit" class="btn" value="DELETE" style="color:red">
+                            </form>
                         </td>
                     </tr>
                 </tbody>

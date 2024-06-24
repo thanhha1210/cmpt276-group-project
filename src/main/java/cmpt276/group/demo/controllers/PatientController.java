@@ -27,6 +27,7 @@ import jakarta.servlet.http.HttpSession;
 
 
 
+
 @Controller
 public class PatientController {
     
@@ -56,38 +57,51 @@ public class PatientController {
         return "patients/mainPage";
     }
     
-
+//--------------------------------------------Manage schedule--------------------------------------------------------
     @GetMapping("/patients/viewSchedule")
     public String getSchedule(Model model, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");
-        
-        List<Schedule> schedules = scheduleRepo.findAll();
-        if (patient != null) {
-            Appointment apt = appointmentRepo.findByPatientName(patient.getName());
-            if (apt != null) {
-                model.addAttribute("appointment", apt);
-            }
+        if (patient == null) {
+            return "loginPage";
         }
+        List<Schedule> schedules = scheduleRepo.findAll();
+        Appointment apt = appointmentRepo.findByPatientName(patient.getName());
+        if (apt != null) {
+            model.addAttribute("appointment", apt);
+        } 
         model.addAttribute("patient", patient);
         model.addAttribute("schedules", schedules);
         return "patients/schedulePage";
     }
-
+    // Patient books appointment
     @PostMapping("/patients/bookAppointment")
     public String bookAppointment(@RequestParam Map<String, String> sche, Model model, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");
+        if (patient == null) {
+            return "loginPage";
+        }
+
         String doctorName = sche.get("doctorName");
         String doctorUsername = sche.get("doctorUsername");
         Date date = Date.valueOf(sche.get("date"));
         Time startTime = Time.valueOf(sche.get("startTime"));
         int duration = Integer.parseInt(sche.get("duration"));
         
+        // if patient already has an appointment => change it to schedule 
+        Appointment oldApt = appointmentRepo.findByPatientName(patient.getName());
+        if (oldApt != null) {
+            Schedule newSche = new Schedule(oldApt.getDoctorName(), oldApt.getDoctorUsername(), oldApt.getDate(), oldApt.getStartTime(), oldApt.getDuration());
+            scheduleRepo.save(newSche);
+            appointmentRepo.delete(oldApt);
+        }
+
         Appointment apt = new Appointment(doctorName, doctorUsername, patient.getName(), date, startTime, duration);
         appointmentRepo.save(apt);
-        Schedule schedule = scheduleRepo.findByDoctorUsernameAndDateAndStartTime(doctorUsername, date, startTime);
+        Schedule schedule = scheduleRepo.findByDoctorNameAndDateAndStartTime(doctorName, date, startTime);
         if (schedule != null) {
             scheduleRepo.delete(schedule);
         }
+
         List<Schedule> schedules = scheduleRepo.findAll();
         Collections.sort(schedules);
         model.addAttribute("patient", patient);
@@ -95,7 +109,35 @@ public class PatientController {
         model.addAttribute("schedules", schedules);
         return "patients/schedulePage";
     }
+
+    @PostMapping("/patients/deleteAppointment")
+    public String deleteAppointment(@RequestParam Map<String,String> apt, Model model, HttpSession session) {
+        Patient patient = (Patient) session.getAttribute("session_patient");
+        if (patient == null) {
+            return "loginPage";
+        }
+
+        String doctorName = apt.get("doctorName");
+        String doctorUsername = apt.get("doctorUsername");
+        Date date = Date.valueOf(apt.get("date"));
+        Time startTime = Time.valueOf(apt.get("startTime"));
+        int duration = Integer.parseInt(apt.get("duration"));
+        
+        Schedule newSche = new Schedule(doctorName, doctorUsername, date, startTime, duration);
+        scheduleRepo.save(newSche);
+        Appointment oldApt = appointmentRepo.findByPatientName(patient.getName());
+        appointmentRepo.delete(oldApt);
+        List<Schedule> schedules = scheduleRepo.findAll();
+        Collections.sort(schedules);
+
+        model.addAttribute("patient", patient);
+        // model.addAttribute("appointment", apt);
+        model.addAttribute("schedules", schedules);
+        return "patients/schedulePage";
+    }
     
+//--------------------------------------------------------------------------------------
+
     @GetMapping("/patients/viewRecord")
     public String getRecord(Model model, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");
