@@ -28,7 +28,7 @@ public class LoginController {
     private DoctorRepository doctorRepo;
     
 
-    @GetMapping("/users/login")
+    @GetMapping("/")
     public String getLogin(Model model, HttpServletRequest request, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");
         if (patient != null) {
@@ -49,7 +49,7 @@ public class LoginController {
         return "loginPage";
     }
     
-    @PostMapping("/users/login")
+    @PostMapping("/")
     public String login(@RequestParam Map<String, String> formData, Model model, HttpServletRequest request, HttpSession session) {
         String name = formData.get("username");
         String pwd = formData.get("password");

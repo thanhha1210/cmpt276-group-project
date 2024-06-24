@@ -100,10 +100,11 @@
             <input type="submit" value="HOME" class="exit-btn">
         </form>
         <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Schedule List</h1>
-        <!-- <form action="/admins/addDoctor" method="get">
-            <input type="submit" value="ADD" class="add-btn">
-        </form> -->
     </header>
+    <!-- Test session -->
+    <!-- <div class="heading">
+        <p th:if="${appointment}" th:text="${appointment.patientName}"></p>
+    </div> -->
     <main class="content">
         <table class="table-container">
             <thead>
@@ -144,6 +145,37 @@
                 </tr>
             </tbody>
         </table>
+        <div th:if="${appointment}">
+            <div class="content" style="display: flex; justify-content: center; text-align: center; gap: 40px; margin-top: 40px;position: relative;">
+                <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Appointment</h1>
+            </div>
+            <table class="table-container">
+                <thead>
+                    <th>Doctor Name</th>
+                    <th>Date</th>
+                    <th>Start time</th>
+                    <th>Duration</th>
+                    <th></th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <span th:text="${appointment.doctorName}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${appointment.date}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${appointment.startTime}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${appointment.duration}"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+        </div>
     </main>
 
 </body>

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import cmpt276.group.demo.models.admin.Admin;
 import cmpt276.group.demo.models.admin.AdminRepository;
 import cmpt276.group.demo.models.appointment.Appointment;
 import cmpt276.group.demo.models.appointment.AppointmentRepository;
@@ -21,6 +22,7 @@ import cmpt276.group.demo.models.doctor.DoctorRepository;
 import cmpt276.group.demo.models.record.RecordRepository;
 import cmpt276.group.demo.models.schedule.ScheduleRepository;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 
 @Controller
@@ -39,9 +41,19 @@ public class AdminController {
     @Autowired
     private AppointmentRepository appointmentRepo;
 
+    //------------------------------------------------------------Get Dashboard-------------------------------------------
+    @GetMapping("/admins/getDashboard")
+    public String getDashboard(Model model, HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("session_admin");
+        model.addAttribute("admin", admin);
+        return "admins/mainPage";
+    }
+
     //------------------------------------------------------------View & add doctor-------------------------------------------------------------------------
     @GetMapping("/admins/viewDoctor")
-    public String viewDoctor(Model model) {
+    public String viewDoctor(Model model, HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("session_admin");
+        model.addAttribute("admin", admin);
         model.addAttribute("doctors", doctorRepo.findAll());
         return "admins/viewDoctorPage";
     }
@@ -105,13 +117,7 @@ public class AdminController {
     public String exitAddDoctorPage(Model model) {
         model.addAttribute("doctors", doctorRepo.findAll());
         return "admins/viewDoctorPage";
-    }
-   
-    @GetMapping("/admins/getDashboard")
-    public String getDashboard() {
-        return "admins/mainPage";
-    }
-    
+    } 
     
 
     //------------------------------------------------------ View & delete appointment----------------------------------------------------
@@ -126,10 +132,10 @@ public class AdminController {
     
    @PostMapping("/admins/deleteAppointment")
     public String deleteAppointment(@RequestParam Map<String, String> apt, Model model, HttpServletResponse response) {
-        String doctorUsername = apt.get("doctorUsername");
+        String doctorName = apt.get("doctorName");
         Date date = Date.valueOf(apt.get("date"));
         Time startTime = Time.valueOf(apt.get("startTime"));
-        Appointment deleteApt = appointmentRepo.findByDoctorUsernameAndDateAndStartTime(doctorUsername, date, startTime);
+        Appointment deleteApt = appointmentRepo.findByDoctorNameAndDateAndStartTime(doctorName, date, startTime);
         List<Appointment> appointments;
         if (deleteApt != null) {
             appointmentRepo.delete(deleteApt);
@@ -137,7 +143,6 @@ public class AdminController {
             Collections.sort(appointments);
             model.addAttribute("appointments", appointments);
         } 
-
         return "admins/viewAppointmentPage";
    }
 
