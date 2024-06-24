@@ -137,8 +137,8 @@
                     </td>
                     <td>
                         <form action="/admins/deleteAppointment" method="post">
-                            <input type="hidden" name="doctorUsername" th:value="${a.doctorUsername}">
-                            <input type="hidden" name="date" th:value="${a.date}">
+                            <input type="hidden" name="doctorName" th:value="${a.doctorName}">      <!--adjust-->
+                            <input type="hidden" name="date" th:value="${a.date}">                  
                             <input type="hidden" name="startTime" th:value="${a.startTime}">
                             <input type="submit" class="btn" value="DELETE">
                         </form>
