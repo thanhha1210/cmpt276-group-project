@@ -6,10 +6,60 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    <title>Document</title>
+    <title>Record Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border-radius: 50px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .search-input {
+            border: none;
+            padding: 10px 20px;
+            outline: none;
+            width: 300px;
+            border-radius: 50px 0 0 50px;
+        }
+
+        .search-input::placeholder {
+            color: #999;
+        }
+
+        .search-button {
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 0 50px 50px 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-button:hover {
+            background-color: #45a049;
+        }
+
+    </style>
 </head>
 <body>
-    <p>record</p>
-   
+    <div class="search-container">
+        <input type="text" placeholder="Search" class="search-input">
+        <button class="search-button">Search</button>
+    </div>
 </body>
 </html>

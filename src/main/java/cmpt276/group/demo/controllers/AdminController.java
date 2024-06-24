@@ -32,12 +32,20 @@ public class AdminController {
     private DoctorRepository doctorRepo;
     @Autowired
     private RecordRepository recordRepo;
-
     @Autowired
     private ScheduleRepository scheduleRepo;
-
     @Autowired
     private AppointmentRepository appointmentRepo;
+
+
+
+    //------------------------------------------------------------Dash Board-------------------------------------------------------------------------
+    @GetMapping("/admins/getDashboard")
+    public String getDashboard() {
+        return "admins/mainPage";
+    }
+
+
 
     //------------------------------------------------------------View & add doctor-------------------------------------------------------------------------
     @GetMapping("/admins/viewDoctor")
@@ -89,6 +97,8 @@ public class AdminController {
         return "admins/addDoctorPage";
     }
 
+
+
     //------------------------------------------------------ Deletes a doctor------------------------------------------------------
     @PostMapping("/admins/deleteDoctor")
     public String deleteDoctor(@RequestParam String username, Model model) {
@@ -100,16 +110,11 @@ public class AdminController {
         return "admins/viewDoctorPage";
     }
 
-    // Return display page
+    // Return doctor display page
     @GetMapping("/admins/exitDoctorAdd")
     public String exitAddDoctorPage(Model model) {
         model.addAttribute("doctors", doctorRepo.findAll());
         return "admins/viewDoctorPage";
-    }
-   
-    @GetMapping("/admins/getDashboard")
-    public String getDashboard() {
-        return "admins/mainPage";
     }
     
     
@@ -126,10 +131,10 @@ public class AdminController {
     
    @PostMapping("/admins/deleteAppointment")
     public String deleteAppointment(@RequestParam Map<String, String> apt, Model model, HttpServletResponse response) {
-        String doctorUsername = apt.get("doctorUsername");
+        String doctorName = apt.get("doctorName");      // adjust
         Date date = Date.valueOf(apt.get("date"));
         Time startTime = Time.valueOf(apt.get("startTime"));
-        Appointment deleteApt = appointmentRepo.findByDoctorUsernameAndDateAndStartTime(doctorUsername, date, startTime);
+        Appointment deleteApt = appointmentRepo.findByDoctorNameAndDateAndStartTime(doctorName, date, startTime);   // adjust
         List<Appointment> appointments;
         if (deleteApt != null) {
             appointmentRepo.delete(deleteApt);
@@ -140,5 +145,15 @@ public class AdminController {
 
         return "admins/viewAppointmentPage";
    }
+
+
+
+    //------------------------------------------------------ View, add & delete schedule----------------------------------------------------
+    @GetMapping("/admins/viewSchedule")
+    public String viewSchedule(Model model) {
+        model.addAttribute("schedules", scheduleRepo.findAll());
+        return "admins/viewSchedulePage";
+    }
+   
 
 }
