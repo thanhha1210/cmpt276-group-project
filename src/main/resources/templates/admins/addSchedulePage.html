@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add doctor</title>
+    <title>Add Schedule</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
@@ -92,6 +92,11 @@
         50%{transform: translateX(8px)}
         100%{transform: translateX(-8px)}
         }
+
+        .success {
+            font-size: 1.2em;
+            color: lightgreen;
+        }
     </style>
 </head>
 <body>
@@ -99,46 +104,45 @@
         
         <div>
             <div style="display: flex; justify-content: center; align-items: center;">
-                <h1 style="font-weight: 700; font-size: 2.4em; display: block; margin: 36px;">Add doctor</h1>
-                <form action="/admins/exitDoctorAdd" method="get">
-                    <input type="submit" value="HOME" class="btn exit-btn">
+                <h1 style="font-weight: 700; font-size: 2.4em; display: block; margin: 36px;">Add Schedule</h1>
+                <form action="/admins/exitScheduleAdd" method="get">
+                    <input type="submit" value="RETURN" class="btn exit-btn">
                 </form>
             </div>
 
-            <form action="/admins/addDoctor" method="post">
+            <form action="/admins/addSchedule" method="post">
+
                 <div>
-                    <label for="name">Name </label>
-                    <input type="text" id="name" name="name" placeholder="Name">
-                </div>
-                <div>
-                    <label for="age">Age </label>
-                    <input type="number" id="age" name="age" placeholder="18">
+                    <label for="doctorUsername">Username </label>
+                    <input type="text" id="doctorUsername" name="doctorUsername" placeholder="Username">
                 </div>
                 
                 <div>
-                    <label for="address">Address </label>
-                    <input type="text" id="address" name="address" placeholder="Address">
+                    <label for="date">Date </label>
+                    <input type="date" id="date" name="date">
                 </div>
+
                 <div>
-                    <label for="phone">Phone Number </label>
-                    <input type="text" id="phone" name="phone" placeholder="888-888-8888">
+                    <label for="time">Start Time </label>
+                    <input type="time" id="startTime" name="startTime">
                 </div>
+               
                 <div>
-                    <label for="username">Username </label>
-                    <input type="text" id="username" name ="username" placeholder="8888-8888">
+                    <label for="duration">Duration </label>
+                    <input type="number" id="duration" name ="duration" placeholder="10">
                 </div>
-                <div>
-                    <label for="password">Password </label>
-                    <input type="text" id="password" name="password" placeholder="Password">
-                </div>
+
                 <div style="display: flex; justify-content: center; align-items: center; margin-top: 20px;">
-                    <button type="submit" class="btn add-btn" value="Sign up">Create Account</button>
+                    <button type="submit" class="btn add-btn" value="Sign up">Create Schedule</button>
                 </div>
+
             </form>
             <div style="display: flex; justify-content: center; align-items: center; margin-top: 20px;">
                 <span th:if="${error0}" class="error" th:text="${error0}"></span>
                 <span th:if="${error1}" class="error" th:text="${error1}"></span>
                 <span th:if="${error2}" class="error" th:text="${error2}"></span>
+                <span th:if="${error3}" class="error" th:text="${error3}"></span>
+                <span th:if="${success}" class="success" th:text="${success}"></span>
             </div>
         </div>
         

@@ -20,9 +20,11 @@ import cmpt276.group.demo.models.appointment.AppointmentRepository;
 import cmpt276.group.demo.models.doctor.Doctor;
 import cmpt276.group.demo.models.doctor.DoctorRepository;
 import cmpt276.group.demo.models.record.RecordRepository;
+import cmpt276.group.demo.models.schedule.Schedule;
 import cmpt276.group.demo.models.schedule.ScheduleRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
 
 
 @Controller
@@ -96,6 +98,7 @@ public class AdminController {
         doctorRepo.save(newDoctor);
         response.setStatus(201);
         model.addAttribute("Doctor", newDoctor);
+        model.addAttribute("success", "Add Successfully");
         return "admins/addDoctorPage";
     }
 
@@ -154,6 +157,87 @@ public class AdminController {
         model.addAttribute("schedules", scheduleRepo.findAll());
         return "admins/viewSchedulePage";
     }
-   
 
+    // add button in addSchedulePage
+    @GetMapping("/admins/addSchedule")
+    public String addSchedulePage(Model model) {
+        model.addAttribute("schedules", scheduleRepo.findAll());
+        return "admins/addSchedulePage";
+    }
+    
+    // return button in addSchedulePage
+    @GetMapping("/admins/exitScheduleAdd")
+    public String exitAddSchedulePage(Model model) {
+        model.addAttribute("schedules", scheduleRepo.findAll());
+        return "admins/viewSchedulePage";
+    }
+    
+    @PostMapping("/admins/addSchedule")
+    public String postMethodName(@RequestParam Map<String, String> scheduleInfo, HttpServletResponse response, Model model) {
+        String doctorUsername = scheduleInfo.get("doctorUsername");
+
+        // Check if any field is empty
+        if (doctorUsername == null || doctorUsername.trim().isEmpty() || scheduleInfo.get("duration") == null || scheduleInfo.get("duration").trim().isEmpty()) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                model.addAttribute("error0", "Please enter all the form!");
+                return "admins/addSchedulePage";
+        }
+
+        // Check if duration is non-negative int
+        int duration = Integer.parseInt(scheduleInfo.get("duration"));
+        if (duration <= 0) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            model.addAttribute("error1", "Please enter a valid duration!");
+            return "admins/addSchedulePage";
+        }
+
+        // Check if doctor w/ matching doctorUsername exists
+        // Add schedule is based on doctorUsername
+        Doctor doc = doctorRepo.findByUsername(doctorUsername);
+        if (doc == null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            model.addAttribute("error2", "Username does not exist. Please enter a valid username!");
+            return "admins/addSchedulePage";
+        } 
+
+        
+
+        Date date = Date.valueOf(scheduleInfo.get("date"));
+        // change to match time format hh:mm:ss
+        Time startTime = Time.valueOf(scheduleInfo.get("startTime") + ":00");
+        
+
+        // Check if admin adds the same schedule as existing schedule
+        if (scheduleRepo.findByDoctorUsernameAndDateAndStartTime(doctorUsername, date, startTime) != null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            model.addAttribute("error3", "This schedule already exists. Please enter another schedule!");
+            return "admins/addSchedulePage";
+        }
+
+        // Get doctorName based on doctorUsername
+        Schedule newSchedule = new Schedule(doc.getName(), doctorUsername, date, startTime, duration);
+        scheduleRepo.save(newSchedule);
+        response.setStatus(201);
+        model.addAttribute("Schedule", newSchedule);
+        model.addAttribute("success", "Add Schedule Successfully");
+        return "admins/addSchedulePage";
+    }
+
+    // delete button in viewSchedulePage
+    @PostMapping("/admins/deleteSchedule")
+    public String deleteSchedule(@RequestParam Map<String, String> scheduleInfo, Model model) {
+        String doctorName = scheduleInfo.get("doctorName");
+        Date date = Date.valueOf(scheduleInfo.get("date"));
+        Time startTime = Time.valueOf(scheduleInfo.get("startTime"));
+        Schedule deleteSchedule = scheduleRepo.findByDoctorNameAndDateAndStartTime(doctorName, date, startTime);
+        List<Schedule> schedules;
+        if (deleteSchedule != null) {
+            scheduleRepo.delete(deleteSchedule);
+            schedules = scheduleRepo.findAll();
+            Collections.sort(schedules);
+            model.addAttribute("schedules", schedules);
+        }
+        return "admins/viewSchedulePage";
+    }
 }
+

@@ -69,6 +69,9 @@ public class PatientController {
         if (apt != null) {
             model.addAttribute("appointment", apt);
         } 
+
+        System.out.println(patient.getUsername());
+
         model.addAttribute("patient", patient);
         model.addAttribute("schedules", schedules);
         return "patients/schedulePage";
@@ -149,7 +152,7 @@ public class PatientController {
 
     @GetMapping("/patients/viewFeedback")
     public String getFeedback(Model model, HttpSession session) {
-        Patient patient = (Patient) session.getAttribute("session_patient");
+       Patient patient = (Patient) session.getAttribute("session_patient");
         if (patient == null) {
             return "loginPage";
         }
