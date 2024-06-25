@@ -94,8 +94,9 @@
         }
 
         .success {
+            animation: shake 0.4s;
             font-size: 1.2em;
-            color: lightgreen;
+            color: green;
         }
     </style>
 </head>
@@ -142,6 +143,7 @@
                 <span th:if="${error1}" class="error" th:text="${error1}"></span>
                 <span th:if="${error2}" class="error" th:text="${error2}"></span>
                 <span th:if="${error3}" class="error" th:text="${error3}"></span>
+                <span th:if="${error4}" class="error" th:text="${error4}"></span>
                 <span th:if="${success}" class="success" th:text="${success}"></span>
             </div>
         </div>

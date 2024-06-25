@@ -108,6 +108,7 @@
             <thead>
                 <th>#</th>
                 <th>Doctor Name</th>
+                <th>Department</th>
                 <th>Date</th>
                 <th>Starting Time</th>
                 <th>Duration</th>
@@ -124,6 +125,9 @@
                     </td>
 
                     <td>
+                        <span th:text="${sche.department}"></span>
+                    </td>
+                    <td>
                         <span th:text="${sche.date}"></span>
                     </td>
 
@@ -137,7 +141,7 @@
 
                     <td>
                         <form action="/admins/deleteSchedule" method="post">
-                            <input type="hidden" name="doctorName" th:value="${sche.doctorName}">
+                            <input type="hidden" name="doctorUsername" th:value="${sche.doctorUsername}">
                             <input type="hidden" name="date" th:value="${sche.date}">
                             <input type="hidden" name="startTime" th:value="${sche.startTime}">
                             <button type="submit" class="btn">DELETE</button>

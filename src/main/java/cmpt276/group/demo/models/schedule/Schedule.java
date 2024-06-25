@@ -3,7 +3,7 @@ package cmpt276.group.demo.models.schedule;
 import java.sql.Date;
 import java.sql.Time;
 
-import cmpt276.group.demo.models.appointment.Appointment;
+import cmpt276.group.demo.models.Department;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -32,15 +32,18 @@ public class Schedule implements Comparable<Schedule>{
     
     private int duration;
 
+    private Department department;
+
     public Schedule() { }
 
     
-    public Schedule(String doctorName, String doctorUsername, Date date, Time startTime, int duration) {
+    public Schedule(String doctorName, String doctorUsername, Date date, Time startTime, int duration, Department department) {
         this.doctorName = doctorName;
         this.doctorUsername = doctorUsername;
         this.date = date;
         this.startTime = startTime;
         this.duration = duration;
+        this.department = department;
     }
 
     @Override
@@ -91,5 +94,13 @@ public class Schedule implements Comparable<Schedule>{
 
     public void setDuration(int duration) {
         this.duration = duration;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
     }
 }

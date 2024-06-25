@@ -86,6 +86,10 @@
             font-size: 1.2em;
             color: #9c2020;
         }
+        .success {
+            font-size: 1.2em;
+            color: lightgreen;
+        }
          /* SHAKE ANIMATION*/
         @keyframes shake {
         25%{transform: translateX(-8px)}
@@ -93,10 +97,16 @@
         100%{transform: translateX(-8px)}
         }
 
-        .success {
-            font-size: 1.2em;
-            color: lightgreen;
+        #department {
+            margin: 12px;
+            padding: 10px 20px;
+            font-family: "Poppins";
+            background-color: #eef0f3;
+            border: none;
+            border-radius: 6px;
+            padding: 12px;
         }
+       
     </style>
 </head>
 <body>
@@ -128,6 +138,18 @@
                     <label for="phone">Phone Number</label>
                     <input type="text" id="phone" name="phone" placeholder="888-888-8888">
                 </div>
+                <div>
+                    <label for="department">Department</label>
+                    <select id="department" name="department">
+                        <option value="General">General</option>
+                        <option value="Cardiology">Cardiology</option>
+                        <option value="Dermatology">Dermatology</option>
+                        <option value="Pediatrics">Pediatrics</option>
+                        <option value="Orthopedics">Orthopedics</option>
+                        <option value="Ophthalmology">Ophthalmology</option>
+                    </select>
+                </div>
+                
                 <div>
                     <label for="username">Username</label>
                     <input type="text" id="username" name ="username" placeholder="example">
