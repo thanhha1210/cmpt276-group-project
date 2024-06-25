@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>view Doctor Page</title>
+    <title>View Schedule</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
@@ -113,25 +113,38 @@
                 <th>Duration</th>
                 <th></th>
             </thead>
-            <!-- <tbody>
-                <tr th:each="doc, cnt:${doctors}">
+            <tbody>
+                <tr th:each="sche, cnt:${schedules}">
                     <td>
                         <span th:text="${cnt.count}"></span>
                     </td>
+
                     <td>
-                        <span th:text="${doc.name}"></span>
+                        <span th:text="${sche.doctorName}"></span>
                     </td>
+
                     <td>
-                        <span th:text="${doc.username}"></span>
+                        <span th:text="${sche.date}"></span>
                     </td>
+
                     <td>
-                        <form action="/admins/deleteDoctor" method="post">
-                            <input type="hidden" name="username" th:value="${doc.username}">
+                        <span th:text="${sche.startTime}"></span>
+                    </td>
+
+                    <td>
+                        <span th:text="${sche.duration}"></span>
+                    </td>
+
+                    <td>
+                        <form action="/admins/deleteSchedule" method="post">
+                            <input type="hidden" name="doctorName" th:value="${sche.doctorName}">
+                            <input type="hidden" name="date" th:value="${sche.date}">
+                            <input type="hidden" name="startTime" th:value="${sche.startTime}">
                             <button type="submit" class="btn">DELETE</button>
                         </form>
                     </td>
                 </tr>
-            </tbody> -->
+            </tbody>
         </table>
     </main>
    

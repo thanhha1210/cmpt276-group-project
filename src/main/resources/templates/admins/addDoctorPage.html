@@ -92,6 +92,11 @@
         50%{transform: translateX(8px)}
         100%{transform: translateX(-8px)}
         }
+
+        .success {
+            font-size: 1.2em;
+            color: lightgreen;
+        }
     </style>
 </head>
 <body>
@@ -101,34 +106,34 @@
             <div style="display: flex; justify-content: center; align-items: center;">
                 <h1 style="font-weight: 700; font-size: 2.4em; display: block; margin: 36px;">Add doctor</h1>
                 <form action="/admins/exitDoctorAdd" method="get">
-                    <input type="submit" value="HOME" class="btn exit-btn">
+                    <input type="submit" value="RETURN" class="btn exit-btn">
                 </form>
             </div>
 
             <form action="/admins/addDoctor" method="post">
                 <div>
-                    <label for="name">Name </label>
+                    <label for="name">Name</label>
                     <input type="text" id="name" name="name" placeholder="Name">
                 </div>
                 <div>
-                    <label for="age">Age </label>
+                    <label for="age">Age</label>
                     <input type="number" id="age" name="age" placeholder="18">
                 </div>
                 
                 <div>
-                    <label for="address">Address </label>
+                    <label for="address">Address</label>
                     <input type="text" id="address" name="address" placeholder="Address">
                 </div>
                 <div>
-                    <label for="phone">Phone Number </label>
+                    <label for="phone">Phone Number</label>
                     <input type="text" id="phone" name="phone" placeholder="888-888-8888">
                 </div>
                 <div>
-                    <label for="username">Username </label>
-                    <input type="text" id="username" name ="username" placeholder="8888-8888">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name ="username" placeholder="example">
                 </div>
                 <div>
-                    <label for="password">Password </label>
+                    <label for="password">Password</label>
                     <input type="text" id="password" name="password" placeholder="Password">
                 </div>
                 <div style="display: flex; justify-content: center; align-items: center; margin-top: 20px;">
@@ -139,6 +144,7 @@
                 <span th:if="${error0}" class="error" th:text="${error0}"></span>
                 <span th:if="${error1}" class="error" th:text="${error1}"></span>
                 <span th:if="${error2}" class="error" th:text="${error2}"></span>
+                <span th:if="${success}" class="success" th:text="${success}"></span>
             </div>
         </div>
         
