@@ -110,6 +110,7 @@
                 <th>#</th>
                 <th>Name</th>
                 <th>Username</th>
+                <th>Department</th>
                 <th></th>
             </thead>
             <tbody>
@@ -122,6 +123,9 @@
                     </td>
                     <td>
                         <span th:text="${doc.username}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${doc.department}"></span>
                     </td>
                     <td>
                         <form action="/admins/deleteDoctor" method="post">

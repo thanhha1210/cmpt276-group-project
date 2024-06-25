@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import cmpt276.group.demo.models.patient.Patient;
 import cmpt276.group.demo.models.patient.PatientRepository;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class SignupController {
@@ -19,7 +20,7 @@ public class SignupController {
     private PatientRepository patientRepo;
     
     @PostMapping("/patients/signup")
-    public String registerPatient(@RequestParam Map<String, String> formData, HttpServletResponse response, Model model) {
+    public String registerPatient(@RequestParam Map<String, String> formData, HttpServletResponse response, Model model, HttpSession session) {
         if (formData.get("age").equals("")) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             model.addAttribute("error0", "Please enter all the form!");
@@ -51,7 +52,9 @@ public class SignupController {
         Patient newPatient = new Patient(username, password, name, age, address, phone);
         patientRepo.save(newPatient);
         response.setStatus(201);
-        model.addAttribute("patient", newPatient);
+        session.setAttribute("session_patient", newPatient);       // ensure the patient object stored during login
+        Patient patient = (Patient) session.getAttribute("session_patient");
+        model.addAttribute("patient", patient);
         return "patients/mainPage";
     }
 }

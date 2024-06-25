@@ -2,6 +2,9 @@ package cmpt276.group.demo.models.appointment;
 
 
 import java.sql.Time;
+
+import cmpt276.group.demo.models.Department;
+
 import java.sql.Date;
 
 import jakarta.persistence.Column;
@@ -34,16 +37,19 @@ public class Appointment implements Comparable<Appointment>{
     
     private int duration;
 
+    private Department department;
+
     public Appointment() { }
     
 
-    public Appointment(String doctorName, String doctorUsername, String patientName, Date date, Time startTime, int duration) {
+    public Appointment(String doctorName, String doctorUsername, String patientName, Date date, Time startTime, int duration, Department department) {
         this.doctorName = doctorName;
         this.doctorUsername = doctorUsername;
         this.patientName = patientName;
         this.date = date;
         this.startTime = startTime;
         this.duration = duration;
+        this.department = department;
     }
 
     @Override
@@ -104,5 +110,13 @@ public class Appointment implements Comparable<Appointment>{
 
     public void setDuration(int duration) {
         this.duration = duration;
+    }
+
+     public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
     }
 }

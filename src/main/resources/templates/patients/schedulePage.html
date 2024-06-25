@@ -124,6 +124,9 @@
                         <span th:text="${s.doctorName}"></span>
                     </td>
                     <td>
+                        <span th:text="${s.department}"></span>
+                    </td>
+                    <td>
                         <span th:text="${s.date}"></span>
                     </td>
                     <td>
@@ -135,10 +138,8 @@
                     <td>
                         <form action="/patients/bookAppointment" method="post">
                             <input type="hidden" name="doctorUsername" th:value="${s.doctorUsername}">
-                            <input type="hidden" name="doctorName" th:value="${s.doctorName}">
                             <input type="hidden" name="date" th:value="${s.date}">
                             <input type="hidden" name="startTime" th:value="${s.startTime}">
-                            <input type="hidden" name="duration" th:value="${s.duration}">
                             <input type="submit" class="btn" value="BOOK">
                         </form>
                     </td>
@@ -163,6 +164,9 @@
                             <span th:text="${appointment.doctorName}"></span>
                         </td>
                         <td>
+                            <span th:text="${appointment.department}"></span>
+                        </td>
+                        <td>
                             <span th:text="${appointment.date}"></span>
                         </td>
                         <td>
@@ -174,10 +178,8 @@
                         <td>    
                             <form action="/patients/deleteAppointment" method="post">
                                 <input type="hidden" name="doctorUsername" th:value="${appointment.doctorUsername}">
-                                <input type="hidden" name="doctorName" th:value="${appointment.doctorName}">
                                 <input type="hidden" name="date" th:value="${appointment.date}">
                                 <input type="hidden" name="startTime" th:value="${appointment.startTime}">
-                                <input type="hidden" name="duration" th:value="${appointment.duration}">
                                 <input type="submit" class="btn" value="DELETE" style="color:red">
                             </form>
                         </td>

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import cmpt276.group.demo.models.Department;
 import cmpt276.group.demo.models.admin.AdminRepository;
 import cmpt276.group.demo.models.appointment.Appointment;
 import cmpt276.group.demo.models.appointment.AppointmentRepository;
@@ -83,27 +84,25 @@ public class PatientController {
         if (patient == null) {
             return "loginPage";
         }
-
-        String doctorName = sche.get("doctorName");
+        
         String doctorUsername = sche.get("doctorUsername");
         Date date = Date.valueOf(sche.get("date"));
         Time startTime = Time.valueOf(sche.get("startTime"));
-        int duration = Integer.parseInt(sche.get("duration"));
+        Schedule schedule = scheduleRepo.findByDoctorUsernameAndDateAndStartTime(doctorUsername, date, startTime);
         
         // if patient already has an appointment => change it to schedule 
         Appointment oldApt = appointmentRepo.findByPatientName(patient.getName());
         if (oldApt != null) {
-            Schedule newSche = new Schedule(oldApt.getDoctorName(), oldApt.getDoctorUsername(), oldApt.getDate(), oldApt.getStartTime(), oldApt.getDuration());
+            Schedule newSche = new Schedule(oldApt.getDoctorName(), oldApt.getDoctorUsername(), oldApt.getDate(), oldApt.getStartTime(), oldApt.getDuration(), oldApt.getDepartment());
             scheduleRepo.save(newSche);
             appointmentRepo.delete(oldApt);
         }
 
-        Appointment apt = new Appointment(doctorName, doctorUsername, patient.getName(), date, startTime, duration);
+        Appointment apt = new Appointment(schedule.getDoctorName(), doctorUsername, patient.getName(), date, startTime, schedule.getDuration(), schedule.getDepartment());
         appointmentRepo.save(apt);
-        Schedule schedule = scheduleRepo.findByDoctorNameAndDateAndStartTime(doctorName, date, startTime);
-        if (schedule != null) {
-            scheduleRepo.delete(schedule);
-        }
+       
+        scheduleRepo.delete(schedule);
+        
 
         List<Schedule> schedules = scheduleRepo.findAll();
         Collections.sort(schedules);
@@ -119,16 +118,14 @@ public class PatientController {
         if (patient == null) {
             return "loginPage";
         }
-
-        String doctorName = apt.get("doctorName");
+       
         String doctorUsername = apt.get("doctorUsername");
         Date date = Date.valueOf(apt.get("date"));
         Time startTime = Time.valueOf(apt.get("startTime"));
-        int duration = Integer.parseInt(apt.get("duration"));
-        
-        Schedule newSche = new Schedule(doctorName, doctorUsername, date, startTime, duration);
+        Appointment oldApt = appointmentRepo.findByDoctorUsernameAndDateAndStartTime(doctorUsername, date, startTime);
+
+        Schedule newSche = new Schedule(oldApt.getDoctorName(), doctorUsername, date, startTime, oldApt.getDuration(), oldApt.getDepartment());
         scheduleRepo.save(newSche);
-        Appointment oldApt = appointmentRepo.findByPatientName(patient.getName());
         appointmentRepo.delete(oldApt);
         List<Schedule> schedules = scheduleRepo.findAll();
         Collections.sort(schedules);

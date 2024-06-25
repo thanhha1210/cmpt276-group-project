@@ -2,6 +2,7 @@ package cmpt276.group.demo.controllers;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import cmpt276.group.demo.models.Department;
 import cmpt276.group.demo.models.admin.Admin;
 import cmpt276.group.demo.models.admin.AdminRepository;
 import cmpt276.group.demo.models.appointment.Appointment;
@@ -77,8 +79,9 @@ public class AdminController {
         int age = Integer.parseInt(formData.get("age"));
         String address = formData.get("address");
         String phone = formData.get("phone");
-
-        if (username.trim().equals("") || password.trim().equals("") || name.trim().equals("") || address.trim().equals("") || phone.trim().equals("") ) {
+        String departmentStr = formData.get("department");
+    
+        if (username.trim().equals("") || password.trim().equals("") || name.trim().equals("") || address.trim().equals("") || phone.trim().equals("") || departmentStr.trim().equals("")) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             model.addAttribute("error0", "Please enter all the form!");
             return "admins/addDoctorPage";
@@ -94,7 +97,8 @@ public class AdminController {
             return "admins/addDoctorPage";
         }
 
-        Doctor newDoctor = new Doctor(username, password, name, age, address, phone);
+        Department department = Department.valueOf(departmentStr);
+        Doctor newDoctor = new Doctor(username, password, name, age, address, phone, department);
         doctorRepo.save(newDoctor);
         response.setStatus(201);
         model.addAttribute("Doctor", newDoctor);
@@ -105,6 +109,7 @@ public class AdminController {
 
 
     //------------------------------------------------------ Deletes a doctor------------------------------------------------------
+    // admin delete doctor => all schedule & appointment with that doctor will be delete
     @PostMapping("/admins/deleteDoctor")
     public String deleteDoctor(@RequestParam String username, Model model) {
         Doctor temp = doctorRepo.findByUsername(username);
@@ -124,7 +129,7 @@ public class AdminController {
     
 
     //------------------------------------------------------ View & delete appointment----------------------------------------------------
-    // view appointment
+    // admin view appointment
     @GetMapping("/admins/viewAppointment")
     public String viewAppointment(Model model) {
         List<Appointment> appointments = appointmentRepo.findAll();
@@ -133,19 +138,22 @@ public class AdminController {
         return "admins/viewAppointmentPage";
     }
     
-   @PostMapping("/admins/deleteAppointment")
+    // admin delete appointment (+)
+   @PostMapping("/admins/deleteAppointment") 
     public String deleteAppointment(@RequestParam Map<String, String> apt, Model model, HttpServletResponse response) {
-        String doctorName = apt.get("doctorName");
+        String doctorUsername = apt.get("doctorUsername");
         Date date = Date.valueOf(apt.get("date"));
         Time startTime = Time.valueOf(apt.get("startTime"));
-        Appointment deleteApt = appointmentRepo.findByDoctorNameAndDateAndStartTime(doctorName, date, startTime);
-        List<Appointment> appointments;
-        if (deleteApt != null) {
-            appointmentRepo.delete(deleteApt);
-            appointments = appointmentRepo.findAll();
-            Collections.sort(appointments);
-            model.addAttribute("appointments", appointments);
-        } 
+        Appointment deleteApt = appointmentRepo.findByDoctorUsernameAndDateAndStartTime(doctorUsername, date, startTime);
+        
+        Schedule newSche = new Schedule(deleteApt.getDoctorName(), deleteApt.getDoctorUsername(), deleteApt.getDate(), deleteApt.getStartTime(), deleteApt.getDuration(), deleteApt.getDepartment());
+        scheduleRepo.save(newSche);
+        
+        appointmentRepo.delete(deleteApt);
+        List<Appointment> appointments = appointmentRepo.findAll();
+        Collections.sort(appointments);
+        model.addAttribute("appointments", appointments);
+        
         return "admins/viewAppointmentPage";
    }
 
@@ -172,6 +180,7 @@ public class AdminController {
         return "admins/viewSchedulePage";
     }
     
+    // doctor add schedule (+)
     @PostMapping("/admins/addSchedule")
     public String postMethodName(@RequestParam Map<String, String> scheduleInfo, HttpServletResponse response, Model model) {
         String doctorUsername = scheduleInfo.get("doctorUsername");
@@ -201,11 +210,10 @@ public class AdminController {
         } 
 
         
-
         Date date = Date.valueOf(scheduleInfo.get("date"));
         // change to match time format hh:mm:ss
         Time startTime = Time.valueOf(scheduleInfo.get("startTime") + ":00");
-        
+        Department department = doc.getDepartment();        
 
         // Check if admin adds the same schedule as existing schedule
         if (scheduleRepo.findByDoctorUsernameAndDateAndStartTime(doctorUsername, date, startTime) != null) {
@@ -214,8 +222,25 @@ public class AdminController {
             return "admins/addSchedulePage";
         }
 
+        // Check conflict time
+        List<Schedule> sches = scheduleRepo.findByDoctorUsernameAndDate(doctorUsername, date);
+        for (int i = 0; i < sches.size(); i++) {
+            Schedule o = sches.get(i);
+            LocalTime st = o.getStartTime().toLocalTime();
+            LocalTime en = st.plusMinutes(o.getDuration()); 
+            LocalTime newStartTime = startTime.toLocalTime();
+            LocalTime newEndTime = newStartTime.plusMinutes(duration);
+
+            if ((st.isAfter(newStartTime) && st.isBefore(newEndTime)) || (newStartTime.isAfter(st) && newStartTime.isBefore(en))) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                model.addAttribute("error4", "The new schedule conflicts with an existing schedule. Please enter another schedule!");
+                return "admins/addSchedulePage";
+            }
+        }
+
+
         // Get doctorName based on doctorUsername
-        Schedule newSchedule = new Schedule(doc.getName(), doctorUsername, date, startTime, duration);
+        Schedule newSchedule = new Schedule(doc.getName(), doctorUsername, date, startTime, duration, department);
         scheduleRepo.save(newSchedule);
         response.setStatus(201);
         model.addAttribute("Schedule", newSchedule);
@@ -223,13 +248,13 @@ public class AdminController {
         return "admins/addSchedulePage";
     }
 
-    // delete button in viewSchedulePage
+    // delete button in viewSchedulePage (+)
     @PostMapping("/admins/deleteSchedule")
     public String deleteSchedule(@RequestParam Map<String, String> scheduleInfo, Model model) {
-        String doctorName = scheduleInfo.get("doctorName");
+        String doctorUsername = scheduleInfo.get("doctorUsername");
         Date date = Date.valueOf(scheduleInfo.get("date"));
         Time startTime = Time.valueOf(scheduleInfo.get("startTime"));
-        Schedule deleteSchedule = scheduleRepo.findByDoctorNameAndDateAndStartTime(doctorName, date, startTime);
+        Schedule deleteSchedule = scheduleRepo.findByDoctorUsernameAndDateAndStartTime(doctorUsername, date, startTime);
         List<Schedule> schedules;
         if (deleteSchedule != null) {
             scheduleRepo.delete(deleteSchedule);
