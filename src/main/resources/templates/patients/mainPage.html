@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>adminPage</title>
+    <title>Admin Page</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-         /*--------------------------------Reset css-------------------------------------------------*/
+        /* Reset CSS */
         html, body, div, span, h1, h2, h3, a, form, label, tr, th, td, header {
             margin: 0;
             padding: 0;
@@ -24,61 +24,93 @@
         body, input {
             font-family: "Poppins", sans-serif;
             line-height: 1.5em;
-            --secondary-color: #0F1B4C;
-        }
-        .content {
-            width: 1100px;
-            max-width: calc(100% - 48px);     
-            margin-left: auto;
-            margin-right: auto;
         }
 
+        /* Container */
+        .content {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            background: #ffffff;
+        }
+
+        /* Button Styles */
         .btn {
-            display: inline-block;
-            padding: 18px 16px;
-            border:none;
+            padding: 12px;
+            border: none;
             font-size: 1.2rem;
             font-weight: 500;
             line-height: 21px;
             text-align: center;
-            color: var(--secondary-color);
+            color: #0F1B4C;
             background-color: transparent;
+            cursor: pointer;
+            transition: opacity 0.3s, text-decoration 0.3s;
         }
+
         .btn:hover {
             opacity: 0.9;
             text-decoration: underline;
         }
-        .signin-btn:hover {
-            text-decoration: none;
-        }
-        .logout-btn:hover {
-            text-decoration: none;
-        }
 
         .logout-btn {
-            padding: 12px; 
-            border-radius: 8px; 
-            background-color:var(--secondary-color); 
-            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            background-color: #0F1B4C;
+            color: #ffffff;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
         }
- 
 
+        .logout-btn:hover {
+            background-color: #0D164A;
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+
+        /* Header Styles */
+        header {
+            padding-top: 26px;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background: #ffffff;
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+        }
+
+        .feature {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            margin-left: auto;
+            gap: 30px;
+        }
     </style>
 </head>
 <body>
-     <!-- Test session -->
-    <!-- <div class="heading">
-        <p th:text="${patient.name}"></p>
-    </div> -->
-    <header class="fix-header" style="padding-top: 26px; position: sticky; top: -26px; z-index: 1;">
+    <header>
         <div class="content">
-            <nav class="navbar" style="display: flex; align-items: center; padding: 12px;">
+            <nav class="navbar">
                 <div class="home">
-                    <form action="/patients/getDashboard" method="get" >
+                    <form action="/patients/getDashboard" method="get">
                         <button class="btn home-btn">Dashboard</button>
                     </form>
                 </div>
-                <div class="feature" style="display: flex; justify-content: center;">
+                <div class="feature">
                     <form action="/patients/viewSchedule" method="get">
                         <button class="btn schedule-btn">Book appointment</button>
                     </form>
@@ -87,28 +119,26 @@
                     </form>
                     <form action="/patients/viewFeedback" method="get">
                         <button class="btn schedule-btn">Feedback</button>
-                    </form> 
+                    </form>
                     <form action="/patients/viewForum" method="get">
                         <button class="btn schedule-btn">Forum</button>
-                    </form> 
+                    </form>
                 </div>
-                <div class="actions" style="display: flex; justify-content: center; margin-left: auto; gap: 30px;">
+                <div class="actions">
                     <form action="/users/logout" method="get">
-                        <button class="btn logout-btn" >Log out</button>
+                        <button class="btn logout-btn">Log out</button>
                     </form>
                 </div>
             </nav>
         </div>
     </header>
-
     <main class="content">
-       
         <div class="feature">
-
+            <!-- Feature content here -->
         </div>
     </main>
     <footer class="footer">
-
+        <!-- Footer content here -->
     </footer>
 </body>
 </html>
