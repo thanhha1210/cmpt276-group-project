@@ -160,25 +160,21 @@ public class AdminController {
 
 
     //------------------------------------------------------ View, add & delete schedule----------------------------------------------------
+    // go to schedule page
     @GetMapping("/admins/viewSchedule")
     public String viewSchedule(Model model) {
-        model.addAttribute("schedules", scheduleRepo.findAll());
+        List<Schedule> schedules = scheduleRepo.findAll();
+        Collections.sort(schedules);
+        model.addAttribute("schedules", schedules);
         return "admins/viewSchedulePage";
     }
 
     // add button in addSchedulePage
     @GetMapping("/admins/addSchedule")
     public String addSchedulePage(Model model) {
-        model.addAttribute("schedules", scheduleRepo.findAll());
         return "admins/addSchedulePage";
     }
     
-    // return button in addSchedulePage
-    @GetMapping("/admins/exitScheduleAdd")
-    public String exitAddSchedulePage(Model model) {
-        model.addAttribute("schedules", scheduleRepo.findAll());
-        return "admins/viewSchedulePage";
-    }
     
     // doctor add schedule (+)
     @PostMapping("/admins/addSchedule")
@@ -238,7 +234,6 @@ public class AdminController {
             }
         }
 
-
         // Get doctorName based on doctorUsername
         Schedule newSchedule = new Schedule(doc.getName(), doctorUsername, date, startTime, duration, department);
         scheduleRepo.save(newSchedule);
@@ -254,14 +249,13 @@ public class AdminController {
         String doctorUsername = scheduleInfo.get("doctorUsername");
         Date date = Date.valueOf(scheduleInfo.get("date"));
         Time startTime = Time.valueOf(scheduleInfo.get("startTime"));
+        
         Schedule deleteSchedule = scheduleRepo.findByDoctorUsernameAndDateAndStartTime(doctorUsername, date, startTime);
-        List<Schedule> schedules;
-        if (deleteSchedule != null) {
-            scheduleRepo.delete(deleteSchedule);
-            schedules = scheduleRepo.findAll();
-            Collections.sort(schedules);
-            model.addAttribute("schedules", schedules);
-        }
+        scheduleRepo.delete(deleteSchedule);
+        
+        List<Schedule> schedules = scheduleRepo.findAll();
+        Collections.sort(schedules);
+        model.addAttribute("schedules", schedules);
         return "admins/viewSchedulePage";
     }
 }
