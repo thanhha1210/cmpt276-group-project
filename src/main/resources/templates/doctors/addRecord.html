@@ -146,30 +146,28 @@
         </div>
        
         <form action="/doctors/addRecord" method="post">
-          <div>
-            <h3>Doctor Name:</h3>
-            <h4 th:text="${doctor.username}"></h4>
-  
-            <input type="hidden" name="doctorUsername" th:value="${doctor.username}">
-        </div>
-        <div>
-            <h3>Date</h3>
-            <h4 th:text="${date}"></h4>
+            <div>
+                <h3>Doctor Name:</h3>
+                <h4 th:text="${pastApt.doctorName}"></h4>
+            </div>
+            <div>
+                <h3>Patient Name</h3>
+                <h4 th:text="${pastApt.patientName}"></h4>
+            </div>  
+            <div>
+                <h3>Date</h3>
+                <h4 th:text="${pastApt.date}"></h4>
+            </div>
+            <div>
+                <label for="description">Description</label>
+                <input type="text" id="description" name="description" placeholder="example">
+            </div>
 
-            <input type="hidden" name="date" th:value="${date}">
-        </div>
-        <div>
-            <h3>Patient Name</h3>
-            <h4 th:text="${patient}"></h4>
-
-            <input type="hidden" name="patientName" th:value="${patient}">
-        </div>
-        
-        <div>
-            <label for="description">Description</label>
-            <input type="text" id="description" name="description" placeholder="example">
-        </div>
-            
+            <!-- Hold data field-->
+            <input type="hidden" name="doctorUsername" th:value="${pastApt.doctorUsername}">
+            <input type="hidden" name="patientUsername" th:value="${pastApt.patientUsername}">
+            <input type="hidden" name="patientName" th:value="${pastApt.patientName}">
+            <input type="hidden" name="date" th:value="${pastApt.date}">
             <button type="submit" class="btn add-btn">Create Record</button>
         </form>
         <div class="message-container" style="display: flex; justify-content: center; align-items: center; margin-top: 16px;">

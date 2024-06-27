@@ -2,6 +2,7 @@ package cmpt276.group.demo.models.record;
 
 import java.util.Date;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,68 +16,47 @@ public class Record {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int rid;
-    private String username;
-    private String patientname;
-    private String doctorUserame;
+
+    @Column(name = "patient_username")
+    private String patientUsername;
+
+    @Column(name = "patient_name")
+    private String patientName;
+
+    @Column(name = "doctor_username")
+    private String doctorUsername;
+    
     private String description;
     private Date date;
 
     public Record() {
     }
 
-    public Record(String username, String patientname, String doctorUserame, String description, Date date) {
-        this.username = username;
-        this.patientname = patientname;
-        this.doctorUserame = doctorUserame;
+    public Record(String patientUsername, String patientName, String doctorUsername, String description, Date date) {
+        this.patientUsername = patientUsername;
+        this.patientName = patientName;
+        this.doctorUsername = doctorUsername;
         this.description = description;
         this.date = date;
     }
 
-    public Record(String patientname, String doctorUserame, String description, Date date) {
-        this.patientname = patientname;
-        this.doctorUserame = doctorUserame;
-        this.description = description;
-        this.date = date;
+    public String getpatientUsername() {
+        return patientUsername;
     }
-
-    public String getUsername() {
-        return username;
+    public String getPatientName() {
+        return patientName;
     }
-
-    public void setUsername(String username) {
-        this.username = username;
+    public String getDoctorUsername() {
+        return doctorUsername;
     }
-
-    public String getPatientname() {
-        return patientname;
-    }
-
-    public void setPatientname(String patientname) {
-        this.patientname = patientname;
-    }
-
-    public String getdoctorUserame() {
-        return doctorUserame;
-    }
-
-    public void setdoctorUserame(String doctorUserame) {
-        this.doctorUserame = doctorUserame;
-    }
-
     public String getDescription() {
         return description;
     }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDescription(String desc) {
+        this.description = desc;
     }
-
     public Date getDate() {
         return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
     }
 
 }

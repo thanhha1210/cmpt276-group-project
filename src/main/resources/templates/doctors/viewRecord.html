@@ -145,11 +145,10 @@
                     </td>
                     <td>
                       <form action="/doctors/addRecord" method="get">
-                          <input type="hidden" name="patientName" th:value="${a.patientName}">
+                          <input type="hidden" name="patientUsername" th:value="${a.patientUsername}">
+                          <input type="hidden" name="doctorUsername" th:value="${a.doctorUsername}">
                           <input type="hidden" name="date" th:value="${a.date}">
-                          
                           <input type="submit" class="btn " value="Add Record">
-                          
                       </form>
                   </td>
                 </tr>
@@ -166,19 +165,19 @@
                 <th></th>
             </thead>
             <tbody>
-                <tr th:each="a, cnt : ${records}">
+                <tr th:each="r, cnt : ${records}">
                     <td>
                         <span th:text="${cnt.count}"></span>
                     </td>
                     <td>
-                        <span th:text="${a.doctorUsername}"></span>
+                        <span th:text="${r.doctorUsername}"></span>
                     </td>
-                    <!-- <td>
-                        <span th:text="${a.patientname}"></span>
-                    </td> -->
-                    <!-- <td>
-                        <span th:text="${a.date}"></span>
-                    </td> -->
+                    <td>
+                        <span th:text="${r.patientName}"></span>
+                    </td> 
+                    <td>
+                        <span th:text="${r.date}"></span>
+                    </td>
                    
                  
                     <td>
