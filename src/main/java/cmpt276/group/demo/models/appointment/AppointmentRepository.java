@@ -6,11 +6,9 @@ import java.sql.Time;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-
-
 public interface AppointmentRepository extends JpaRepository<Appointment, Integer> {
-    Appointment findByDoctorName(String doctorName);
-    Appointment findByPatientName(String patientName);
-    Appointment findByDoctorNameAndDateAndStartTime(String doctorUsername, Date date, Time startTime);
-    Appointment findByDoctorUsernameAndDateAndStartTime(String DoctorUsername, Date date, Time starTime);    
+    Appointment findByDoctorUsername(String doctorUsername);
+    Appointment findByPatientUsername(String patientUsername);
+    Appointment findByPatientUsernameAndDate(String patientUsername, Date date);
+    Appointment findByDoctorUsernameAndDateAndStartTime(String doctorUsername, Date date, Time starTime);    
 }

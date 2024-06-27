@@ -1,4 +1,4 @@
-package cmpt276.group.demo.models.appointment;
+package cmpt276.group.demo.models.past_appointment;
 
 
 import java.sql.Time;
@@ -15,8 +15,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "appointments")
-public class Appointment implements Comparable<Appointment>{
+@Table(name = "past_appointments")
+public class PastAppointment implements Comparable<PastAppointment>{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int pid;
@@ -42,10 +42,16 @@ public class Appointment implements Comparable<Appointment>{
 
     private Department department;
 
-    public Appointment() { }
+    @Column(name = "is_report")
+    private boolean isReport = false;
+    
+    @Column(name = "is_feedback")
+    private boolean isFeedback = false;
+
+    public PastAppointment() { }
     
 
-    public Appointment(String doctorName, String doctorUsername, String patientName, String patientUsername, Date date, Time startTime, int duration, Department department) {
+    public PastAppointment(String doctorName, String doctorUsername, String patientName, String patientUsername, Date date, Time startTime, int duration, Department department) {
         this.doctorName = doctorName;
         this.doctorUsername = doctorUsername;
         this.patientName = patientName;
@@ -57,7 +63,7 @@ public class Appointment implements Comparable<Appointment>{
     }
 
     @Override
-    public int compareTo(Appointment o) {
+    public int compareTo(PastAppointment o) {
         if (o.getDate() != this.date) {
             return this.date.compareTo(o.getDate());
         }
@@ -65,7 +71,6 @@ public class Appointment implements Comparable<Appointment>{
             return this.startTime.compareTo(o.getStartTime());
         }
     }
-
 
     public String getDoctorName() {
         return doctorName;
@@ -82,7 +87,6 @@ public class Appointment implements Comparable<Appointment>{
     public void setDoctorUsername(String doctorUsername) {
         this.doctorUsername = doctorUsername;
     }
-
 
     public String getPatientName() {
         return patientName;
@@ -127,5 +131,21 @@ public class Appointment implements Comparable<Appointment>{
 
     public void setDepartment(Department department) {
         this.department = department;
+    }
+
+    public boolean isReport() {
+        return isReport;
+    }
+
+    public void setIsReport(boolean isAddReport) {
+        this.isReport = isAddReport;
+    }
+
+    public boolean isFeedback() {
+        return isFeedback;
+    }
+
+    public void setIsFeedback(boolean isAddFeedback) {
+        this.isFeedback = isAddFeedback;
     }
 }

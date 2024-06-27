@@ -7,9 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 
 public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
-    Schedule findByDoctorName(String doctorName);
+    List<Schedule> findByDoctorUsername(String doctorUsername);
     List<Schedule> findByDoctorUsernameAndDate(String doctorUsername, Date date);
     Schedule findByDoctorUsernameAndDateAndStartTime(String doctorUsername, Date date, Time starTime);
-    Schedule findByDoctorNameAndDateAndStartTime(String doctorName, Date date, Time starTime);
 }
 
