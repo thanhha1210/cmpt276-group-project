@@ -145,17 +145,47 @@
                     </td>
                     <td>
                       <form action="/doctors/addRecord" method="get">
-                          <input type="hidden" name="patientName" th:value="${a.patientName}">
+                          <input type="hidden" name="patientUsername" th:value="${a.patientUsername}">
+                          <input type="hidden" name="doctorUsername" th:value="${a.doctorUsername}">
                           <input type="hidden" name="date" th:value="${a.date}">
-                          
                           <input type="submit" class="btn " value="Add Record">
-                          
                       </form>
                   </td>
                 </tr>
             </tbody>
         </table>
+        <table class="table-container">
+            <thead>
+                <th>#</th>
+                <th>Doctor Name</th>
+                <th>Patient Name</th>
+                <th>Date</th>
+                <th>Start time</th>
+                <th>Duration</th>
+                <th></th>
+            </thead>
+            <tbody>
+                <tr th:each="r, cnt : ${records}">
+                    <td>
+                        <span th:text="${cnt.count}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${r.doctorUsername}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${r.patientName}"></span>
+                    </td> 
+                    <td>
+                        <span th:text="${r.date}"></span>
+                    </td>
+                   
+                 
+                    <td>
 
+                  </td>
+                </tr>
+            </tbody>
+        </table>
     </main>
 
 </body>

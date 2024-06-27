@@ -138,7 +138,7 @@ public class PatientController {
     @GetMapping("/patients/viewRecord")
     public String getRecord(Model model, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");
-        List<Record> records = recordRepo.findByUsername(patient.getUsername());
+        List<Record> records = recordRepo.findByPatientUsername(patient.getUsername());
         model.addAttribute("patient", patient);
         model.addAttribute("records", records);
         return "patients/recordPage";

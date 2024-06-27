@@ -1,8 +1,6 @@
 package cmpt276.group.demo.controllers;
 
 import java.sql.Date;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -11,33 +9,31 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import cmpt276.group.demo.models.admin.Admin;
 import cmpt276.group.demo.models.admin.AdminRepository;
 import cmpt276.group.demo.models.appointment.Appointment;
 import cmpt276.group.demo.models.appointment.AppointmentRepository;
 import cmpt276.group.demo.models.doctor.Doctor;
 import cmpt276.group.demo.models.doctor.DoctorRepository;
-import cmpt276.group.demo.models.past_appointment.PastAppointment;
 import cmpt276.group.demo.models.past_appointment.PastAppointmentRepository;
 import cmpt276.group.demo.models.patient.PatientRepository;
-import cmpt276.group.demo.models.record.RecordRepository;
 import cmpt276.group.demo.models.record.Record;
+import cmpt276.group.demo.models.record.RecordRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 public class DoctorController {
   @Autowired
-  private DoctorRepository doctors;
+  private DoctorRepository doctorRepo;
 
   @Autowired
-  private PatientRepository patients;
+  private PatientRepository patientRepo;
 
   @Autowired
   private AppointmentRepository appointmentRepo;
+
   @Autowired
   private AdminRepository adminRepo;
 
@@ -47,22 +43,6 @@ public class DoctorController {
   @Autowired
   private PastAppointmentRepository pastAppointmentRepo;
 
-  @GetMapping("/doctors/viewRecord")
-  public String viewRecord(Model model, HttpSession session) {
-    Doctor doctor = (Doctor) session.getAttribute("session_doctor");
-    model.addAttribute("doctor", doctor);
-
-    model.addAttribute("records",
-        recordRepo.findByDoctorUserame(doctor.getUsername()));
-
-    // List<PastAppointment> pastAppointments = pastAppointmentRepo.findAll();
-    // Collections.sort(pastAppointments);
-
-    List<Appointment> appointments = appointmentRepo.findByDoctorUsername(doctor.getUsername());
-    // model.addAttribute("appointments", pastAppointments);
-    model.addAttribute("appointments", appointments);
-    return "/doctors/viewRecord";
-  }
 
   @GetMapping("/doctors/getDashboard")
   public String getDashboard(Model model, HttpSession session) {
@@ -71,29 +51,68 @@ public class DoctorController {
     return "doctors/mainPage";
   }
 
-  @GetMapping("/doctors/addRecord")
-  public String addRecord(Model model, HttpSession session, @RequestParam(name = "date") String date,
-      @RequestParam(name = "patientName") String patient) {
+  @GetMapping("/doctors/viewRecord")
+  public String viewRecord(Model model, HttpSession session) {
     Doctor doctor = (Doctor) session.getAttribute("session_doctor");
     model.addAttribute("doctor", doctor);
-    model.addAttribute("date", date);
-    model.addAttribute("patient", patient);
+
+    // List<PastAppointment> pastAppointments = pastAppointmentRepo.findAll();
+    // Collections.sort(pastAppointments);
+
+    List<Appointment> appointments = appointmentRepo.findByDoctorUsername(doctor.getUsername());
+    List<Record> records = recordRepo.findByDoctorUsername(doctor.getUsername());
+
+
+    // model.addAttribute("appointments", pastAppointments);\
+    model.addAttribute("doctor", doctor);
+    model.addAttribute("records", records);
+    model.addAttribute("appointments", appointments);
+    return "/doctors/viewRecord";
+  }
+
+ 
+
+  @GetMapping("/doctors/addRecord")
+  public String addRecord(@RequestParam Map<String, String> formData, Model model, HttpSession session) {
+    Doctor doctor = (Doctor) session.getAttribute("session_doctor");
+    model.addAttribute("doctor", doctor);
+
+    String patientUsername = formData.get("patientUsername");
+    String doctorUsername = formData.get("doctorUsername");
+    String dateStr = formData.get("date");
+    Date date = Date.valueOf(dateStr);
+    Appointment pastApt = appointmentRepo.findByPatientUsernameAndDoctorUsernameAndDate(patientUsername, doctorUsername, date);
+    
+    model.addAttribute("pastApt", pastApt);
     return "doctors/addRecord";
   }
 
   @PostMapping("/doctors/addRecord")
-  public String addRecord(@RequestParam Map<String, String> formData, HttpServletResponse response, Model model,
-      HttpSession session) {
-    model.addAttribute("doctor", session.getAttribute("session_doctor"));
+  public String addRecord(@RequestParam Map<String, String> formData, HttpServletResponse response, Model model, HttpSession session) {
+    Doctor doctor = (Doctor) session.getAttribute("session_doctor");
+    model.addAttribute("doctor", doctor);
     // TODO: process POST request
     String description = formData.get("description");
+    String patientUsername = formData.get("patientUsername");
+    String doctorUsername = formData.get("doctorUsername");
+    String patientName = formData.get("patientName");
+
     String dateStr = formData.get("date");
     Date date = Date.valueOf(dateStr);
-    String patient = formData.get("patientName");
-    String doctor = formData.get("doctorUsername");
-    Record newRecord = new Record(patient, doctor, description, date);
+
+    Record newRecord = new Record(patientUsername, patientName, doctorUsername, description, date);
     recordRepo.save(newRecord);
-    return "doctors/addRecord";
+
+
+    List<Appointment> appointments = appointmentRepo.findByDoctorUsername(doctor.getUsername());
+    List<Record> records = recordRepo.findByDoctorUsername(doctor.getUsername());
+
+    
+
+    model.addAttribute("records", records);
+    model.addAttribute("appointments", appointments);
+
+    return "doctors/viewRecord";
   }
 
 }
