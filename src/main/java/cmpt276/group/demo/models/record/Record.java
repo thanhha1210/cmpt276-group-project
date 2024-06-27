@@ -15,21 +15,21 @@ public class Record {
     private int rid;
     private String username;
     private String patientname;
-    private String doctorname;
+    private String doctorUserame;
     private String description;
     private Date date;
     
     public Record() {}
-    public Record(String username, String patientname, String doctorname, String description, Date date) {
+    public Record(String username, String patientname, String doctorUserame, String description, Date date) {
         this.username = username;
         this.patientname = patientname;
-        this.doctorname = doctorname;
+        this.doctorUserame = doctorUserame;
         this.description = description;
         this.date = date;
     }
-    public Record(String patientname, String doctorname, String description, Date date) {
+    public Record(String patientname, String doctorUserame, String description, Date date) {
         this.patientname = patientname;
-        this.doctorname = doctorname;
+        this.doctorUserame = doctorUserame;
         this.description = description;
         this.date = date;
     }
@@ -45,11 +45,11 @@ public class Record {
     public void setPatientname(String patientname) {
         this.patientname = patientname;
     }
-    public String getDoctorname() {
-        return doctorname;
+    public String getdoctorUserame() {
+        return doctorUserame;
     }
-    public void setDoctorname(String doctorname) {
-        this.doctorname = doctorname;
+    public void setdoctorUserame(String doctorUserame) {
+        this.doctorUserame = doctorUserame;
     }
     public String getDescription() {
         return description;

@@ -62,19 +62,18 @@ public class PatientController {
     @GetMapping("/patients/viewSchedule")
     public String getSchedule(Model model, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");
-        if (patient == null) {
-            return "loginPage";
-        }
-        List<Schedule> schedules = scheduleRepo.findAll();
-        Appointment apt = appointmentRepo.findByPatientName(patient.getName());
+        String patientUsername = patient.getUsername();
+        
+        
+        Appointment apt = appointmentRepo.findByPatientUsername(patientUsername);
         if (apt != null) {
             model.addAttribute("appointment", apt);
-        } 
+        }
 
-        System.out.println(patient.getUsername());
-
-        model.addAttribute("patient", patient);
+        List<Schedule> schedules = scheduleRepo.findAll();
+        Collections.sort(schedules);
         model.addAttribute("schedules", schedules);
+       
         return "patients/schedulePage";
     }
     // Patient books appointment
@@ -89,21 +88,20 @@ public class PatientController {
         Date date = Date.valueOf(sche.get("date"));
         Time startTime = Time.valueOf(sche.get("startTime"));
         Schedule schedule = scheduleRepo.findByDoctorUsernameAndDateAndStartTime(doctorUsername, date, startTime);
+        String patientUsername = patient.getUsername();
         
         // if patient already has an appointment => change it to schedule 
-        Appointment oldApt = appointmentRepo.findByPatientName(patient.getName());
+        Appointment oldApt = appointmentRepo.findByPatientUsername(patientUsername);
         if (oldApt != null) {
             Schedule newSche = new Schedule(oldApt.getDoctorName(), oldApt.getDoctorUsername(), oldApt.getDate(), oldApt.getStartTime(), oldApt.getDuration(), oldApt.getDepartment());
             scheduleRepo.save(newSche);
             appointmentRepo.delete(oldApt);
         }
 
-        Appointment apt = new Appointment(schedule.getDoctorName(), doctorUsername, patient.getName(), date, startTime, schedule.getDuration(), schedule.getDepartment());
+        Appointment apt = new Appointment(schedule.getDoctorName(), doctorUsername, patient.getName(), patientUsername, date, startTime, schedule.getDuration(), schedule.getDepartment());
         appointmentRepo.save(apt);
-       
-        scheduleRepo.delete(schedule);
-        
 
+        scheduleRepo.delete(schedule);
         List<Schedule> schedules = scheduleRepo.findAll();
         Collections.sort(schedules);
         model.addAttribute("patient", patient);
@@ -131,7 +129,6 @@ public class PatientController {
         Collections.sort(schedules);
 
         model.addAttribute("patient", patient);
-        // model.addAttribute("appointment", apt);
         model.addAttribute("schedules", schedules);
         return "patients/schedulePage";
     }
