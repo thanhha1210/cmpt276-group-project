@@ -1,6 +1,9 @@
 package cmpt276.group.demo.controllers;
 
 import java.sql.Date;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +19,7 @@ import cmpt276.group.demo.models.appointment.Appointment;
 import cmpt276.group.demo.models.appointment.AppointmentRepository;
 import cmpt276.group.demo.models.doctor.Doctor;
 import cmpt276.group.demo.models.doctor.DoctorRepository;
+import cmpt276.group.demo.models.past_appointment.PastAppointment;
 import cmpt276.group.demo.models.past_appointment.PastAppointmentRepository;
 import cmpt276.group.demo.models.patient.PatientRepository;
 import cmpt276.group.demo.models.record.Record;
@@ -43,7 +47,7 @@ public class DoctorController {
   @Autowired
   private PastAppointmentRepository pastAppointmentRepo;
 
-
+  //---------------------------------------Dashboard-------------------------------------------------
   @GetMapping("/doctors/getDashboard")
   public String getDashboard(Model model, HttpSession session) {
     Doctor doctor = (Doctor) session.getAttribute("session_doctor");
@@ -51,26 +55,39 @@ public class DoctorController {
     return "doctors/mainPage";
   }
 
+  //-------------------------------------Book appointment-------------------------------------------------
+
+
+
+
+
+
+  //-------------------------------------View record-------------------------------------------------
   @GetMapping("/doctors/viewRecord")
   public String viewRecord(Model model, HttpSession session) {
     Doctor doctor = (Doctor) session.getAttribute("session_doctor");
     model.addAttribute("doctor", doctor);
+    changeApt();
 
-    // List<PastAppointment> pastAppointments = pastAppointmentRepo.findAll();
-    // Collections.sort(pastAppointments);
+    // all appointments
+    List<PastAppointment> pastAppointmentAll = pastAppointmentRepo.findByDoctorUsername(doctor.getUsername());
+    // list that hasven't add record
+    List<PastAppointment> pastAppointments  = new ArrayList<>();
+    for (int i = 0; i < pastAppointmentAll.size(); i++) {
+      if (!pastAppointmentAll.get(i).isReport())
+        pastAppointments.add(pastAppointmentAll.get(i));
+    }
 
-    List<Appointment> appointments = appointmentRepo.findByDoctorUsername(doctor.getUsername());
+    Collections.sort(pastAppointments);
     List<Record> records = recordRepo.findByDoctorUsername(doctor.getUsername());
 
-
-    // model.addAttribute("appointments", pastAppointments);\
+    // model.addAttribute("appointments", pastAppointments);
     model.addAttribute("doctor", doctor);
     model.addAttribute("records", records);
-    model.addAttribute("appointments", appointments);
+    model.addAttribute("appointments", pastAppointments);
     return "/doctors/viewRecord";
   }
 
- 
 
   @GetMapping("/doctors/addRecord")
   public String addRecord(@RequestParam Map<String, String> formData, Model model, HttpSession session) {
@@ -81,7 +98,7 @@ public class DoctorController {
     String doctorUsername = formData.get("doctorUsername");
     String dateStr = formData.get("date");
     Date date = Date.valueOf(dateStr);
-    Appointment pastApt = appointmentRepo.findByPatientUsernameAndDoctorUsernameAndDate(patientUsername, doctorUsername, date);
+    PastAppointment pastApt = pastAppointmentRepo.findByPatientUsernameAndDoctorUsernameAndDate(patientUsername, doctorUsername, date);
     
     model.addAttribute("pastApt", pastApt);
     return "doctors/addRecord";
@@ -103,40 +120,53 @@ public class DoctorController {
     Record newRecord = new Record(patientUsername, patientName, doctorUsername, description, date);
     recordRepo.save(newRecord);
 
-
-    List<Appointment> appointments = appointmentRepo.findByDoctorUsername(doctor.getUsername());
+    PastAppointment pastApt = pastAppointmentRepo.findByPatientUsernameAndDoctorUsernameAndDate(patientUsername, doctorUsername, date);
+    pastApt.setIsReport(true);
     List<Record> records = recordRepo.findByDoctorUsername(doctor.getUsername());
 
+    // all the list
+    List<PastAppointment> pastAppointmentAll = pastAppointmentRepo.findByDoctorUsername(doctor.getUsername());
     
+    // list that hasven't add record
+    List<PastAppointment> pastAppointments  = new ArrayList<>();
+    for (int i = 0; i < pastAppointmentAll.size(); i++) {
+      if (!pastAppointmentAll.get(i).isReport())
+        pastAppointments.add(pastAppointmentAll.get(i));
+    }
 
     model.addAttribute("records", records);
-    model.addAttribute("appointments", appointments);
+    model.addAttribute("appointments", pastAppointments);
 
     return "doctors/viewRecord";
   }
 
+  // function to change appointment to past appointment
+  public void changeApt() {
+        // Get the current date
+        LocalDate currentDate = LocalDate.now();
+        System.out.println(currentDate);
+
+        // Retrieve all appointments
+        List<Appointment> appointmentList = appointmentRepo.findAll();
+
+        // Loop through appointments and update status
+        for (Appointment appointment : appointmentList) {
+            // if the 
+            if (appointment.getDate().toLocalDate().isBefore(currentDate)) {
+                // Create a new PastAppointment
+                PastAppointment pastAppointment = 
+                new PastAppointment(appointment.getDoctorName(), appointment.getDoctorUsername(),
+                                    appointment.getPatientName(), appointment.getPatientUsername(),
+                                    appointment.getDate(), appointment.getStartTime(),
+                                    appointment.getDuration(), appointment.getDepartment());
+
+                // Add to pastApt
+                pastAppointmentRepo.save(pastAppointment);
+
+                // Delete from Apt
+                appointmentRepo.delete(appointment);
+            }
+        }
+    }
 }
 
-// @PostMapping("/admins/addDoctor")
-// public String registerDoctor(@RequestParam Map<String, String> formData,
-// HttpServletResponse response, Model model,
-// HttpSession session) {
-
-// String username = formData.get("username");
-// String password = formData.get("password");
-// String name = formData.get("name");
-// int age = Integer.parseInt(formData.get("age"));
-// String address = formData.get("address");
-// String phone = formData.get("phone");
-// String departmentStr = formData.get("department");
-
-// Department department = Department.valueOf(departmentStr);
-// Doctor newDoctor = new Doctor(username, password, name, age, address, phone,
-// department);
-// doctorRepo.save(newDoctor);
-// response.setStatus(201);
-// model.addAttribute("Doctor", newDoctor);
-// session.setAttribute("session_doctor", newDoctor);
-// model.addAttribute("success", "Add Successfully");
-// return "admins/addDoctorPage";
-// }

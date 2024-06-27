@@ -2,6 +2,7 @@ package cmpt276.group.demo.controllers;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +22,8 @@ import cmpt276.group.demo.models.appointment.Appointment;
 import cmpt276.group.demo.models.appointment.AppointmentRepository;
 import cmpt276.group.demo.models.doctor.Doctor;
 import cmpt276.group.demo.models.doctor.DoctorRepository;
+import cmpt276.group.demo.models.past_appointment.PastAppointment;
+import cmpt276.group.demo.models.past_appointment.PastAppointmentRepository;
 import cmpt276.group.demo.models.record.RecordRepository;
 import cmpt276.group.demo.models.schedule.Schedule;
 import cmpt276.group.demo.models.schedule.ScheduleRepository;
@@ -40,9 +43,10 @@ public class AdminController {
     private ScheduleRepository scheduleRepo;
     @Autowired
     private AppointmentRepository appointmentRepo;
+    @Autowired
+    private PastAppointmentRepository pastAppointmentRepo;
 
-    // ------------------------------------------------------------Get
-    // Dashboard-------------------------------------------
+    // ------------------------------------------------------Get Dashboard--------------------------------------------------
     @GetMapping("/admins/getDashboard")
     public String getDashboard(Model model, HttpSession session) {
         Admin admin = (Admin) session.getAttribute("session_admin");
@@ -50,8 +54,7 @@ public class AdminController {
         return "admins/mainPage";
     }
 
-    // ------------------------------------------------------------View & add
-    // doctor-------------------------------------------------------------------------
+    // -----------------------------------------------------View & add doctor-----------------------------------------------
     @GetMapping("/admins/viewDoctor")
     public String viewDoctor(Model model, HttpSession session) {
         Admin admin = (Admin) session.getAttribute("session_admin");
@@ -109,8 +112,7 @@ public class AdminController {
         return "admins/addDoctorPage";
     }
 
-    // ------------------------------------------------------ Deletes a
-    // doctor------------------------------------------------------
+    // ------------------------------------------------------ Deletes doctor--------------------------------------------------
     // admin delete doctor => all schedule & appointment with that doctor will be
     // delete
     @PostMapping("/admins/deleteDoctor")
@@ -130,14 +132,48 @@ public class AdminController {
         return "admins/viewDoctorPage";
     }
 
-    // ------------------------------------------------------ View & delete
-    // appointment----------------------------------------------------
+    // ------------------------------------------------------ View & delete appointment----------------------------------------
+    
+    // function to change appointment to past appointment
+    public void changeApt() {
+        // Get the current date
+        LocalDate currentDate = LocalDate.now();
+        System.out.println(currentDate);
+
+        // Retrieve all appointments
+        List<Appointment> appointmentList = appointmentRepo.findAll();
+
+        // Loop through appointments and update status
+        for (Appointment appointment : appointmentList) {
+            // if the 
+            if (appointment.getDate().toLocalDate().isBefore(currentDate)) {
+                // Create a new PastAppointment
+                PastAppointment pastAppointment = 
+                new PastAppointment(appointment.getDoctorName(), appointment.getDoctorUsername(),
+                                    appointment.getPatientName(), appointment.getPatientUsername(),
+                                    appointment.getDate(), appointment.getStartTime(),
+                                    appointment.getDuration(), appointment.getDepartment());
+
+                // Add to pastApt
+                pastAppointmentRepo.save(pastAppointment);
+
+                // Delete from Apt
+                appointmentRepo.delete(appointment);
+            }
+        }
+    }
+   
     // admin view appointment
     @GetMapping("/admins/viewAppointment")
     public String viewAppointment(Model model) {
+        changeApt();
         List<Appointment> appointments = appointmentRepo.findAll();
         Collections.sort(appointments);
+        List<PastAppointment> pastAppointments = pastAppointmentRepo.findAll();
+        Collections.sort(pastAppointments);
+
         model.addAttribute("appointments", appointments);
+        model.addAttribute("pastAppointments", pastAppointments);
         return "admins/viewAppointmentPage";
     }
 
@@ -147,26 +183,46 @@ public class AdminController {
         String doctorUsername = apt.get("doctorUsername");
         Date date = Date.valueOf(apt.get("date"));
         Time startTime = Time.valueOf(apt.get("startTime"));
-        Appointment deleteApt = appointmentRepo.findByDoctorUsernameAndDateAndStartTime(doctorUsername, date,
-                startTime);
+        Appointment deleteApt = appointmentRepo.findByDoctorUsernameAndDateAndStartTime(doctorUsername, date, startTime);
 
         Schedule newSche = new Schedule(deleteApt.getDoctorName(), deleteApt.getDoctorUsername(), deleteApt.getDate(),
-                deleteApt.getStartTime(), deleteApt.getDuration(), deleteApt.getDepartment());
+                        deleteApt.getStartTime(), deleteApt.getDuration(), deleteApt.getDepartment());
         scheduleRepo.save(newSche);
 
         appointmentRepo.delete(deleteApt);
         List<Appointment> appointments = appointmentRepo.findAll();
         Collections.sort(appointments);
+        List<PastAppointment> pastAppointments = pastAppointmentRepo.findAll();
+        Collections.sort(pastAppointments);
+        
         model.addAttribute("appointments", appointments);
+        model.addAttribute("pastAppointments", pastAppointments);
 
         return "admins/viewAppointmentPage";
     }
 
-    // ------------------------------------------------------ View, add & delete
-    // schedule----------------------------------------------------
+    // ------------------------------------------------------ View, add & delete schedule---------------------------------------------
+    // function to change appointment to past appointment
+    public void deleteSchedule() {
+        // Get the current date
+        LocalDate currentDate = LocalDate.now();
+        System.out.println(currentDate);
+
+        // Retrieve all appointments
+        List<Schedule> scheduleList = scheduleRepo.findAll();
+
+        // Loop through schedule and delete
+        for (Schedule schedule : scheduleList) {
+            if (schedule.getDate().toLocalDate().isBefore(currentDate)) {
+                scheduleRepo.delete(schedule);
+            }
+        }
+    }
+   
     // go to schedule page
     @GetMapping("/admins/viewSchedule")
     public String viewSchedule(Model model) {
+        deleteSchedule();
         List<Schedule> schedules = scheduleRepo.findAll();
         Collections.sort(schedules);
         model.addAttribute("schedules", schedules);
@@ -181,8 +237,7 @@ public class AdminController {
 
     // doctor add schedule (+)
     @PostMapping("/admins/addSchedule")
-    public String postMethodName(@RequestParam Map<String, String> scheduleInfo, HttpServletResponse response,
-            Model model) {
+    public String postMethodName(@RequestParam Map<String, String> scheduleInfo, HttpServletResponse response, Model model) {
         String doctorUsername = scheduleInfo.get("doctorUsername");
 
         // Check if any field is empty
