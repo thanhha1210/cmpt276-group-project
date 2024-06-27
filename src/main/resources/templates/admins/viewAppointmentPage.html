@@ -154,6 +154,40 @@
                 </tr>
             </tbody>
         </table>
+        <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Past Appointment</h1>
+        <table class="table-container">
+            <thead>
+                <th>#</th>
+                <th>Doctor Name</th>
+                <th>Patient Name</th>
+                <th>Date</th>
+                <th>Start time</th>
+                <th>Duration</th>
+            </thead>
+            <tbody>
+                <tr th:each="a, cnt : ${pastAppointments}">
+                    <td>
+                        <span th:text="${cnt.count}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${a.doctorName}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${a.patientName}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${a.date}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${a.startTime}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${a.duration}"></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
 
     </main>
 

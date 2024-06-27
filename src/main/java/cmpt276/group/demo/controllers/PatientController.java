@@ -2,6 +2,7 @@ package cmpt276.group.demo.controllers;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -13,11 +14,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import cmpt276.group.demo.models.Department;
 import cmpt276.group.demo.models.admin.AdminRepository;
 import cmpt276.group.demo.models.appointment.Appointment;
 import cmpt276.group.demo.models.appointment.AppointmentRepository;
 import cmpt276.group.demo.models.doctor.DoctorRepository;
+import cmpt276.group.demo.models.past_appointment.PastAppointment;
+import cmpt276.group.demo.models.past_appointment.PastAppointmentRepository;
 import cmpt276.group.demo.models.patient.Patient;
 import cmpt276.group.demo.models.patient.PatientRepository;
 import cmpt276.group.demo.models.record.Record;
@@ -44,6 +46,8 @@ public class PatientController {
     private ScheduleRepository scheduleRepo;
     @Autowired
     private AppointmentRepository appointmentRepo;
+    @Autowired
+    private PastAppointmentRepository pastAppointmentRepo;
    
     
     @GetMapping("/patients/signup")
@@ -59,12 +63,44 @@ public class PatientController {
     }
     
 //--------------------------------------------Manage schedule--------------------------------------------------------
+    
+    // function to change appointment to past appointment
+    public void changeApt() {
+        // Get the current date
+        LocalDate currentDate = LocalDate.now();
+        System.out.println(currentDate);
+
+        // Retrieve all appointments
+        List<Appointment> appointmentList = appointmentRepo.findAll();
+
+        // Loop through appointments and update status
+        for (Appointment appointment : appointmentList) {
+            // if the 
+            if (appointment.getDate().toLocalDate().isBefore(currentDate)) {
+                // Create a new PastAppointment
+                PastAppointment pastAppointment = 
+                new PastAppointment(appointment.getDoctorName(), appointment.getDoctorUsername(),
+                                    appointment.getPatientName(), appointment.getPatientUsername(),
+                                    appointment.getDate(), appointment.getStartTime(),
+                                    appointment.getDuration(), appointment.getDepartment());
+
+                // Add to pastApt
+                pastAppointmentRepo.save(pastAppointment);
+
+                // Delete from Apt
+                appointmentRepo.delete(appointment);
+            }
+        }
+    }
+   
+    // Patient go to view schedule page
     @GetMapping("/patients/viewSchedule")
     public String getSchedule(Model model, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");
         String patientUsername = patient.getUsername();
         
-        
+        changeApt();
+
         Appointment apt = appointmentRepo.findByPatientUsername(patientUsername);
         if (apt != null) {
             model.addAttribute("appointment", apt);
@@ -76,7 +112,8 @@ public class PatientController {
        
         return "patients/schedulePage";
     }
-    // Patient books appointment
+    
+    // Patient books appointment    
     @PostMapping("/patients/bookAppointment")
     public String bookAppointment(@RequestParam Map<String, String> sche, Model model, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");
@@ -110,6 +147,7 @@ public class PatientController {
         return "patients/schedulePage";
     }
 
+    // Patient deletes appointment
     @PostMapping("/patients/deleteAppointment")
     public String deleteAppointment(@RequestParam Map<String,String> apt, Model model, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");

@@ -116,10 +116,47 @@
         <form action="/patients/getDashboard" method="get">
             <input type="submit" value="HOME" class="btn exit-btn">
         </form>
-        <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Schedule List</h1>
+        <div>
+            <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Appointment</h1>
+        </div>
         <div></div>
     </header>
-
+    <main class="content">
+        <div th:if="${appointment}">
+            <table class="table-container">
+                <thead>
+                    <tr>
+                        <th>Doctor Name</th>
+                        <th>Department</th>
+                        <th>Date</th>
+                        <th>Start time</th>
+                        <th>Duration</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span th:text="${appointment.doctorName}"></span></td>
+                        <td><span th:text="${appointment.department}"></span></td>
+                        <td><span th:text="${appointment.date}"></span></td>
+                        <td><span th:text="${appointment.startTime}"></span></td>
+                        <td><span th:text="${appointment.duration}"></span></td>
+                        <td>
+                            <form action="/patients/deleteAppointment" method="post">
+                                <input type="hidden" name="doctorUsername" th:value="${appointment.doctorUsername}">
+                                <input type="hidden" name="date" th:value="${appointment.date}">
+                                <input type="hidden" name="startTime" th:value="${appointment.startTime}">
+                                <input type="submit" class="btn delete-btn" value="DELETE" style="color:red">
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+    <div class="content" style="display: flex; justify-content: center; text-align: center">
+        <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Schedule</h1>
+    </div>
     <main class="content">
         <div class="search">
             <label for="departmentFilter">Find by Department</label>
@@ -165,43 +202,7 @@
                 </tr>
             </tbody>
         </table>
-
-        <div th:if="${appointment}">
-            <div class="content" style="display: flex; justify-content: center; text-align: center; gap: 40px; margin-top: 40px;position: relative;">
-                <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Appointment</h1>
-            </div>
-            <table class="table-container">
-                <thead>
-                    <tr>
-                        <th>Doctor Name</th>
-                        <th>Department</th>
-                        <th>Date</th>
-                        <th>Start time</th>
-                        <th>Duration</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><span th:text="${appointment.doctorName}"></span></td>
-                        <td><span th:text="${appointment.department}"></span></td>
-                        <td><span th:text="${appointment.date}"></span></td>
-                        <td><span th:text="${appointment.startTime}"></span></td>
-                        <td><span th:text="${appointment.duration}"></span></td>
-                        <td>
-                            <form action="/patients/deleteAppointment" method="post">
-                                <input type="hidden" name="doctorUsername" th:value="${appointment.doctorUsername}">
-                                <input type="hidden" name="date" th:value="${appointment.date}">
-                                <input type="hidden" name="startTime" th:value="${appointment.startTime}">
-                                <input type="submit" class="btn delete-btn" value="DELETE" style="color:red">
-                            </form>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
     </main>
-
     <script> 
         function listSchedules() {
             var filterValue = document.getElementById("departmentFilter").value.toLowerCase();
