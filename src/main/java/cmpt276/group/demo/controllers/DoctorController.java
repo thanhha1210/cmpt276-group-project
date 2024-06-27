@@ -59,7 +59,11 @@ public class DoctorController {
     // Collections.sort(pastAppointments);
 
     List<Appointment> appointments = appointmentRepo.findByDoctorUsername(doctor.getUsername());
-    // model.addAttribute("appointments", pastAppointments);
+    List<Record> records = recordRepo.findByDoctorUserame(doctor.getUsername());
+
+    // model.addAttribute("appointments", pastAppointments);\
+
+    model.addAttribute("records", records);
     model.addAttribute("appointments", appointments);
     return "/doctors/viewRecord";
   }

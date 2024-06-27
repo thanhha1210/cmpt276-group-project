@@ -155,7 +155,38 @@
                 </tr>
             </tbody>
         </table>
+        <table class="table-container">
+            <thead>
+                <th>#</th>
+                <th>Doctor Name</th>
+                <th>Patient Name</th>
+                <th>Date</th>
+                <th>Start time</th>
+                <th>Duration</th>
+                <th></th>
+            </thead>
+            <tbody>
+                <tr th:each="a, cnt : ${records}">
+                    <td>
+                        <span th:text="${cnt.count}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${a.doctorUsername}"></span>
+                    </td>
+                    <!-- <td>
+                        <span th:text="${a.patientname}"></span>
+                    </td> -->
+                    <!-- <td>
+                        <span th:text="${a.date}"></span>
+                    </td> -->
+                   
+                 
+                    <td>
 
+                  </td>
+                </tr>
+            </tbody>
+        </table>
     </main>
 
 </body>
