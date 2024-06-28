@@ -61,6 +61,15 @@
             transform: translateY(-2px);
         }
 
+        #searchInput {
+            font-weight: 600;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
         .add-btn {
             background-color: #0F1B4C;
             color: #ffffff;
@@ -154,12 +163,13 @@
                 </tr>
             </tbody>
         </table>
-        <div style="display: flex; justify-content: center; gap: 50px ; align-items: center; margin-top: 30px;">
-            <h1 style="font-weight: 700; font-size: 2.4em;  display: inline-block; margin-left: 50px;">Records</h1>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px;">
+            <div></div>
+            <h1 style="font-weight: 700; font-size: 2.4em;  display: inline-block; margin-left: 300px;">Records</h1>
             <div class="search-container" style="display: inline-block;">
-                <input type="text" id="searchInput" class="btn" placeholder="Enter person's name...">
+                <input type="text" id="searchInput" placeholder="Patient name">
                 <button onclick="searchRecord()" class="btn" style="margin-left: 12px;">Search</button>
-            </div>
+            </div>      
         </div>
         
         <table class="table-container" id="recordsTable">
