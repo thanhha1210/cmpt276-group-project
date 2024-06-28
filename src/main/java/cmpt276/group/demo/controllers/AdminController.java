@@ -226,7 +226,7 @@ public class AdminController {
     // go to schedule page
     @GetMapping("/admins/viewSchedule")
     public String viewSchedule(Model model) {
-        deleteSchedule();
+        // deleteSchedule();
         List<Schedule> schedules = scheduleRepo.findAll();
         Collections.sort(schedules);
         model.addAttribute("schedules", schedules);
@@ -301,12 +301,13 @@ public class AdminController {
         }
 
         // Check the schedule time with real time
-        LocalDate currentDate = LocalDate.now();
-        if (date.toLocalDate().isBefore(currentDate)) {
-            model.addAttribute("error5", "The schedule is before today date. Please choose another date");
-            return "admins/addSchedulePage";
+        // LocalDate currentDate = LocalDate.now();
+        // if (date.toLocalDate().isBefore(currentDate)) {
+        // model.addAttribute("error5", "The schedule is before today date. Please
+        // choose another date");
+        // return "admins/addSchedulePage";
 
-        }
+        // }
 
         // Get doctorName based on doctorUsername
         Schedule newSchedule = new Schedule(doc.getName(), doctorUsername, date, startTime, duration, department);
