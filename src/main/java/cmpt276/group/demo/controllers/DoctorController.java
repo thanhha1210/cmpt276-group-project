@@ -50,9 +50,9 @@ public class DoctorController {
   //---------------------------------------Dashboard-------------------------------------------------
   @GetMapping("/doctors/getDashboard")
   public String getDashboard(Model model, HttpSession session) {
-    Doctor doctor = (Doctor) session.getAttribute("session_doctor");
-    model.addAttribute("doctor", doctor);
-    return "doctors/mainPage";
+      Doctor doctor = (Doctor) session.getAttribute("session_doctor");
+      model.addAttribute("doctor", doctor);
+      return "doctors/mainPage";
   }
 
   //-------------------------------------Book appointment-------------------------------------------------
@@ -68,16 +68,7 @@ public class DoctorController {
     Doctor doctor = (Doctor) session.getAttribute("session_doctor");
     model.addAttribute("doctor", doctor);
     changeApt();
-
-    // all appointments
-    List<PastAppointment> pastAppointmentAll = pastAppointmentRepo.findByDoctorUsername(doctor.getUsername());
-    // list that hasven't add record
-    List<PastAppointment> pastAppointments  = new ArrayList<>();
-    for (int i = 0; i < pastAppointmentAll.size(); i++) {
-      if (!pastAppointmentAll.get(i).isReport())
-        pastAppointments.add(pastAppointmentAll.get(i));
-    }
-
+    List<PastAppointment> pastAppointments = findNotRecord(doctor.getUsername());
     Collections.sort(pastAppointments);
     List<Record> records = recordRepo.findByDoctorUsername(doctor.getUsername());
 
@@ -91,17 +82,17 @@ public class DoctorController {
 
   @GetMapping("/doctors/addRecord")
   public String addRecord(@RequestParam Map<String, String> formData, Model model, HttpSession session) {
-    Doctor doctor = (Doctor) session.getAttribute("session_doctor");
-    model.addAttribute("doctor", doctor);
+      Doctor doctor = (Doctor) session.getAttribute("session_doctor");
+      model.addAttribute("doctor", doctor);
 
-    String patientUsername = formData.get("patientUsername");
-    String doctorUsername = formData.get("doctorUsername");
-    String dateStr = formData.get("date");
-    Date date = Date.valueOf(dateStr);
-    PastAppointment pastApt = pastAppointmentRepo.findByPatientUsernameAndDoctorUsernameAndDate(patientUsername, doctorUsername, date);
-    
-    model.addAttribute("pastApt", pastApt);
-    return "doctors/addRecord";
+      String patientUsername = formData.get("patientUsername");
+      String doctorUsername = formData.get("doctorUsername");
+      String dateStr = formData.get("date");
+      Date date = Date.valueOf(dateStr);
+      PastAppointment pastApt = pastAppointmentRepo.findByPatientUsernameAndDoctorUsernameAndDate(patientUsername, doctorUsername, date);
+
+      model.addAttribute("pastApt", pastApt);
+      return "doctors/addRecord";
   }
 
   @PostMapping("/doctors/addRecord")
@@ -122,25 +113,29 @@ public class DoctorController {
 
     PastAppointment pastApt = pastAppointmentRepo.findByPatientUsernameAndDoctorUsernameAndDate(patientUsername, doctorUsername, date);
     pastApt.setIsReport(true);
+    pastAppointmentRepo.save(pastApt);
     List<Record> records = recordRepo.findByDoctorUsername(doctor.getUsername());
 
     // all the list
-    List<PastAppointment> pastAppointmentAll = pastAppointmentRepo.findByDoctorUsername(doctor.getUsername());
-    
-    // list that hasven't add record
-    List<PastAppointment> pastAppointments  = new ArrayList<>();
-    for (int i = 0; i < pastAppointmentAll.size(); i++) {
-      if (!pastAppointmentAll.get(i).isReport())
-        pastAppointments.add(pastAppointmentAll.get(i));
-    }
-
+    List<PastAppointment> pastAppointments = findNotRecord(doctorUsername);
     model.addAttribute("records", records);
     model.addAttribute("appointments", pastAppointments);
 
     return "doctors/viewRecord";
   }
 
-  // function to change appointment to past appointment
+  // function to get past_appointment that haven't written record
+  public List<PastAppointment> findNotRecord(String doctorUsername) {
+    List<PastAppointment> pastAppointmentAll = pastAppointmentRepo.findByDoctorUsername(doctorUsername);
+    List<PastAppointment> pastAppointments  = new ArrayList<>();
+    for (int i = 0; i < pastAppointmentAll.size(); i++) {
+      if (pastAppointmentAll.get(i).isReport() == false)
+        pastAppointments.add(pastAppointmentAll.get(i));
+    }
+    return pastAppointments;
+  }
+  
+  // function to change appointment to past_appointment
   public void changeApt() {
         // Get the current date
         LocalDate currentDate = LocalDate.now();

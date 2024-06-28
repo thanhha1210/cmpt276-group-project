@@ -109,7 +109,6 @@ public class PatientController {
         List<Schedule> schedules = scheduleRepo.findAll();
         Collections.sort(schedules);
         model.addAttribute("schedules", schedules);
-       
         return "patients/schedulePage";
     }
     
