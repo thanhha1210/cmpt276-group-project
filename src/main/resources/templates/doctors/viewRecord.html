@@ -109,7 +109,7 @@
       <form action="/doctors/getDashboard" method="get">
         <input type="submit" value="HOME" class="btn exit-btn">
     </form>
-        <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Records</h1>
+        <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Past Appointments and Records</h1>
         <div></div>
     </header>
     <main class="content">
@@ -154,39 +154,65 @@
                 </tr>
             </tbody>
         </table>
-        <table class="table-container">
+        <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 30px;">Records</h1>
+        <div class="search-container">
+            <input type="text" id="searchInput" class="btn" placeholder="Enter person's name...">
+            <button onclick="searchRecord()" class="btn">Search</button>
+        </div>
+        <table class="table-container" id="recordsTable">
             <thead>
                 <th>#</th>
-                <th>Doctor Name</th>
-                <th>Patient Name</th>
-                <th>Date</th>
-                <th>Start time</th>
-                <th>Duration</th>
-                <th></th>
+            <th>Patient Name</th>
+            <th>Date</th>
+            <th>Expand Record</th>
+
             </thead>
             <tbody>
                 <tr th:each="r, cnt : ${records}">
                     <td>
                         <span th:text="${cnt.count}"></span>
                     </td>
-                    <td>
-                        <span th:text="${r.doctorUsername}"></span>
-                    </td>
+
                     <td>
                         <span th:text="${r.patientName}"></span>
                     </td> 
                     <td>
                         <span th:text="${r.date}"></span>
                     </td>
-                   
-                 
-                    <td>
+                   <td>
+                        <form action="/doctors/expandRecord" method="get">
+                            <input type="hidden" name="patientUsername" th:value="${r.patientUsername}">
+                            <input type="hidden" name="patientName" th:value="${r.patientName}">
+                            <input type="hidden" name="doctorUsername" th:value="${r.doctorUsername}">
+                            <input type="hidden" name="date" th:value="${r.date}">
+                            <input type="hidden" name="description" th:value="${r.description}">
+                            <input type="submit" class="btn " value="Expand Record">
+                        </form>
+                   </td>
 
-                  </td>
                 </tr>
             </tbody>
         </table>
+
     </main>
 
+    <script>
+        function searchRecord() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const table = document.getElementById('recordsTable');
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                const patientName = cells[1] ? cells[1].innerText.toLowerCase() : '';
+
+                if (patientName.includes(input)) {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+    </script>
 </body>
 </html>
