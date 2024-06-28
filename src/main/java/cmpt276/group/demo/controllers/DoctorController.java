@@ -99,13 +99,14 @@ public class DoctorController {
     model.addAttribute("doctor", doctor);
     // TODO: process POST request
     String description = formData.get("description");
+    String patientName = formData.get("patientName");
     String patientUsername = formData.get("patientUsername");
     String doctorUsername = formData.get("doctorUsername");
-    String patientName = formData.get("patientName");
 
     String dateStr = formData.get("date");
     Date date = Date.valueOf(dateStr);
-
+    System.out.println(patientName);
+    System.out.println(patientUsername);
     Record newRecord = new Record(patientUsername, patientName, doctorUsername, description, date);
     recordRepo.save(newRecord);
 

@@ -312,6 +312,7 @@ public class AdminController {
         Schedule newSchedule = new Schedule(doc.getName(), doctorUsername, date, startTime, duration, department);
         scheduleRepo.save(newSchedule);
         response.setStatus(201);
+        System.out.println("POGGGGGG++");
         model.addAttribute("Schedule", newSchedule);
         model.addAttribute("success", "Add Schedule Successfully");
         return "admins/addSchedulePage";
