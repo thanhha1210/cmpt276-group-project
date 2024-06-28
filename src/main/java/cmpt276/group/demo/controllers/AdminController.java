@@ -206,8 +206,6 @@ public class AdminController {
     public void deleteSchedule() {
         // Get the current date
         LocalDate currentDate = LocalDate.now();
-        System.out.println(currentDate);
-
         // Retrieve all appointments
         List<Schedule> scheduleList = scheduleRepo.findAll();
 
@@ -293,6 +291,14 @@ public class AdminController {
                         "The new schedule conflicts with an existing schedule. Please enter another schedule!");
                 return "admins/addSchedulePage";
             }
+        }
+
+        // Check the schedule time with real time
+        LocalDate currentDate = LocalDate.now();
+        if (date.toLocalDate().isBefore(currentDate)) {
+            model.addAttribute("error5", "The schedule is before today date. Please choose another date");
+            return "admins/addSchedulePage";
+            
         }
 
         // Get doctorName based on doctorUsername

@@ -1,6 +1,6 @@
 package cmpt276.group.demo.models.record;
 
-import java.util.Date;
+import java.sql.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,7 +40,7 @@ public class Record {
         this.date = date;
     }
 
-    public String getpatientUsername() {
+    public String getPatientUsername() {
         return patientUsername;
     }
     public String getPatientName() {

@@ -83,6 +83,7 @@
             background-color: #0F1B4C;
             color: #ffffff;
             grid-column: span 2;
+            grid-row: 4;
             justify-self: center;
         }
 
@@ -90,7 +91,9 @@
             background-color: #f44336;
             color: #ffffff;
         }
-
+        .desc {
+            grid-column: span 2;
+        }
         /* Message Styles */
         .error {
             color: #e74c3c;
@@ -105,6 +108,10 @@
         }
 
         /* Title Styles */
+        h3, label {
+            font-size: 1.2em;
+            font-weight: 700;
+        }
         h1 {
             font-weight: 700;
             font-size: 2em;
@@ -112,8 +119,12 @@
             grid-column: span 2;
             margin-bottom: 20px;
         }
-        .error, .error {
+        .error, .success {
             animation: shake 0.4s;
+        }
+        .description {
+
+            min-width: 100%;
         }
          /* SHAKE ANIMATION*/
         @keyframes shake {
@@ -135,38 +146,37 @@
 </head>
 <body>
     <main class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 30px 0 0">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 30px 10px 0">
             <form action="/doctors/viewRecord" method="get" style="padding: 10px; margin-top: -20px;">
                 <input type="submit" value="RETURN" class="btn exit-btn">
             </form>
             <div style="margin-right: 300px">
                 <h1>Add Record</h1>
             </div>
-          
         </div>
        
         <form action="/doctors/addRecord" method="post">
             <div>
-                <h3>Doctor Name:</h3>
-                <h4 th:text="${pastApt.doctorName}"></h4>
+                <h3>Doctor Name</h3>
+                <span th:text="${pastApt.doctorName}"></span>
             </div>
             <div>
                 <h3>Patient Name</h3>
-                <h4 th:text="${pastApt.patientName}"></h4>
+                <span th:text="${pastApt.patientName}"></span>
             </div>  
             <div>
-                <h3>Date</h3>
-                <h4 th:text="${pastApt.date}"></h4>
+                <h3>Date </h3>
+                <span th:text="${pastApt.date}"></span>
             </div>
-            <div>
-                <label for="description">Description</label>
-                <input type="text" id="description" name="description" placeholder="example">
+            <div></div>
+            <div class="desc">
+                <label for="description" style="margin-bottom: 10px;">Description</label>
+                <input id="description" name="description" placeholder="Description" ></input>
             </div>
-
+           
             <!-- Hold data field-->
             <input type="hidden" name="doctorUsername" th:value="${pastApt.doctorUsername}">
             <input type="hidden" name="patientUsername" th:value="${pastApt.patientUsername}">
-            <input type="hidden" name="patientName" th:value="${pastApt.patientName}">
             <input type="hidden" name="date" th:value="${pastApt.date}">
             <button type="submit" class="btn add-btn">Create Record</button>
         </form>
