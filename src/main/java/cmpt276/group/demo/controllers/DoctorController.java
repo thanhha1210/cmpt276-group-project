@@ -55,11 +55,9 @@ public class DoctorController {
     return "doctors/mainPage";
   }
 
-  // -------------------------------------Book
-  // appointment-------------------------------------------------
+  // -------------------------------------Book appointment-------------------------------------------------
 
-  // -------------------------------------View
-  // record-------------------------------------------------
+  // -------------------------------------View record-------------------------------------------------
   @GetMapping("/doctors/viewRecord")
   public String viewRecord(Model model, HttpSession session) {
     Doctor doctor = (Doctor) session.getAttribute("session_doctor");
