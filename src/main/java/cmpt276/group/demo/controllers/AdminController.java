@@ -113,21 +113,23 @@ public class AdminController {
     }
 
     // ------------------------------------------------------ Deletes doctor--------------------------------------------------
-    // admin delete doctor => all schedule & appointment with that doctor will be
-    // delete
+    // admin delete doctor => all schedule & appointment with that doctor will be delete
     @PostMapping("/admins/deleteDoctor")
     public String deleteDoctor(@RequestParam String username, Model model) {
         Doctor temp = doctorRepo.findByUsername(username);
+        List<Appointment> deleteList= appointmentRepo.findByDoctorUsername(username);
+        for (int i = 0; i < deleteList.size(); i++) {
+            appointmentRepo.delete(deleteList.get(i));
+        }
+
+        List<Schedule> deleteSchedule= scheduleRepo.findByDoctorUsername(username);
+        for (int i = 0; i < deleteSchedule.size(); i++) {
+            scheduleRepo.delete(deleteSchedule.get(i));
+        }
+        
         if (temp != null) {
             doctorRepo.delete(temp);
         }
-        model.addAttribute("doctors", doctorRepo.findAll());
-        return "admins/viewDoctorPage";
-    }
-
-    // Return doctor display page
-    @GetMapping("/admins/exitDoctorAdd")
-    public String exitAddDoctorPage(Model model) {
         model.addAttribute("doctors", doctorRepo.findAll());
         return "admins/viewDoctorPage";
     }
