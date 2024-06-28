@@ -151,36 +151,28 @@
                 <input type="submit" value="RETURN" class="btn exit-btn">
             </form>
             <div style="margin-right: 300px">
-                <h1>Add Record</h1>
+              <h1 th:text="${record.patientName} + '\'s Record'"></h1>
             </div>
         </div>
-       
-        <form action="/doctors/addRecord" method="post">
             <div>
                 <h3>Doctor Name</h3>
-                <span th:text="${pastApt.doctorName}"></span>
+                <span th:text="${record.doctorUsername}"></span>
             </div>
             <div>
                 <h3>Patient Name</h3>
-                <span th:text="${pastApt.patientName}"></span>
+                <span th:text="${record.patientName}"></span>
             </div>  
             <div>
                 <h3>Date </h3>
-                <span th:text="${pastApt.date}"></span>
+                <span th:text="${record.date}"></span>
             </div>
-            <div></div>
-            <div class="desc">
-                <label for="description" style="margin-bottom: 10px;">Description</label>
-                <input id="description" name="description" placeholder="Description" ></input>
-            </div>
-           
-            <!-- Hold data field-->
-            <input type="hidden" name="doctorUsername" th:value="${pastApt.doctorUsername}">
-            <input type="hidden" name="patientUsername" th:value="${pastApt.patientUsername}">
-            <input type="hidden" name="date" th:value="${pastApt.date}">
-            <input type="hidden" name="patientName" th:value="${pastApt.patientName}">
-            <button type="submit" class="btn add-btn">Create Record</button>
-        </form>
+            <div>
+              <h3>Description </h3>
+              <span th:text="${record.description}"></span>
+          </div>
+
+
+
         <div class="message-container" style="display: flex; justify-content: center; align-items: center; margin-top: 16px;">
             <span th:if="${error0}" class="error" th:text="${error0}"></span>
             <span th:if="${error1}" class="error" th:text="${error1}"></span>
