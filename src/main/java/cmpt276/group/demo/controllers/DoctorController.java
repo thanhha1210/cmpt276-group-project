@@ -138,6 +138,17 @@ public class DoctorController {
     return "doctors/expandRecord";
   }
 
+  @GetMapping("/doctors/viewSchedule")
+  public String viewBookedAppointments(Model model, HttpSession session) {
+    Doctor doctor = (Doctor) session.getAttribute("session_doctor");
+    model.addAttribute("doctor", doctor);
+    
+    List<Appointment> appointments = appointmentRepo.findByDoctorUsername(doctor.getUsername());
+    model.addAttribute("appointments", appointments);
+    
+    return "doctors/viewSchedule";
+  }
+
   // function to get past_appointment that haven't written record
   public List<PastAppointment> findNotRecord(String doctorUsername) {
     List<PastAppointment> pastAppointmentAll = pastAppointmentRepo.findByDoctorUsername(doctorUsername);
@@ -177,4 +188,5 @@ public class DoctorController {
       }
     }
   }
+
 }
