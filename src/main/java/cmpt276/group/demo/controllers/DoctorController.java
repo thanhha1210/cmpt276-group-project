@@ -56,9 +56,11 @@ public class DoctorController {
     return "doctors/mainPage";
   }
 
-  // -------------------------------------Book appointment-------------------------------------------------
+  // -------------------------------------Book
+  // appointment-------------------------------------------------
 
-  // -------------------------------------View record-------------------------------------------------
+  // -------------------------------------View
+  // record-------------------------------------------------
   @GetMapping("/doctors/viewRecord")
   public String viewRecord(Model model, HttpSession session) {
     Doctor doctor = (Doctor) session.getAttribute("session_doctor");
@@ -143,10 +145,10 @@ public class DoctorController {
   public String viewBookedAppointments(Model model, HttpSession session) {
     Doctor doctor = (Doctor) session.getAttribute("session_doctor");
     model.addAttribute("doctor", doctor);
-    
+
     List<Appointment> appointments = appointmentRepo.findByDoctorUsername(doctor.getUsername());
     model.addAttribute("appointments", appointments);
-    
+
     return "doctors/viewSchedulePage";
   }
 
@@ -163,7 +165,7 @@ public class DoctorController {
 
   // function to change appointment to past_appointment
   public void changeApt() {
-    
+
     // Get the current date
     LocalDate currentDate = LocalDate.now();
     LocalTime currentTime = LocalTime.now();
@@ -175,27 +177,26 @@ public class DoctorController {
 
     // Loop through appointments and update status
     for (Appointment apt : appointmentList) {
-        
-        // Get date and startTime of each appointment in a list
-        LocalDate aptDate = apt.getDate().toLocalDate();
-        LocalTime aptTime = apt.getStartTime().toLocalTime().plusMinutes(apt.getDuration());
-        System.out.println(aptDate);
-        System.out.println(aptTime);
-        if (aptDate.isBefore(currentDate) || (aptDate.isEqual(currentDate) && aptTime.isBefore(currentTime))) {
 
-            // Create a new PastAppointment
-            PastAppointment pastApt = 
-            new PastAppointment(apt.getDoctorName(), apt.getDoctorUsername(),
-                                apt.getPatientName(), apt.getPatientUsername(),
-                                apt.getDate(), apt.getStartTime(),
-                                apt.getDuration(), apt.getDepartment());
+      // Get date and startTime of each appointment in a list
+      LocalDate aptDate = apt.getDate().toLocalDate();
+      LocalTime aptTime = apt.getStartTime().toLocalTime().plusMinutes(apt.getDuration());
+      System.out.println(aptDate);
+      System.out.println(aptTime);
+      if (aptDate.isBefore(currentDate) || (aptDate.isEqual(currentDate) && aptTime.isBefore(currentTime))) {
 
-            // Add to pastApt
-            pastAppointmentRepo.save(pastApt);
+        // Create a new PastAppointment
+        PastAppointment pastApt = new PastAppointment(apt.getDoctorName(), apt.getDoctorUsername(),
+            apt.getPatientName(), apt.getPatientUsername(),
+            apt.getDate(), apt.getStartTime(),
+            apt.getDuration(), apt.getDepartment());
 
-            // Delete from Apt
-            appointmentRepo.delete(apt);
-        }
+        // Add to pastApt
+        pastAppointmentRepo.save(pastApt);
+
+        // Delete from Apt
+        appointmentRepo.delete(apt);
+      }
     }
   }
 
