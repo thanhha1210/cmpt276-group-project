@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>adminPage</title>
+    <title>Admin Page</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-         /*--------------------------------Reset css-------------------------------------------------*/
         /* Reset CSS */
         html, body, div, span, h1, h2, h3, a, form, label, tr, th, td, header {
             margin: 0;
@@ -17,25 +16,27 @@
             font-size: 100%;
             font: inherit;
             vertical-align: baseline;
+            
         }
         table {
             border-collapse: collapse;
             border-spacing: 0;
         }
-        body, input {
+        body, input, header {
             font-family: "Poppins", sans-serif;
             line-height: 1.5em;
+            background-color: #fff;
         }
 
         /* Container */
-        .content {
+        .content, .content-main {
             width: 100%;
             max-width: 1100px;
             margin: 0 auto;
             padding: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
-            background: #ffffff;
+            background: #fff;
         }
 
         /* Button Styles */
@@ -74,28 +75,24 @@
 
         /* Header Styles */
         header {
-            padding-top: 26px;
+            /* padding-top: 26px; */
             position: sticky;
             top: 0;
             z-index: 1;
-            background: #ffffff;
+            background: #fff;
         }
 
         .navbar {
             display: flex;
             align-items: center;
-            padding: 12px;
+            padding: 6px 12px;
         }
 
-        .feature {
+        .nav-item {
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
             gap: 20px;
-        }
-        .features > .feature:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
         }
 
         .actions {
@@ -104,14 +101,102 @@
             margin-left: auto;
             gap: 30px;
         }
+        /* Content */
+        .content-main h2 {
+            color: #333;
+            font-weight: 800;
+            font-size: 1.6em;
+        }
+        .content-main p {
+            line-height: 1.6;
+        }
+        .content-main .features {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .content-main .feature {
+            flex: 1;
+            margin: 10px;
+            padding: 20px;
+            border-radius: 5px;
+            background: linear-gradient(135deg, #2329d3, #27d983);
+            opacity: 0.9;
+        }
+        h3 {
+            margin-top: 0;
+            font-weight: 500;
+            font-size: 1.2em;
+        }
+        .content-main .question {
+            margin: 20px 0;
+        }
+        footer {
+            background: #0F1B4C;
+            color: #fff;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 30px;
+        }
+        .feature > p {
+            color: #fff;
+        }
+        .feature > h3 {
+            color: #67f011;
+        }
+        .features > .feature:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /*Hero tag*/
+        .hero {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .hero-wrap {
+            margin-bottom: 60px;
+        }
+        .hero .info {
+            width: 50%;
+        }
+        .hero .sub-title {
+            color: #687690;
+            font-size: 1.2rem;
+            line-height: 1.5; 
+            letter-spacing: 0.01em;
+        }
+
+        .hero .title {
+            color: #000336;
+            font-size: 2.2rem;
+            font-weight: 700;
+            line-height: 1.19;
+            margin-top: 8px; 
+        }
+
+        .hero .desc {
+            color: #687690;
+            font-size: 1.2rem;
+            font-weight: 400;
+            line-height: 1.78;
+            margin-top: 30px;
+        }
+
+        .hero .btn {
+            width: 170px;
+            margin-top: 55px;
+            border-radius: 12px;
+        }
+
+        .hero-img {
+            width: 50%;
+        }
     </style>
 </head>
 <body>
-    <!-- Test session -->
-    <!-- <div >
-        <p th:text="${admin.username}" style="font-size: 3em;"></p>
-    </div> -->
-    <header class="fix-header" style="padding-top: 26px; position: sticky; top: -26px; z-index: 1;">
+    <header class="fix-header">
         <div class="content">
             <nav class="navbar" style="display: flex; align-items: center; padding: 12px;">
                 <div class="home">
@@ -139,17 +224,68 @@
             </nav>
         </div>
     </header>
-
-    <main class="content">
-        <div class="heading">
+    <main class="content-main">
+         <!-- Hero-wrap -->
+         <div class="hero-wrap">
+                <div class="hero">
+                    <div class="info">
+                        <h1 class="title">Welcome to HealthAce</h1>
+                        <p class="sub-title">Discover a place you'll love to check your health.</p>
+                        <p class="desc">Access to a comprehensive and reliable healthcare services with just some simple click</p>
+                       
+                    </div>
+                    <img src="/img/hospital.jpg" alt="Discover a place you'll love to live." class="hero-img">
+                </div>
+        </div>
+        <div class="container">
             
+                <h2>About us</h2>
+                <p>HealthAce is your online healthcare companion, connecting you with doctors and health services from the comfort of your home.</p>
+    
+                <div class="features">
+                    <div class="feature">
+                        <h3>Online Appointments</h3>
+                        <p>Skip the long queues and book your appointments online with ease.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>Health Records</h3>
+                        <p>Access and manage your health records anytime, anywhere.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>Find Health Services</h3>
+                        <p>Locate nearby healthcare facilities and services using our integrated map.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>Feedback</h3>
+                        <p>Share your experiences and help improve healthcare services for everyone.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>Community Forum</h3>
+                        <p>Join health discussions, attend virtual events, and interact with experts.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>Supportive Chatbot</h3>
+                        <p>Get quick answers to common health questions with our friendly chatbot.</p>
+                    </div>
+                </div>
+    
+                <div class="question">
+                    <h3>What problem does it solve?</h3>
+                    <p>Patients find it difficult to reach healthcare locations in-person due to long queues and anxiety-inducing environments.</p>
+                </div>
+                <div class="question">
+                    <h3>How is this problem currently solved?</h3>
+                    <p>Patients currently go to the clinic, wait for a ticket, deal with ticket queues, phone receptionists, and rely on Google or word of mouth for information.</p>
+                </div>
+                <div class="question">
+                    <h3>How will this project make life better?</h3>
+                    <p>HealthAce eliminates annoying hospital lines and reduces hospital anxiety by providing online appointments, health record management, and easy access to health services.</p>
+                </div>
         </div>
-        <div class="feature">
 
-        </div>
     </main>
-    <footer class="footer">
-
+    <footer>
+        <p>HealthAce &copy; 2024</p>
     </footer>
 </body>
 </html>
