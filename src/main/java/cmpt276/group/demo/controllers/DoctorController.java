@@ -74,7 +74,7 @@ public class DoctorController {
     model.addAttribute("doctor", doctor);
     model.addAttribute("records", records);
     model.addAttribute("appointments", pastAppointments);
-    return "/doctors/viewRecordPage";
+    return "doctors/viewRecordPage";
   }
 
   @GetMapping("/doctors/addRecord")
@@ -173,9 +173,6 @@ public class DoctorController {
       return "doctors/expandRecordPage";
   }
   
-
-
-
   //--------------------------------------------View schedule------------------------------------------------
 
   @GetMapping("/doctors/viewSchedule")
@@ -188,6 +185,8 @@ public class DoctorController {
 
     return "doctors/viewSchedulePage";
   }
+
+  //---------------------------------------------Helper function---------------------------------------------
 
   // function to get past_appointment that haven't written record
   public List<PastAppointment> findNotRecord(String doctorUsername) {
