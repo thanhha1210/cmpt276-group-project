@@ -72,13 +72,18 @@
             font-size: 1em;
             cursor: pointer;
             transition: background-color 0.3s, transform 0.3s;
+
         }
 
         .btn:hover {
             opacity: 0.9;
             transform: translateY(-2px);
         }
+        .edit-btn{
+            margin-left:20px;
 
+
+        }
         .add-btn {
             background-color: #0F1B4C;
             color: #ffffff;
@@ -154,23 +159,30 @@
               <h1 th:text="${record.patientName} + '\'s Record'"></h1>
             </div>
         </div>
+        <p style="display:none" th:text="${record.patientUsername}" id="patientUsername"></p>
             <div>
                 <h3>Doctor Name</h3>
-                <span th:text="${record.doctorUsername}"></span>
+                <span id ="doctorUsername"th:text="${record.doctorUsername}"></span>
+                <button onclick="editDoctorUsername()" class="btn edit-btn">Edit</button>
             </div>
             <div>
                 <h3>Patient Name</h3>
-                <span th:text="${record.patientName}"></span>
+                <span  id="patientName"th:text="${record.patientName}"></span>
+                <button onclick="editPatientName()" class="btn edit-btn">Edit</button>
             </div>  
             <div>
                 <h3>Date </h3>
-                <span th:text="${record.date}"></span>
+                <span id="date" th:text="${record.date}"></span>
+                <button onclick="editDate()" class="btn edit-btn">Edit</button>
             </div>
             <div>
               <h3>Description </h3>
-              <span th:text="${record.description}"></span>
+              <span id="description"th:text="${record.description}"></span>
+              <button onclick="editDescription()" class="btn edit-btn">Edit</button>
           </div>
-
+          <div>
+            <button onclick="saveEditChanges()" class="btn ">Save Edit Changes</button>
+          </div>
 
 
         <div class="message-container" style="display: flex; justify-content: center; align-items: center; margin-top: 16px;">
@@ -181,4 +193,103 @@
         </div>
     </main>
 </body>
+<script>
+    function editPatientName() {
+        console.log("Edit Patient name");
+    // Replace the span with an input field
+        var name = document.getElementById("patientName").innerText;
+        var inputField = '<input id="editPatientName" value="' + name + '">';
+        inputField += '<button onclick="savePatientName()" class="btn edit-button">Save</button>';
+        document.getElementById("patientName").innerHTML = inputField;
+}
+
+    function savePatientName() {
+        var newName = document.getElementById("editPatientName").value;
+    // Here, send newName to your backend to update the record
+    // For demonstration, we'll just update the frontend
+        document.getElementById("patientName").innerText = newName;
+    // In a real application, you would send an AJAX request to your backend
+    // and only update the frontend if the backend update is successful
+}   
+function editDoctorUsername() {
+        console.log("Edit doctor name");
+    // Replace the span with an input field
+        var name = document.getElementById("doctorUsername").innerText;
+        var inputField = '<input id="editDoctorUsername" value="' + name + '">';
+        inputField += '<button onclick="saveDoctorUsername()" class="btn edit-button"">Save</button>';
+        document.getElementById("doctorUsername").innerHTML = inputField;
+}
+
+    function saveDoctorUsername() {
+        var newName = document.getElementById("editDoctorUsername").value;
+    // Here, send newName to your backend to update the record
+    // For demonstration, we'll just update the frontend
+        document.getElementById("doctorUsername").innerText = newName;
+    // In a real application, you would send an AJAX request to your backend
+    // and only update the frontend if the backend update is successful
+}
+function editDate() {
+        console.log("editDate");
+    // Replace the span with an input field
+        var name = document.getElementById("date").innerText;
+        var inputField = '<input id="editDate" value="' + name + '">';
+        inputField += '<button onclick="saveDate()" class="btn edit-button">Save</button>';
+        document.getElementById("date").innerHTML = inputField;
+}
+
+    function saveDate() {
+        var newName = document.getElementById("editDate").value;
+    // Here, send newName to your backend to update the record
+    // For demonstration, we'll just update the frontend
+        document.getElementById("date").innerText = newName;
+    // In a real application, you would send an AJAX request to your backend
+    // and only update the frontend if the backend update is successful
+}
+    function editDescription() {
+        console.log("editDescription");
+    // Replace the span with an input field
+        var name = document.getElementById("description").innerText;
+        var inputField = '<input id="editDescription" value="' + name + '">';
+        inputField += '<button onclick="saveDescription()"class="btn edit-button">Save</button>';
+        document.getElementById("description").innerHTML = inputField;
+}
+
+    function saveDescription() {
+        var newName = document.getElementById("editDescription").value;
+    // Here, send newName to your backend to update the record
+    // For demonstration, we'll just update the frontend
+        document.getElementById("description").innerText = newName;
+    // In a real application, you would send an AJAX request to your backend
+    // and only update the frontend if the backend update is successful
+}
+
+    
+    function saveEditChanges() {
+            //save 
+           console.log(document.getElementById("patientUsername").innerText)
+            console.log("Save edit changes");
+            var formData={
+                patientName:document.getElementById("patientName").innerText,
+                patientUsername:document.getElementById("patientUsername").innerText,
+                doctorUsername:document.getElementById("doctorUsername").innerText,
+                date:document.getElementById("date").innerText,
+                description:document.getElementById("description").innerText,
+            }
+            fetch('/doctors/editRecord', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if(data.success){
+                    console.log("success");
+               
+                }
+            })
+    }
+</script>
 </html>
