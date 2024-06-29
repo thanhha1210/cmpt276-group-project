@@ -28,6 +28,7 @@ import cmpt276.group.demo.models.record.RecordRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+
 @Controller
 public class DoctorController {
   @Autowired
@@ -56,11 +57,9 @@ public class DoctorController {
     return "doctors/mainPage";
   }
 
-  // -------------------------------------Book
-  // appointment-------------------------------------------------
+  // -------------------------------------Book appointment------------------------------------------
 
-  // -------------------------------------View
-  // record-------------------------------------------------
+  // -------------------------------------View record----------------------------------------------
   @GetMapping("/doctors/viewRecord")
   public String viewRecord(Model model, HttpSession session) {
     Doctor doctor = (Doctor) session.getAttribute("session_doctor");
@@ -69,6 +68,7 @@ public class DoctorController {
     List<PastAppointment> pastAppointments = findNotRecord(doctor.getUsername());
     Collections.sort(pastAppointments);
     List<Record> records = recordRepo.findByDoctorUsername(doctor.getUsername());
+    Collections.sort(records);
 
     // model.addAttribute("appointments", pastAppointments);
     model.addAttribute("doctor", doctor);
@@ -94,8 +94,7 @@ public class DoctorController {
   }
 
   @PostMapping("/doctors/addRecord")
-  public String addRecord(@RequestParam Map<String, String> formData, HttpServletResponse response, Model model,
-      HttpSession session) {
+  public String addRecord(@RequestParam Map<String, String> formData, HttpServletResponse response, Model model, HttpSession session) {
     Doctor doctor = (Doctor) session.getAttribute("session_doctor");
     model.addAttribute("doctor", doctor);
     // TODO: process POST request
@@ -103,22 +102,26 @@ public class DoctorController {
     String patientName = formData.get("patientName");
     String patientUsername = formData.get("patientUsername");
     String doctorUsername = formData.get("doctorUsername");
-
     String dateStr = formData.get("date");
     Date date = Date.valueOf(dateStr);
-    System.out.println(patientName);
-    System.out.println(patientUsername);
-    Record newRecord = new Record(patientUsername, patientName, doctorUsername, description, date);
-    recordRepo.save(newRecord);
 
-    PastAppointment pastApt = pastAppointmentRepo.findByPatientUsernameAndDoctorUsernameAndDate(patientUsername,
-        doctorUsername, date);
+    PastAppointment pastApt = pastAppointmentRepo.findByPatientUsernameAndDoctorUsernameAndDate(patientUsername, doctorUsername, date);
+    if (description.trim().equals("")) {
+      model.addAttribute("error0", "Please fill the description form!");
+      model.addAttribute("pastApt", pastApt);
+      return "doctors/addRecordPage";
+    }
+
+    Record newRecord = new Record(patientUsername, patientName, doctorUsername, description, date);
+    recordRepo.save(newRecord);   
     pastApt.setIsReport(true);
     pastAppointmentRepo.save(pastApt);
+    
     List<Record> records = recordRepo.findByDoctorUsername(doctor.getUsername());
-
-    // all the list
     List<PastAppointment> pastAppointments = findNotRecord(doctorUsername);
+
+    Collections.sort(pastAppointments);
+    Collections.sort(records);
     model.addAttribute("records", records);
     model.addAttribute("appointments", pastAppointments);
 
@@ -132,14 +135,48 @@ public class DoctorController {
 
     String patientUsername = formData.get("patientUsername");
     String doctorUsername = formData.get("doctorUsername");
+    String doctorName = doctor.getName();
     String dateStr = formData.get("date");
     Date date = Date.valueOf(dateStr);
 
     Record record = recordRepo.findByPatientUsernameAndDoctorUsernameAndDate(patientUsername, doctorUsername, date);
-
+    model.addAttribute("doctorName", doctorName);
     model.addAttribute("record", record);
     return "doctors/expandRecordPage";
   }
+
+  @PostMapping("/doctors/editRecord")
+  public String editSchedule(@RequestParam Map<String, String> formData, Model model, HttpSession session) {
+      Doctor doctor = (Doctor) session.getAttribute("session_doctor");
+      model.addAttribute("doctor", doctor);
+
+      //TODO: process POST request
+      String description = formData.get("desc");
+      String patientUsername = formData.get("patientUsername");
+      String doctorUsername = formData.get("doctorUsername");
+      String dateStr = formData.get("date");
+      Date date = Date.valueOf(dateStr);
+
+      Record editRecord = recordRepo.findByPatientUsernameAndDoctorUsernameAndDate(patientUsername, doctorUsername, date);
+      if (description.trim().equals("")) {
+          model.addAttribute("doctorName", doctor.getName());  
+          model.addAttribute("record", editRecord);
+          model.addAttribute("error0", "Please fill the description form!");
+          return "doctors/expandRecordPage";
+      }
+
+      editRecord.setDescription(description);
+      recordRepo.save(editRecord);
+      model.addAttribute("doctorName", doctor.getName());
+      model.addAttribute("record", editRecord);
+      model.addAttribute("success", "Change patient description successfully!");
+      return "doctors/expandRecordPage";
+  }
+  
+
+
+
+  //--------------------------------------------View schedule------------------------------------------------
 
   @GetMapping("/doctors/viewSchedule")
   public String viewBookedAppointments(Model model, HttpSession session) {

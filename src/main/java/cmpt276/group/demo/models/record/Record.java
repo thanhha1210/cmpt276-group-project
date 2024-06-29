@@ -2,6 +2,7 @@ package cmpt276.group.demo.models.record;
 
 import java.sql.Date;
 
+import cmpt276.group.demo.models.record.Record;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,7 +12,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "records")
-public class Record {
+public class Record implements Comparable<Record>{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +29,12 @@ public class Record {
     
     private String description;
     private Date date;
+
+
+    @Override
+    public int compareTo(Record o) {
+        return this.date.compareTo(o.getDate());  
+    }
 
     public Record() {
     }
