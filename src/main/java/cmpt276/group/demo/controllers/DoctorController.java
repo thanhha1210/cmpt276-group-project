@@ -72,7 +72,7 @@ public class DoctorController {
     model.addAttribute("doctor", doctor);
     model.addAttribute("records", records);
     model.addAttribute("appointments", pastAppointments);
-    return "/doctors/viewRecord";
+    return "/doctors/viewRecordPage";
   }
 
   @GetMapping("/doctors/addRecord")
@@ -88,7 +88,7 @@ public class DoctorController {
         doctorUsername, date);
 
     model.addAttribute("pastApt", pastApt);
-    return "doctors/addRecord";
+    return "doctors/addRecordPage";
   }
 
   @PostMapping("/doctors/addRecord")
@@ -120,7 +120,7 @@ public class DoctorController {
     model.addAttribute("records", records);
     model.addAttribute("appointments", pastAppointments);
 
-    return "doctors/viewRecord";
+    return "doctors/viewRecordPage";
   }
 
   @GetMapping("doctors/expandRecord")
@@ -136,7 +136,7 @@ public class DoctorController {
     Record record = recordRepo.findByPatientUsernameAndDoctorUsernameAndDate(patientUsername, doctorUsername, date);
 
     model.addAttribute("record", record);
-    return "doctors/expandRecord";
+    return "doctors/expandRecordPage";
   }
 
   @GetMapping("/doctors/viewSchedule")
@@ -147,7 +147,7 @@ public class DoctorController {
     List<Appointment> appointments = appointmentRepo.findByDoctorUsername(doctor.getUsername());
     model.addAttribute("appointments", appointments);
     
-    return "doctors/viewSchedule";
+    return "doctors/viewSchedulePage";
   }
 
   // function to get past_appointment that haven't written record
