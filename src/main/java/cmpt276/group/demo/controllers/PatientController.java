@@ -3,6 +3,7 @@ package cmpt276.group.demo.controllers;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -62,44 +63,15 @@ public class PatientController {
         return "patients/mainPage";
     }
     
-//--------------------------------------------Manage schedule--------------------------------------------------------
-    
-    // function to change appointment to past appointment
-    public void changeApt() {
-        // Get the current date
-        LocalDate currentDate = LocalDate.now();
-        System.out.println(currentDate);
-
-        // Retrieve all appointments
-        List<Appointment> appointmentList = appointmentRepo.findAll();
-
-        // Loop through appointments and update status
-        for (Appointment appointment : appointmentList) {
-            // if the 
-            if (appointment.getDate().toLocalDate().isBefore(currentDate)) {
-                // Create a new PastAppointment
-                PastAppointment pastAppointment = 
-                new PastAppointment(appointment.getDoctorName(), appointment.getDoctorUsername(),
-                                    appointment.getPatientName(), appointment.getPatientUsername(),
-                                    appointment.getDate(), appointment.getStartTime(),
-                                    appointment.getDuration(), appointment.getDepartment());
-
-                // Add to pastApt
-                pastAppointmentRepo.save(pastAppointment);
-
-                // Delete from Apt
-                appointmentRepo.delete(appointment);
-            }
-        }
-    }
+    //--------------------------------------------Manage schedule--------------------------------------------------------
    
     // Patient go to view schedule page
     @GetMapping("/patients/viewSchedule")
     public String getSchedule(Model model, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");
-        String patientUsername = patient.getUsername();
-        
+        deleteSchedule();
         changeApt();
+        String patientUsername = patient.getUsername();
 
         Appointment apt = appointmentRepo.findByPatientUsername(patientUsername);
         if (apt != null) {
@@ -116,6 +88,7 @@ public class PatientController {
     @PostMapping("/patients/bookAppointment")
     public String bookAppointment(@RequestParam Map<String, String> sche, Model model, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");
+        
         if (patient == null) {
             return "loginPage";
         }
@@ -189,5 +162,64 @@ public class PatientController {
         }
         model.addAttribute("patient", patient);
         return "patients/feedbackPage";
+    }
+
+    
+    // Helper function
+    // function to change appointment to past appointment
+    public void deleteSchedule() {
+        // Get the current date and time 
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+
+        // Retrieve all appointments
+        List<Schedule> scheduleList = scheduleRepo.findAll();
+
+        // Loop through schedule and delete if pass the current time
+        for (Schedule schedule : scheduleList) {
+
+            // Get date and time of each schedule in a list
+            LocalDate scheDate = schedule.getDate().toLocalDate();
+            LocalTime scheTime = schedule.getStartTime().toLocalTime();
+            if (scheDate.isBefore(currentDate) || (scheDate.isEqual(currentDate) && scheTime.isBefore(currentTime))) {
+                scheduleRepo.delete(schedule);
+            }
+        }
+    }
+
+    // function to change appointment to past appointment
+    public void changeApt() {
+        // Get the current date
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+        System.out.println(currentDate);
+        System.out.println(currentTime);
+        // Retrieve all appointments
+        List<Appointment> appointmentList = appointmentRepo.findAll();
+
+        // Loop through appointments and update status
+        for (Appointment apt : appointmentList) {
+            
+            // Get date and startTime of each appointment in a list
+            LocalDate aptDate = apt.getDate().toLocalDate();
+            LocalTime aptTime = apt.getStartTime().toLocalTime().plusMinutes(apt.getDuration());
+            System.out.println(aptDate);
+            System.out.println(aptTime);
+            if (aptDate.isBefore(currentDate) || (aptDate.isEqual(currentDate) && aptTime.isBefore(currentTime))) {
+
+                // Create a new PastAppointment
+                PastAppointment pastApt = 
+                new PastAppointment(apt.getDoctorName(), apt.getDoctorUsername(),
+                                    apt.getPatientName(), apt.getPatientUsername(),
+                                    apt.getDate(), apt.getStartTime(),
+                                    apt.getDuration(), apt.getDepartment());
+
+                // Add to pastApt
+                pastAppointmentRepo.save(pastApt);
+
+                // Delete from Apt
+                appointmentRepo.delete(apt);
+            }
+        }
     }
 }
