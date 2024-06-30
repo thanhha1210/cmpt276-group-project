@@ -59,172 +59,92 @@
             opacity: 0.9;
             transform: translateY(-2px);
         }
-        .add-btn {
-            background-color: #0F1B4C;
-            color: #ffffff;
-            grid-column: span 2;
-            justify-self: center;
-        }
         .exit-btn {
             background-color: #f44336;
             color: #ffffff;
         }
-        .book-btn {
-            background-color: #fff;
-            color: green;
-        }
-        .book-btn:hover {
-            text-decoration: underline;
-        }
-        .delete-btn {
-            background-color: #fff;
-            color: #f44336;
-        }
-        .delete-btn:hover {
-            text-decoration: underline;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        th, td {
-            padding: 12px;
-            border: 1px solid #dee2e6;
-            text-align: center;
-        }
-        th {
-            background-color: var(--secondary-color, #0F1B4C);
-            color: #fff;
-            font-weight: 600;
-        }
-        td {
-            font-size: 0.9rem;
-        }
-        .search {
-            margin: 20px;
+        .info-container {
             display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            font-size: 1.2em;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
         }
-        .description-cell:hover {
-            background-color: #e0e0e0; /* Darken effect */
-            cursor: pointer;
-        }
-        .window {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-        }
-        .window-content {
-            background-color: white;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 40%;
-            max-width: 500px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        .info {
+            flex: 1 1 calc(33% - 40px);
+            max-width: calc(33% - 40px);
+            box-sizing: border-box;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
             border-radius: 8px;
+            padding: 20px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: transform 0.3s ease, scale 0.3s ease;
         }
-        .window-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            text-align: center;
+        .info:hover {
+            flex: 1 1 100%;
+            transform: scale(1.05);
+            z-index: 1;
+            overflow-wrap: break-word;
+            overflow: visible;
         }
-        .close-window-button {
-            background-color: red;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            float: right;
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
         }
-        .hover-effect tbody tr:hover {
-            transform: scale(1.02);
-            transition: transform 0.2s;
+        .info-item > h3 {
+            min-width: 150px;
+            margin-right: 10px;
         }
-        .no-hover-effect tbody tr:hover {
-            transform: none;
+        .desc {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: all 0.3s ease;
         }
+        .info:hover .desc {
+            white-space: normal;
+            overflow: visible;
+        }
+            
     </style>
 </head>
 <body>
-    <header>
-        <h1>Your Records</h1>
+    <header class="content" style="display: flex; justify-content: space-between; text-align: center; margin-bottom: 30px;">
+        <form action="/patients/getDashboard" method="get">
+            <input type="submit" value="HOME" class="btn exit-btn">
+        </form>
+        <div>
+            <h1 th:text="${patient.name}  + '\'s Records'" style="font-weight: 700; font-size: 2.4em; margin-top: 12px;"></h1>
+        </div>
+        <div></div>
     </header>
+    
     <main class="content">
-        <table class="hover-effect" id="records-table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Patient Name</th>
-                    <th>Doctor</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="record : ${records}" class="record-row">
-                    <td th:text="${record.date}"></td>
-                    <td th:text="${record.patientName}"></td>
-                    <td th:text="${record.doctorUsername}"></td>
-                    <td class="description-cell" th:data-description="${record.description}">
-                        <span th:text="${record.description}"></span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <div id="description-window" class="window">
-            <div class="window-content">
-                <div class="window-title">Extended Description</div>
-                <span id="window-description"></span>
-                <br><br>
-                <button id="close-window-button" class="close-window-button">Close</button>
+        <div class="info-container">
+            <div th:each="record : ${records}" class="info">
+                <div>
+                    <div class="info-item">
+                        <h3>Date</h3>
+                        <span th:text="${record.date}"></span>
+                    </div>
+                    <div class="info-item">
+                        <h3>Patient Name</h3>
+                        <span th:text="${record.patientName}"></span>
+                    </div>
+                    <div class="info-item">
+                        <h3>Doctor Name</h3>
+                        <span th:text="${record.doctorUsername}"></span>
+                    </div>
+                    <div class="info-item">
+                        <h3>Description</h3>
+                        <span th:text="${record.description}" class="desc"></span>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var descriptionCells = document.querySelectorAll('.description-cell');
-            var window            = document.getElementById('description-window');
-            var windowDescription = document.getElementById('window-description');
-            var closewindowButton = document.getElementById('close-window-button');
-            var recordsTable      = document.getElementById('records-table');
-
-            descriptionCells.forEach(function(descriptionCell) {
-                descriptionCell.addEventListener('dblclick', function() {
-                    recordsTable.classList.remove('hover-effect');
-                    recordsTable.classList.add('no-hover-effect');
-                    windowDescription.textContent = descriptionCell.getAttribute('data-description');
-                    window.style.display = 'block';
-                });
-            });
-
-            closewindowButton.addEventListener('click', function() {
-                window.style.display = 'none';
-                recordsTable.classList.remove('no-hover-effect');
-                recordsTable.classList.add('hover-effect');
-            });
-
-            window.addEventListener('click', function(event) {
-                if (event.target == window) {
-                    window.style.display = 'none';
-                    recordsTable.classList.remove('no-hover-effect');
-                    recordsTable.classList.add('hover-effect');
-                }
-            });
-        });
-    </script>
+   
 </body>
 </html>

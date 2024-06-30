@@ -20,7 +20,7 @@ public class Doctor {
     private int age;
     private String address;
     private String phone;
-        private Department department;
+    private Department department;
 
 
     public Doctor() { }
