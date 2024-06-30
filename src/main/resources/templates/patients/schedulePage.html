@@ -132,35 +132,36 @@
     </header>
     <main class="content">
       
-            <table class="table-container">
-                <thead>
-                    <tr>
-                        <th>Doctor Name</th>
-                        <th>Department</th>
-                        <th>Date</th>
-                        <th>Start time</th>
-                        <th>Duration</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:if="${appointment}">
-                        <td><span th:text="${appointment.doctorName}"></span></td>
-                        <td><span th:text="${appointment.department}"></span></td>
-                        <td><span th:text="${appointment.date}"></span></td>
-                        <td><span th:text="${appointment.startTime}"></span></td>
-                        <td><span th:text="${appointment.duration}"></span></td>
-                        <td>
-                            <form action="/patients/deleteAppointment" method="post">
-                                <input type="hidden" name="doctorUsername" th:value="${appointment.doctorUsername}">
-                                <input type="hidden" name="date" th:value="${appointment.date}">
-                                <input type="hidden" name="startTime" th:value="${appointment.startTime}">
-                                <input type="submit" class="btn delete-btn" value="DELETE" style="color:red">
-                            </form>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+           
+        <table class="table-container">
+            <thead>
+                <tr>
+                    <th>Doctor Name</th>
+                    <th>Department</th>
+                    <th>Date</th>
+                    <th>Start time</th>
+                    <th>Duration</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${appointment}">
+                    <td><span th:text="${appointment.doctorName}"></span></td>
+                    <td><span th:text="${appointment.department}"></span></td>
+                    <td><span th:text="${appointment.date}"></span></td>
+                    <td><span th:text="${appointment.startTime}"></span></td>
+                    <td><span th:text="${appointment.duration}"></span></td>
+                    <td>
+                        <form action="/patients/deleteAppointment" method="post">
+                            <input type="hidden" name="doctorUsername" th:value="${appointment.doctorUsername}">
+                            <input type="hidden" name="date" th:value="${appointment.date}">
+                            <input type="hidden" name="startTime" th:value="${appointment.startTime}">
+                            <input type="submit" class="btn delete-btn" value="DELETE" style="color:red">
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
         
     </main>
     

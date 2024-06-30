@@ -33,9 +33,10 @@ public class Record implements Comparable<Record>{
 
     @Override
     public int compareTo(Record o) {
-        return this.date.compareTo(o.getDate());  
+        //return this.date.compareTo(o.getDate());  
+        return o.getDate().compareTo(date);
     }
-
+    
     public Record() {
     }
 
