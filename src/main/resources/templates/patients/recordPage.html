@@ -3,63 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Records</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    <title>Record Page</title>
     <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            border: 0;
+        }
+        body, input, button {
+            font-family: "Poppins", sans-serif;
+        }
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            line-height: 1.5;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        .content {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header, main {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        header {
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .search-container {
-            display: flex;
             align-items: center;
-            background-color: white;
-            border-radius: 50px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0F1B4C;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .btn {
+            font-weight: 600;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        .add-btn {
+            background-color: #0F1B4C;
+            color: #ffffff;
+            grid-column: span 2;
+            justify-self: center;
+        }
+        .exit-btn {
+            background-color: #f44336;
+            color: #ffffff;
+        }
+        .book-btn {
+            background-color: #fff;
+            color: green;
+        }
+        .book-btn:hover {
+            text-decoration: underline;
+        }
+        .delete-btn {
+            background-color: #fff;
+            color: #f44336;
+        }
+        .delete-btn:hover {
+            text-decoration: underline;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
             margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
         }
-
-        .search-input {
-            border: none;
-            padding: 10px 20px;
-            outline: none;
-            width: 300px;
-            border-radius: 50px 0 0 50px;
+        th, td {
+            padding: 12px;
+            border: 1px solid #dee2e6;
+            text-align: center;
         }
-
-        .search-input::placeholder {
-            color: #999;
+        th {
+            background-color: var(--secondary-color, #0F1B4C);
+            color: #fff;
+            font-weight: 600;
         }
-
-        .search-button {
-            border: none;
-            background-color: #4CAF50;
+        td {
+            font-size: 0.9rem;
+        }
+        .search {
+            margin: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            font-size: 1.2em;
+        }
+        .description-cell:hover {
+            background-color: #e0e0e0; /* Darken effect */
+            cursor: pointer;
+        }
+        .window {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        .window-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 40%;
+            max-width: 500px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        .window-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .close-window-button {
+            background-color: red;
             color: white;
+            border: none;
             padding: 10px 20px;
             cursor: pointer;
-            border-radius: 0 50px 50px 0;
-            transition: background-color 0.3s ease;
+            float: right;
         }
-
-        .search-button:hover {
-            background-color: #45a049;
+        .hover-effect tbody tr:hover {
+            transform: scale(1.02);
+            transition: transform 0.2s;
         }
-
+        .no-hover-effect tbody tr:hover {
+            transform: none;
+        }
     </style>
 </head>
 <body>
-    <div class="search-container">
-        <input type="text" placeholder="Search" class="search-input">
-        <button class="search-button">Search</button>
-    </div>
+    <header>
+        <h1>Your Records</h1>
+    </header>
+    <main class="content">
+        <table class="hover-effect" id="records-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Patient Name</th>
+                    <th>Doctor</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="record : ${records}" class="record-row">
+                    <td th:text="${record.date}"></td>
+                    <td th:text="${record.patientName}"></td>
+                    <td th:text="${record.doctorUsername}"></td>
+                    <td class="description-cell" th:data-description="${record.description}">
+                        <span th:text="${record.description}"></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div id="description-window" class="window">
+            <div class="window-content">
+                <div class="window-title">Extended Description</div>
+                <span id="window-description"></span>
+                <br><br>
+                <button id="close-window-button" class="close-window-button">Close</button>
+            </div>
+        </div>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var descriptionCells = document.querySelectorAll('.description-cell');
+            var window            = document.getElementById('description-window');
+            var windowDescription = document.getElementById('window-description');
+            var closewindowButton = document.getElementById('close-window-button');
+            var recordsTable      = document.getElementById('records-table');
+
+            descriptionCells.forEach(function(descriptionCell) {
+                descriptionCell.addEventListener('dblclick', function() {
+                    recordsTable.classList.remove('hover-effect');
+                    recordsTable.classList.add('no-hover-effect');
+                    windowDescription.textContent = descriptionCell.getAttribute('data-description');
+                    window.style.display = 'block';
+                });
+            });
+
+            closewindowButton.addEventListener('click', function() {
+                window.style.display = 'none';
+                recordsTable.classList.remove('no-hover-effect');
+                recordsTable.classList.add('hover-effect');
+            });
+
+            window.addEventListener('click', function(event) {
+                if (event.target == window) {
+                    window.style.display = 'none';
+                    recordsTable.classList.remove('no-hover-effect');
+                    recordsTable.classList.add('hover-effect');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
