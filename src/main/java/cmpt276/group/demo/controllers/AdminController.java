@@ -255,8 +255,9 @@ public class AdminController {
 
         // Check the schedule time with real time
         LocalDate currentDate = LocalDate.now();
-        if (date.toLocalDate().isBefore(currentDate)) {
-            model.addAttribute("error5", "The schedule is before today date. Please choose another date");
+        LocalTime currentTime = LocalTime.now();
+        if (date.toLocalDate().isBefore(currentDate) || (date.toLocalDate().isEqual(currentDate) && startTime.toLocalTime().isBefore(currentTime))) {
+            model.addAttribute("error5", "The schedule is behind the current date and time. Please enter a valid schedule");
             return "admins/addSchedulePage";
             
         }
@@ -315,6 +316,7 @@ public class AdminController {
         LocalTime currentTime = LocalTime.now();
         System.out.println(currentDate);
         System.out.println(currentTime);
+
         // Retrieve all appointments
         List<Appointment> appointmentList = appointmentRepo.findAll();
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Page</title>
+    <title>Admin Mainpage</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -144,9 +144,14 @@
         .feature > h3 {
             color: #67f011;
         }
+        .features > .feature {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
         .features > .feature:hover {
             opacity: 0.9;
-            transform: translateY(-2px);
+            /* transform: translateY(-2px); */
+            transform: scale(1.1);
         }
 
         /*Hero tag*/
@@ -230,8 +235,8 @@
                 <div class="hero">
                     <div class="info">
                         <h1 class="title">Welcome to HealthAce</h1>
-                        <p class="sub-title">Discover a place you'll love to check your health.</p>
-                        <p class="desc">Access to a comprehensive and reliable healthcare services with just some simple click</p>
+                        <p class="sub-title">Discover a place you'd love to check your health.</p>
+                        <p class="desc">Access to a comprehensive and reliable healthcare services with just some simple clicks</p>
                        
                     </div>
                     <img src="/img/hospital.jpg" alt="Discover a place you'll love to live." class="hero-img">

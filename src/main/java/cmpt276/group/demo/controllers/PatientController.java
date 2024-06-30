@@ -222,4 +222,19 @@ public class PatientController {
             }
         }
     }
+
+    @GetMapping("/patients/recordPage")
+    public String viewPastAppointments(Model model, HttpSession session) {
+        String username = (String) session.getAttribute("session_user");
+  
+        if (username != null && !username.isEmpty()) {
+            List<Record> records = recordRepo.findByPatientUsername(username);
+            Collections.sort(records);
+            model.addAttribute("records", records);
+        } 
+        else {
+            model.addAttribute("error", "No user logged in");
+        }
+        return "patients/recordPage";
+    }
 }
