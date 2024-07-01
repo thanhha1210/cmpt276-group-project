@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import cmpt276.group.demo.models.Department;
 import cmpt276.group.demo.models.admin.AdminRepository;
 import cmpt276.group.demo.models.appointment.Appointment;
 import cmpt276.group.demo.models.appointment.AppointmentRepository;
@@ -112,7 +113,8 @@ public class DoctorController {
       return "doctors/addRecordPage";
     }
 
-    Record newRecord = new Record(patientUsername, patientName, doctorUsername, description, date);
+    // Get doctorName and department by session
+    Record newRecord = new Record(patientUsername, patientName, doctorUsername, doctor.getName(), doctor.getDepartment(), description, date);
     recordRepo.save(newRecord);   
     pastApt.setIsReport(true);
     pastAppointmentRepo.save(pastApt);

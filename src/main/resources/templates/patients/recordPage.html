@@ -129,14 +129,17 @@
                         <h3>Date</h3>
                         <span th:text="${record.date}"></span>
                     </div>
-                    <div class="info-item">
-                        <h3>Patient Name</h3>
-                        <span th:text="${record.patientName}"></span>
-                    </div>
+                    
                     <div class="info-item">
                         <h3>Doctor Name</h3>
-                        <span th:text="${record.doctorUsername}"></span>
+                        <span th:text="${record.doctorName}"></span>       <!-- change to doctorName -->
                     </div>
+
+                    <div class="info-item">
+                        <h3>Department</h3>
+                        <span th:text="${record.department}"></span>       <!-- change to department -->
+                    </div>
+
                     <div class="info-item">
                         <h3>Description</h3>
                         <span th:text="${record.description}" class="desc"></span>
