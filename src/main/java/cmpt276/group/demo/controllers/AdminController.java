@@ -22,6 +22,8 @@ import cmpt276.group.demo.models.appointment.Appointment;
 import cmpt276.group.demo.models.appointment.AppointmentRepository;
 import cmpt276.group.demo.models.doctor.Doctor;
 import cmpt276.group.demo.models.doctor.DoctorRepository;
+import cmpt276.group.demo.models.event.Event;
+import cmpt276.group.demo.models.event.EventRepository;
 import cmpt276.group.demo.models.past_appointment.PastAppointment;
 import cmpt276.group.demo.models.past_appointment.PastAppointmentRepository;
 import cmpt276.group.demo.models.record.RecordRepository;
@@ -45,7 +47,8 @@ public class AdminController {
     private AppointmentRepository appointmentRepo;
     @Autowired
     private PastAppointmentRepository pastAppointmentRepo;
-
+    @Autowired
+    private EventRepository eventRepo;
     // ------------------------------------------------------Get Dashboard--------------------------------------------------
     @GetMapping("/admins/getDashboard")
     public String getDashboard(Model model, HttpSession session) {
@@ -135,7 +138,6 @@ public class AdminController {
     }
 
     // ------------------------------------------------------ View & delete appointment----------------------------------------
-   
     // admin view appointment
     @GetMapping("/admins/viewAppointment")
     public String viewAppointment(Model model) {
@@ -175,8 +177,6 @@ public class AdminController {
     }
 
     // ------------------------------------------------------ View, add & delete schedule---------------------------------------------
-
-   
     // go to schedule page
     @GetMapping("/admins/viewSchedule")
     public String viewSchedule(Model model) {
@@ -345,4 +345,12 @@ public class AdminController {
             }
         }
     }
+
+
+    // ------------------------------------------------------ View, add, modify & event---------------------------------------------
+    // go to event page
+ 
+    
+
+    
 }

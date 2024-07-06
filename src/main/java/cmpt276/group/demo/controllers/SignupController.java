@@ -22,6 +22,13 @@ public class SignupController {
     
     @PostMapping("/patients/signup")
     public String registerPatient(@RequestParam Map<String, String> formData, HttpServletResponse response, Model model, HttpSession session, HttpServletRequest request) {
+        String ageStr = formData.get("age");
+        if (ageStr.trim().equals("")) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            model.addAttribute("error0", "Please enter all the form!");
+            return "patients/signupPage";
+        }
+
         String username = formData.get("username");
         String password = formData.get("password");
         String name = formData.get("name");

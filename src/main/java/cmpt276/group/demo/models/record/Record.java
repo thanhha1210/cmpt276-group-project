@@ -3,7 +3,6 @@ package cmpt276.group.demo.models.record;
 import java.sql.Date;
 
 import cmpt276.group.demo.models.Department;
-import cmpt276.group.demo.models.record.Record;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

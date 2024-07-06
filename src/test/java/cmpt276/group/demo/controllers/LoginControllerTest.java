@@ -1,26 +1,24 @@
 package cmpt276.group.demo.controllers;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-
 import org.junit.jupiter.api.Test;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-import cmpt276.group.demo.models.admin.AdminRepository;
-import cmpt276.group.demo.models.doctor.DoctorRepository;
-import cmpt276.group.demo.models.patient.PatientRepository;
 import cmpt276.group.demo.models.admin.Admin;
+import cmpt276.group.demo.models.admin.AdminRepository;
 import cmpt276.group.demo.models.doctor.Doctor;
+import cmpt276.group.demo.models.doctor.DoctorRepository;
 import cmpt276.group.demo.models.patient.Patient;
-
-import static org.mockito.BDDMockito.given;
+import cmpt276.group.demo.models.patient.PatientRepository;
 
 @WebMvcTest(LoginController.class)
 public class LoginControllerTest {
@@ -48,9 +46,9 @@ public class LoginControllerTest {
     public void testPatientLoginSuccess() throws Exception {
         Patient patient = new Patient();
         patient.setUsername("patient");
-        patient.setPassword("password");
+        patient.setPassword("passwort");
 
-        given(patientRepo.findByUsernameAndPassword("patient", "password")).willReturn(patient);
+        when(patientRepo.findByUsernameAndPassword("patient", "password")).thenReturn(patient);
 
         mockMvc.perform(post("/")
                 .param("username", "patient")
@@ -64,7 +62,7 @@ public class LoginControllerTest {
     @Test
     public void testAdminLoginSuccess() throws Exception {
         Admin admin = new Admin("admin", "password"); 
-        given(adminRepo.findByUsernameAndPassword("admin", "password")).willReturn(admin);
+        when(adminRepo.findByUsernameAndPassword("admin", "password")).thenReturn(admin);
 
         mockMvc.perform(post("/")
                 .param("username", "admin")

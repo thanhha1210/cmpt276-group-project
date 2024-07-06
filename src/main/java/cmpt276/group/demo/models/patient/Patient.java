@@ -20,6 +20,7 @@ public class Patient {
     private String address;
     private String phone;
 
+    
     public Patient() { }
 
     public Patient(String username, String password, String name, int age, String address, String phone) {
