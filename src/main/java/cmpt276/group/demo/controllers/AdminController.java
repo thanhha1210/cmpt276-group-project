@@ -16,49 +16,46 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import cmpt276.group.demo.models.Department;
-import cmpt276.group.demo.models.admin.Admin;
-import cmpt276.group.demo.models.admin.AdminRepository;
 import cmpt276.group.demo.models.appointment.Appointment;
 import cmpt276.group.demo.models.appointment.AppointmentRepository;
 import cmpt276.group.demo.models.doctor.Doctor;
 import cmpt276.group.demo.models.doctor.DoctorRepository;
+import cmpt276.group.demo.models.event.Event;
+import cmpt276.group.demo.models.event.EventRepository;
 import cmpt276.group.demo.models.past_appointment.PastAppointment;
 import cmpt276.group.demo.models.past_appointment.PastAppointmentRepository;
-import cmpt276.group.demo.models.record.RecordRepository;
+import cmpt276.group.demo.models.patient.PatientRepository;
 import cmpt276.group.demo.models.schedule.Schedule;
 import cmpt276.group.demo.models.schedule.ScheduleRepository;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class AdminController {
 
     @Autowired
-    private AdminRepository adminRepo;
+    private PatientRepository patientRepo;
     @Autowired
     private DoctorRepository doctorRepo;
-    @Autowired
-    private RecordRepository recordRepo;
     @Autowired
     private ScheduleRepository scheduleRepo;
     @Autowired
     private AppointmentRepository appointmentRepo;
     @Autowired
     private PastAppointmentRepository pastAppointmentRepo;
+    @Autowired
+    private EventRepository eventRepo;
 
     // ------------------------------------------------------Get Dashboard--------------------------------------------------
-    @GetMapping("/admins/getDashboard")
-    public String getDashboard(Model model, HttpSession session) {
-        Admin admin = (Admin) session.getAttribute("session_admin");
-        model.addAttribute("admin", admin);
+    // get dashboard (added test)
+    @GetMapping("/admins/getDashboard") 
+    public String getDashboard(Model model) {
         return "admins/mainPage";
     }
 
-    // -----------------------------------------------------View & add doctor-----------------------------------------------
+    // -----------------------------------------------------View & add, delete doctor-----------------------------------------------
+    // admin go to view doctor page (added test)
     @GetMapping("/admins/viewDoctor")
-    public String viewDoctor(Model model, HttpSession session) {
-        Admin admin = (Admin) session.getAttribute("session_admin");
-        model.addAttribute("admin", admin);
+    public String viewDoctor(Model model) {
         model.addAttribute("doctors", doctorRepo.findAll());
         return "admins/viewDoctorPage";
     }
@@ -70,27 +67,21 @@ public class AdminController {
     }
 
     @PostMapping("/admins/addDoctor")
-    public String registerDoctor(@RequestParam Map<String, String> formData, HttpServletResponse response, Model model,
-            HttpSession session) {
-        if (formData.get("age").equals("")) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            model.addAttribute("error0", "Please enter all the form!");
-            return "admins/addDoctorPage";
-        }
+    public String registerDoctor(@RequestParam Map<String, String> formData, HttpServletResponse response, Model model) {
         String username = formData.get("username");
         String password = formData.get("password");
         String name = formData.get("name");
-        int age = Integer.parseInt(formData.get("age"));
         String address = formData.get("address");
         String phone = formData.get("phone");
         String departmentStr = formData.get("department");
 
-        if (username.trim().equals("") || password.trim().equals("") || name.trim().equals("")
-                || address.trim().equals("") || phone.trim().equals("") || departmentStr.trim().equals("")) {
+        if (username.trim().isEmpty() || password.trim().isEmpty() || name.trim().isEmpty()
+                || address.trim().isEmpty() || phone.trim().isEmpty() || departmentStr.trim().isEmpty() || formData.get("age").isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             model.addAttribute("error0", "Please enter all the form!");
             return "admins/addDoctorPage";
         }
+        int age = Integer.parseInt(formData.get("age"));
         if (age <= 0) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             model.addAttribute("error1", "Please enter a valid age");
@@ -107,12 +98,9 @@ public class AdminController {
         doctorRepo.save(newDoctor);
         response.setStatus(201);
         model.addAttribute("Doctor", newDoctor);
-        session.setAttribute("session_doctor", newDoctor);
         model.addAttribute("success", "Add Successfully");
         return "admins/addDoctorPage";
     }
-
-    // ------------------------------------------------------ Deletes doctor--------------------------------------------------
     // admin delete doctor => all schedule & appointment with that doctor will be delete
     @PostMapping("/admins/deleteDoctor")
     public String deleteDoctor(@RequestParam String username, Model model) {
@@ -134,6 +122,13 @@ public class AdminController {
         return "admins/viewDoctorPage";
     }
 
+
+    // ------------------------------------------------------ View & delete patient----------------------------------------
+    @GetMapping("/admins/viewPatient")
+    public String viewPatient(Model model) {
+        model.addAttribute("patients", patientRepo.findAll());
+        return "admins/viewPatientPage";
+    }
     // ------------------------------------------------------ View & delete appointment----------------------------------------
    
     // admin view appointment
@@ -175,7 +170,6 @@ public class AdminController {
     }
 
     // ------------------------------------------------------ View, add & delete schedule---------------------------------------------
-
    
     // go to schedule page
     @GetMapping("/admins/viewSchedule")
@@ -187,20 +181,20 @@ public class AdminController {
         return "admins/viewSchedulePage";
     }
 
-    // add button in addSchedulePage
+    // go to addSchedulePage
     @GetMapping("/admins/addSchedule")
     public String addSchedulePage(Model model) {
         return "admins/addSchedulePage";
     }
 
-    // doctor add schedule (+)
+    // admin add schedule (+)
     @PostMapping("/admins/addSchedule")
-    public String postMethodName(@RequestParam Map<String, String> scheduleInfo, HttpServletResponse response, Model model) {
+    public String addSchedule(@RequestParam Map<String, String> scheduleInfo, HttpServletResponse response, Model model) {
         String doctorUsername = scheduleInfo.get("doctorUsername");
 
         // Check if any field is empty
-        if (doctorUsername == null || doctorUsername.trim().isEmpty() || scheduleInfo.get("duration") == null
-                || scheduleInfo.get("duration").trim().isEmpty()) {
+        if (doctorUsername == null || doctorUsername.trim().isEmpty() || scheduleInfo.get("duration") == null || scheduleInfo.get("duration").trim().isEmpty() ||
+            scheduleInfo.get("date") == null || scheduleInfo.get("date").trim().isEmpty() ||  scheduleInfo.get("startTime") == null || scheduleInfo.get("startTime").trim().isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             model.addAttribute("error0", "Please enter all the form!");
             return "admins/addSchedulePage";
@@ -345,4 +339,91 @@ public class AdminController {
             }
         }
     }
+
+    // ------------------------------------------------------ View, add & delete event---------------------------------------------
+    // go to view event page
+    @GetMapping("/admins/viewEvent")
+    public String viewEvent(Model model) {
+        List<Event> events = eventRepo.findAll();
+        model.addAttribute("events", events);
+        return "admins/viewEventPage";
+    }
+
+    // go to add event page
+    @GetMapping("/admins/addEvent") 
+    public String addEventPage(Model model) {
+        return "admins/addEventPage";
+    }
+    
+    // add event
+    @PostMapping("/admins/addEvent")
+    public String addEvent(@RequestParam Map<String, String> formData, Model model, HttpServletResponse response) {
+        //TODO: process POST request
+      
+        if (formData.get("startTime").trim().isEmpty() || formData.get("date").trim().isEmpty() ||formData.get("eventCode").trim().isEmpty() || formData.get("eventName").trim().isEmpty() || 
+            formData.get("capacity").trim().isEmpty()  ||formData.get("duration").trim().isEmpty() || formData.get("description").trim().isEmpty() ) {
+            model.addAttribute("error0", "Please fill all the forms");
+            return "admins/addEventPage";
+        }
+
+        String eventCode = formData.get("eventCode");
+        String eventName = formData.get("eventName");
+        String description = formData.get("description");
+
+        Date date = Date.valueOf(formData.get("date"));
+        Time startTime = Time.valueOf(formData.get("startTime")+ ":00");
+        int capacity = Integer.parseInt(formData.get("capacity"));
+        int  duration = Integer.parseInt(formData.get("duration"));
+        
+        if (eventRepo.findByEventCode(eventCode) != null) {
+            model.addAttribute("error1", "This event code existed");
+            return "admins/addEventPage";
+        }
+
+        Event newEvent = new Event(eventCode, eventName, capacity, description, date, startTime, duration);
+        eventRepo.save(newEvent);
+        List<Event> events = eventRepo.findAll();
+        model.addAttribute("events", events);
+        model.addAttribute("success", "You create an event successfully");
+        return "admins/addEventPage";
+    }
+
+    // delete event
+    @PostMapping("/admins/deleteEvent")
+    public String deleteEvent(@RequestParam String eventCode, Model model) {
+        Event deleteEvent = eventRepo.findByEventCode(eventCode); 
+        eventRepo.delete(deleteEvent);
+        List<Event> events = eventRepo.findAll();
+        model.addAttribute("events", events);
+        return "admins/viewEventPage";
+    }
+    
+    // display event
+    @GetMapping("/admins/displayEvent")
+    public String displayEvent(@RequestParam String eventCode, Model model) {
+        Event displayEvent = eventRepo.findByEventCode(eventCode);
+        model.addAttribute("event", displayEvent);
+        return "admins/displayEventPage";
+    }
+
+    // edit event
+    @PostMapping("/admins/editEvent")
+    public String editEvent(@RequestParam Map<String, String> formData, Model model) {
+        Event editEvent = eventRepo.findByEventCode(formData.get("eventCode"));
+        String description = formData.get("description");
+        if (description.trim().isEmpty()) {
+            model.addAttribute("error0", "Please enter description form");
+        }
+        else {
+            editEvent.setDescription(formData.get("description"));
+            eventRepo.save(editEvent);
+            model.addAttribute("success", "Successfully edit event");
+        }
+        
+        model.addAttribute("event", editEvent);
+        return "admins/displayEventPage";
+
+    }
+
+
 }

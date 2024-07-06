@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            border: 0;
+        }
+        body, input, button {
+            font-family: "Poppins", sans-serif;
+        }
+        body {
+            line-height: 1.5;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        .content {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header, main {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0F1B4C;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .btn {
+            font-weight: 600;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        .add-btn {
+            background-color: #0F1B4C;
+            color: #ffffff;
+        }
+        .exit-btn {
+            background-color: #f44336;
+            color: #ffffff;
+        }
+        .info-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        .flex-container {
+            display: flex;
+            justify-content: flex-start;
+        }
+        .info {
+            margin-left: auto;
+            margin-right: auto;
+            box-sizing: border-box;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: transform 0.3s ease, scale 0.3s ease;
+            width: 70%;
+        }
+        .info:hover {
+            transform: scale(1.05);
+            z-index: 1;
+            overflow-wrap: break-word;
+            overflow: visible;
+        }
+        .info-item {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .info-item > h3 {
+            min-width: 150px;
+            margin-right: 10px;
+        }
+        .desc {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: all 0.3s ease;
+        }
+        .info:hover .desc {
+            white-space: normal;
+            overflow: visible;
+        }
+            
+    </style>
+</head>
+<body>
+    <header class="content" style="display: flex; justify-content: space-between; text-align: center; margin-bottom: 30px;">
+        <form action="/patients/getDashboard" method="get">
+            <input type="submit" value="HOME" class="btn exit-btn">
+        </form>
+        <div>
+            <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Events</h1>
+        </div>
+        <div></div>
+    </header>
+    <main>
+         <!-- Booked section -->
+        <div class="content">
+            <div class="info-container">
+                <div th:each="event : ${booked}" class="info">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; ">
+                        <div class="info-item">
+                            <h3>Event Name</h3>
+                            <span th:text="${event.eventName}"></span>
+                        </div>
+                        <div class="info-item">
+                            <h3>Current / Capacity</h3>
+                            <span th:text="${event.currentNum} + ' / ' + ${event.capacity}"></span>      
+                        </div>
+                        <div class="info-item">
+                            <h3>Duration </h3>
+                            <span th:text="${event.duration}"></span>
+                        </div>
+                        <div class="info-item">
+                            <h3>Date </h3>
+                            <span th:text="${event.date}"></span>
+                        </div>
+                        <div class="info-item">
+                            <h3>Start time </h3>
+                            <span th:text="${event.startTime}"></span>
+                        </div>
+                        
+                    </div>
+                    <div class="info-item">
+                        <h3>Description</h3>
+                        <span th:text="${event.description}" class="desc"></span>
+                    </div>
+                   
+                    <form action="/patients/deleteEvent" method="post">
+                        <input type="hidden" name="eventCode" th:value="${event.eventCode}">
+                        <input type="submit" class="btn exit-btn" value="DELETE">
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div style="margin: 50px;">
+           
+        </div>
+        <!-- Unbooked section -->
+        <div class="content">
+            <div class="info-container">
+                <div th:each="event : ${unbooked}" class="info">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; ">
+                        <div class="info-item">
+                            <h3>Event Name</h3>
+                            <span th:text="${event.eventName}"></span>
+                        </div>
+                        <div class="info-item">
+                            <h3>Current / Capacity</h3>
+                            <span th:text="${event.currentNum} + ' / ' + ${event.capacity}"></span>      
+                        </div>
+                        <div class="info-item">
+                            <h3>Date </h3>
+                            <span th:text="${event.date}"></span>
+                        </div>
+                        <div class="info-item">
+                            <h3>Start time </h3>
+                            <span th:text="${event.startTime}"></span>
+                        </div>
+                        <div class="info-item">
+                            <h3>Duration </h3>
+                            <span th:text="${event.duration}"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <h3>Description</h3>
+                        <span th:text="${event.description}" class="desc"></span>
+                    </div>
+                    <form action="/patients/addEvent" method="post">
+                        <input type="hidden" name="eventCode" th:value="${event.eventCode}">
+                        <input type="submit" class="btn add-btn" value="BOOK">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
