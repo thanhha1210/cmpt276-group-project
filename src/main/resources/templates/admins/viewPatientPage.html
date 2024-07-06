@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Events</title>
+    <title>View Doctors</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
@@ -108,51 +108,35 @@
         <form action="/admins/getDashboard" method="get">
             <input type="submit" value="HOME" class="btn exit-btn">
         </form>
-        <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Event List</h1>
-        <form action="/admins/addEvent" method="get">      <!--get to navigate to addDoctorPage-->
-            <input type="submit" value="ADD" class="btn add-btn">
-        </form>
+        <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Patient List</h1>
+        <div></div>
     </header>
     <main class="content">
         <table class="table-container">
             <thead>
                 <th>#</th>
-                <th>Code</th>
                 <th>Name</th>
-                <th>Date</th>
-                <th>Start Time</th>
-                <th>Duration</th>
-                <th></th>
+                <th>Username</th>
+                <th>Age</th>
+                <th>Phone number</th>
+                
             </thead>
             <tbody>
-                <tr th:each="event, cnt:${events}">
+                <tr th:each="patient, cnt:${patients}">
                     <td>
                         <span th:text="${cnt.count}"></span>
                     </td>
                     <td>
-                        <form action="/admins/displayEvent" method="get">
-                            <input type="hidden" name="eventCode" th:value="${event.eventCode}">
-                            <button type="submit" class="btn delete-btn" th:text="${event.eventCode}"></button>
-                        </form>
+                        <span th:text="${patient.name}"></span>
                     </td>
                     <td>
-                        <span th:text="${event.eventName}"></span>
+                        <span th:text="${patient.username}"></span>
                     </td>
                     <td>
-                        <span th:text="${event.date}"></span>
+                        <span th:text="${patient.age}"></span>
                     </td>
                     <td>
-                        <span th:text="${event.startTime}"></span>
-                    </td>
-                    <td>
-                        <span th:text="${event.duration}"></span>
-                    </td>
-                    <td>
-                        <form action="/admins/deleteEvent" method="post">
-                            <input type="hidden" name="eventCode" th:value="${event.eventCode}">
-                            <button type="submit" class="btn delete-btn">DELETE</button>
-                        </form>
-                    </td>
+                        <span th:text="${patient.phone}"></span>
                 </tr>
             </tbody>
         </table>
