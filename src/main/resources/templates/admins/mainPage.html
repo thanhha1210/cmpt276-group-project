@@ -204,11 +204,11 @@
     <header class="fix-header">
         <div class="content">
             <nav class="navbar" style="display: flex; align-items: center; padding: 12px;">
-                <div class="home">
+                <!-- <div class="home">
                     <form action="/admins/getDashboard" method="get" >
                         <button class="btn home-btn">Dashboard</button>
                     </form>
-                </div>
+                </div> -->
                 <div class="feature" style="display: flex; justify-content: center;">
                     <form action="/admins/viewDoctor" method="get">
                         <button class="btn schedule-btn">Manage doctor</button>
@@ -225,7 +225,9 @@
                     <form action="/admins/viewEvent" method="get">
                         <button class="btn schedule-btn">Manage events</button>
                     </form>
-                    
+                    <form action="/admins/viewFeedback" method="get">
+                        <button class="btn schedule-btn">View feedback</button>
+                    </form>
                 </div>
                 <div class="actions" style="display: flex; justify-content: center; margin-left: auto; gap: 30px;">
                     <form action="/users/logout" method="get">
