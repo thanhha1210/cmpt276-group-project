@@ -21,6 +21,8 @@ import cmpt276.group.demo.models.appointment.Appointment;
 import cmpt276.group.demo.models.appointment.AppointmentRepository;
 import cmpt276.group.demo.models.doctor.Doctor;
 import cmpt276.group.demo.models.doctor.DoctorRepository;
+import cmpt276.group.demo.models.feedback.Feedback;
+import cmpt276.group.demo.models.feedback.FeedbackRepository;
 import cmpt276.group.demo.models.past_appointment.PastAppointment;
 import cmpt276.group.demo.models.past_appointment.PastAppointmentRepository;
 import cmpt276.group.demo.models.patient.PatientRepository;
@@ -49,6 +51,9 @@ public class DoctorController {
 
   @Autowired
   private PastAppointmentRepository pastAppointmentRepo;
+
+  @Autowired
+  private FeedbackRepository feedbackRepo;
 
   // ---------------------------------------Dashboard-------------------------------------------------
   @GetMapping("/doctors/getDashboard")
@@ -187,6 +192,24 @@ public class DoctorController {
 
     return "doctors/viewSchedulePage";
   }
+
+  //--------------------------------------------View patients' feedback------------------------------------------------
+
+  @GetMapping("/doctors/viewFeedback")
+  public String viewFeedbackPage(HttpSession session, Model model) {
+    Doctor doctor = (Doctor) session.getAttribute("session_doctor");
+    if (doctor == null) {
+      return "loginPage";
+    }
+
+    // return a list of feedback sent to that doctor
+    List<Feedback> feedbackList = feedbackRepo.findByDoctorUsername(doctor.getUsername());
+    Collections.sort(feedbackList);
+    model.addAttribute("feedbackList", feedbackList);
+    model.addAttribute("doctor", doctor);
+    return "doctors/viewFeedbackPage";
+  }
+  
 
   //---------------------------------------------Helper function---------------------------------------------
 

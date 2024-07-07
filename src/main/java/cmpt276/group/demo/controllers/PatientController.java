@@ -19,9 +19,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import cmpt276.group.demo.models.admin.AdminRepository;
 import cmpt276.group.demo.models.appointment.Appointment;
 import cmpt276.group.demo.models.appointment.AppointmentRepository;
+import cmpt276.group.demo.models.doctor.Doctor;
 import cmpt276.group.demo.models.doctor.DoctorRepository;
 import cmpt276.group.demo.models.event.Event;
 import cmpt276.group.demo.models.event.EventRepository;
+import cmpt276.group.demo.models.feedback.Feedback;
+import cmpt276.group.demo.models.feedback.FeedbackRepository;
 import cmpt276.group.demo.models.past_appointment.PastAppointment;
 import cmpt276.group.demo.models.past_appointment.PastAppointmentRepository;
 import cmpt276.group.demo.models.patient.Patient;
@@ -51,6 +54,8 @@ public class PatientController {
     private PastAppointmentRepository pastAppointmentRepo;
     @Autowired
     private EventRepository eventRepo;
+    @Autowired
+    private FeedbackRepository feedbackRepo;
    
     
     @GetMapping("/patients/signup")
@@ -313,15 +318,93 @@ public class PatientController {
         }
     }
     //-------------------------------------Feedback------------------------------------------------
-    @GetMapping("/patients/viewFeedback")
+     @GetMapping("/patients/viewFeedback")
     public String getFeedback(Model model, HttpSession session) {
-       Patient patient = (Patient) session.getAttribute("session_patient");
+        Patient patient = (Patient) session.getAttribute("session_patient");
         if (patient == null) {
             return "loginPage";
         }
-        model.addAttribute("patient", patient);
+
+        // list of past apt that are not add to feedback 
+        List<PastAppointment> pastAptList = pastAppointmentRepo.findByPatientUsername(patient.getUsername());
+        List<PastAppointment> nonFeedbackPastAptList = new ArrayList<>();
+        for (PastAppointment pastApt : pastAptList) {
+            if (!pastApt.isFeedback()) {
+                nonFeedbackPastAptList.add(pastApt);
+            }
+        }
+
+        Collections.sort(nonFeedbackPastAptList);
+        model.addAttribute("nonFeedbackList", nonFeedbackPastAptList);
+
+        List<Feedback> feedbackList = feedbackRepo.findByPatientUsername(patient.getUsername());
+        Collections.sort(feedbackList);
+        model.addAttribute("feedbackList", feedbackList);
+        return "patients/viewFeedbackPage";
+    }    
+
+    @GetMapping("/patients/addFeedback")
+    public String getAddFeedbackPage(HttpSession session, Model model, @RequestParam Map<String, String> formData) {
+        Patient patient = (Patient) session.getAttribute("session_patient");
+        if (patient == null) {
+            return "loginPage";
+        }
+
+        String doctorUsername = formData.get("doctorUsername");
+        String patientUsername = formData.get("patientUsername");
+        Date date = Date.valueOf(formData.get("date"));
+        PastAppointment pastApt = pastAppointmentRepo.findByPatientUsernameAndDoctorUsernameAndDate(patientUsername, doctorUsername, date);
+        model.addAttribute("nonFeedbackPastApt", pastApt);
+        return "patients/addFeedbackPage";
+    }
+    
+
+    @PostMapping("/patients/addFeedback")
+    public String addFeedbackPage(@RequestParam Map<String, String> formData, HttpSession session, Model model) {
+        Patient patient = (Patient) session.getAttribute("session_patient");
+        if (patient == null) {
+            return "loginPage";
+        }
+
+        String doctorUsername = formData.get("doctorUsername");
+        String patientUsername = formData.get("patientUsername");
+        Date date = Date.valueOf(formData.get("date"));
+        String feedbackStr = formData.get("feedbackStr");
+        PastAppointment pastApt = pastAppointmentRepo.findByPatientUsernameAndDoctorUsernameAndDate(patientUsername, doctorUsername, date);
+
+        if (feedbackStr.trim().isEmpty()) {
+            model.addAttribute("nonFeedbackPastApt", pastApt);
+            model.addAttribute("error0", "Please fill the feedback form!");
+            return "patients/addFeedbackPage";
+        }
+
+        // public Feedback(String doctorName, String doctorUsername, String patientName, String patientUsername, Date date, Department department, String feedback)
+        Doctor doc = doctorRepo.findByUsername(doctorUsername);
+        Feedback newFeedback = new Feedback(doc.getName(), doctorUsername, patient.getName(), patientUsername, date, doc.getDepartment(), feedbackStr);
+        feedbackRepo.save(newFeedback);
+        List<Feedback> feedbackList = feedbackRepo.findByPatientUsername(patientUsername);
+        Collections.sort(feedbackList);
+        model.addAttribute("feedbackList", feedbackList);
+
+        // update past apt 
+        pastApt.setIsFeedback(true);
+        pastAppointmentRepo.save(pastApt);
+        
+        List<PastAppointment> pastAptList = pastAppointmentRepo.findByPatientUsername(patientUsername);
+        List<PastAppointment> nonFeedbackPastAptList = new ArrayList<>();
+        
+        // display only those are not added to feedback 
+        for (PastAppointment apt : pastAptList) {
+            if (!apt.isFeedback()) {
+                nonFeedbackPastAptList.add(apt);
+            }
+        }
+
+        Collections.sort(nonFeedbackPastAptList);
+        model.addAttribute("nonFeedbackList", nonFeedbackPastAptList);
         return "patients/viewFeedbackPage";
     }
+
 
 
 }
