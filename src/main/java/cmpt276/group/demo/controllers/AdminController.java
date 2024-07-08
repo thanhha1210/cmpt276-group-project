@@ -245,8 +245,7 @@ public class AdminController {
             if ((st.isAfter(newStartTime) && st.isBefore(newEndTime))
                     || (newStartTime.isAfter(st) && newStartTime.isBefore(en))) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                model.addAttribute("error4",
-                        "The new schedule conflicts with an existing schedule. Please enter another schedule!");
+                model.addAttribute("error4", "The new schedule conflicts with an existing schedule. Please enter another schedule!");
                 return "admins/addSchedulePage";
             }
         }
@@ -264,7 +263,7 @@ public class AdminController {
         Schedule newSchedule = new Schedule(doc.getName(), doctorUsername, date, startTime, duration, department);
         scheduleRepo.save(newSchedule);
         response.setStatus(201);
-        model.addAttribute("Schedule", newSchedule);
+        model.addAttribute("schedule", newSchedule);
         model.addAttribute("success", "Add Schedule Successfully");
         return "admins/addSchedulePage";
     }
