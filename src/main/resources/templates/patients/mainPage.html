@@ -198,6 +198,81 @@
         .hero-img {
             width: 50%;
         }
+
+        #chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999; /* Ensure it is in front of other content */
+        }
+
+        #chat-icon {
+            width: 50px;
+            height: 50px;
+            background-color: #007bff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #chat-window {
+            width: 300px;
+            height: 400px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            position: fixed; 
+            bottom: 80px; /* Adjust according to your preference */
+            right: 20px;
+            z-index: 9999; /* Ensure it is in front of other content */
+        }
+
+        #chat-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        #chat-messages {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            max-width: 300px;
+        }
+
+        #chat-input {
+            width: calc(100% - 40x);
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #chat-input + button {
+            margin: 10px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #chat-input + button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -223,6 +298,7 @@
                         <button class="btn schedule-btn">Forum</button>
                     </form>
                 </div>
+                
                 <div class="actions">
                     <form action="/users/logout" method="get">
                         <button class="btn logout-btn">Log out</button>
@@ -290,9 +366,58 @@
                 </div>
         </div>
 
+        <!-- Chatbot Container -->
+        <div id="chatbot-container">
+            <div id="chat-icon" onclick="toggleChat()">💬</div>
+            <div id="chat-window" style="display: none;">
+                <div id="chat-header">Your HealthAce Assistant</div>
+                <div id="chat-messages"></div>
+                <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+
     </main>
     <footer>
         <p>HealthAce &copy; 2024</p>
     </footer>
+
+    <script>
+        function toggleChat() {
+            const chatWindow = document.getElementById('chat-window');
+            if (chatWindow.style.display === 'none') {
+                chatWindow.style.display = 'block';
+            } else {
+                chatWindow.style.display = 'none';
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const inputField = document.getElementById('chat-input');
+            const message = inputField.value;
+            if (message.trim() === '') return;
+
+            addMessageToChat('user', message);
+            inputField.value = '';
+
+            // Send message to ChatGPT API, don't know how to do this yet
+        }
+
+        function addMessageToChat(sender, message) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageElement = document.createElement('div');
+            messageElement.classList.add(sender);
+            messageElement.textContent = message;
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    </script>
+
 </body>
 </html>
