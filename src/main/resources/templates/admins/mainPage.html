@@ -16,7 +16,6 @@
             font-size: 100%;
             font: inherit;
             vertical-align: baseline;
-            
         }
         table {
             border-collapse: collapse;
@@ -75,7 +74,6 @@
 
         /* Header Styles */
         header {
-            /* padding-top: 26px; */
             position: sticky;
             top: 0;
             z-index: 1;
@@ -87,34 +85,62 @@
             align-items: center;
             padding: 6px 12px;
         }
-
-        .nav-item {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
         .actions {
             display: flex;
             justify-content: center;
             margin-left: auto;
             gap: 30px;
         }
+        .navbar > form {
+            margin-right: 30px;
+        }
+        /* Submenu Styles */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            margin-right: 30px;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 200px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+        }
+
+        .dropdown-content form {
+            display: block;
+        }
+
+        .dropdown-content .btn {
+            width: 100%;
+            text-align: left;
+            padding: 12px 16px;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
         /* Content */
         .content-main h2 {
             color: #333;
             font-weight: 800;
             font-size: 1.6em;
         }
+
         .content-main p {
             line-height: 1.6;
         }
+
         .content-main .features {
             display: flex;
             flex-wrap: wrap;
             justify-content: space-around;
         }
+
         .content-main .feature {
             flex: 1;
             margin: 10px;
@@ -123,14 +149,17 @@
             background: linear-gradient(135deg, #2329d3, #27d983);
             opacity: 0.9;
         }
+
         h3 {
             margin-top: 0;
             font-weight: 500;
             font-size: 1.2em;
         }
+
         .content-main .question {
             margin: 20px 0;
         }
+
         footer {
             background: #0F1B4C;
             color: #fff;
@@ -138,38 +167,43 @@
             padding: 20px 0;
             margin-top: 30px;
         }
+
         .feature > p {
             color: #fff;
         }
+
         .feature > h3 {
             color: #67f011;
         }
+
         .features > .feature {
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
         .features > .feature:hover {
             opacity: 0.9;
-            /* transform: translateY(-2px); */
             transform: scale(1.1);
         }
 
-        /*Hero tag*/
+        /* Hero tag */
         .hero {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+
         .hero-wrap {
             margin-bottom: 60px;
         }
+
         .hero .info {
             width: 50%;
         }
+
         .hero .sub-title {
             color: #687690;
             font-size: 1.2rem;
-            line-height: 1.5; 
+            line-height: 1.5;
             letter-spacing: 0.01em;
         }
 
@@ -178,7 +212,7 @@
             font-size: 2.2rem;
             font-weight: 700;
             line-height: 1.19;
-            margin-top: 8px; 
+            margin-top: 8px;
         }
 
         .hero .desc {
@@ -203,99 +237,100 @@
 <body>
     <header class="fix-header">
         <div class="content">
-            <nav class="navbar" style="display: flex; align-items: center; padding: 12px;">
-                <!-- <div class="home">
-                    <form action="/admins/getDashboard" method="get" >
-                        <button class="btn home-btn">Dashboard</button>
-                    </form>
-                </div> -->
-                <div class="feature" style="display: flex; justify-content: center;">
-                    <form action="/admins/viewDoctor" method="get">
-                        <button class="btn schedule-btn">Manage doctor</button>
-                    </form>
-                    <form action="/admins/viewPatient" method="get">
-                        <button class="btn schedule-btn">Manage patient</button>
-                    </form>
-                    <form action="/admins/viewAppointment" method="get">
-                        <button class="btn schedule-btn">View appointment</button>
-                    </form>
-                    <form action="/admins/viewSchedule" method="get">
-                        <button class="btn schedule-btn">Manage schedule</button>
-                    </form>
-                    <form action="/admins/viewEvent" method="get">
-                        <button class="btn schedule-btn">Manage events</button>
-                    </form>
-                    <form action="/admins/viewFeedback" method="get">
-                        <button class="btn schedule-btn">View feedback</button>
-                    </form>
+            <nav class="navbar">
+                <form action="/admins/getDashboard" method="get" >
+                    <button class="btn home-btn">Dashboard</button>
+                </form>
+                <div class="dropdown">
+                    <button class="btn">Manage</button>
+                    <div class="dropdown-content">
+                        <form action="/admins/viewDoctor" method="get">
+                            <button class="btn schedule-btn">Manage doctor</button>
+                        </form>
+                        <form action="/admins/viewPatient" method="get">
+                            <button class="btn schedule-btn">Manage patient</button>
+                        </form>
+                    </div>
                 </div>
-                <div class="actions" style="display: flex; justify-content: center; margin-left: auto; gap: 30px;">
+                <div class="dropdown">
+                    <button class="btn">Schedule</button>
+                    <div class="dropdown-content">
+                        <form action="/admins/viewAppointment" method="get">
+                            <button class="btn schedule-btn">View appointment</button>
+                        </form>
+                        <form action="/admins/viewSchedule" method="get">
+                            <button class="btn schedule-btn">Manage schedule</button>
+                        </form>
+                    </div>
+                </div>
+                <form action="/admins/viewEvent" method="get">
+                    <button class="btn schedule-btn">Manage events</button>
+                </form>
+                <form action="/admins/viewFeedback" method="get">
+                    <button class="btn schedule-btn">View feedback</button>
+                </form>
+                <div class="actions">
                     <form action="/users/logout" method="get">
-                        <button class="btn logout-btn" >Log out</button>
+                        <button class="btn logout-btn">Log out</button>
                     </form>
                 </div>
             </nav>
         </div>
     </header>
     <main class="content-main">
-         <!-- Hero-wrap -->
-         <div class="hero-wrap">
-                <div class="hero">
-                    <div class="info">
-                        <h1 class="title">Welcome to HealthAce</h1>
-                        <p class="sub-title">Discover a place you'd love to check your health.</p>
-                        <p class="desc">Access to a comprehensive and reliable healthcare services with just some simple clicks</p>
-                       
-                    </div>
-                    <img src="/img/hospital.jpg" alt="Discover a place you'll love to live." class="hero-img">
+        <!-- Hero-wrap -->
+        <div class="hero-wrap">
+            <div class="hero">
+                <div class="info">
+                    <h1 class="title">Welcome to HealthAce</h1>
+                    <p class="sub-title">Discover a place you'd love to check your health.</p>
+                    <p class="desc">Access to comprehensive and reliable healthcare services with just some simple clicks</p>
                 </div>
+                <img src="/img/hospital.jpg" alt="Discover a place you'll love to live." class="hero-img">
+            </div>
         </div>
         <div class="container">
-            
-                <h2>About us</h2>
-                <p>HealthAce is your online healthcare companion, connecting you with doctors and health services from the comfort of your home.</p>
-    
-                <div class="features">
-                    <div class="feature">
-                        <h3>Online Appointments</h3>
-                        <p>Skip the long queues and book your appointments online with ease.</p>
-                    </div>
-                    <div class="feature">
-                        <h3>Health Records</h3>
-                        <p>Access and manage your health records anytime, anywhere.</p>
-                    </div>
-                    <div class="feature">
-                        <h3>Find Health Services</h3>
-                        <p>Locate nearby healthcare facilities and services using our integrated map.</p>
-                    </div>
-                    <div class="feature">
-                        <h3>Feedback</h3>
-                        <p>Share your experiences and help improve healthcare services for everyone.</p>
-                    </div>
-                    <div class="feature">
-                        <h3>Community Forum</h3>
-                        <p>Join health discussions, attend virtual events, and interact with experts.</p>
-                    </div>
-                    <div class="feature">
-                        <h3>Supportive Chatbot</h3>
-                        <p>Get quick answers to common health questions with our friendly chatbot.</p>
-                    </div>
+            <h2>About us</h2>
+            <p>HealthAce is your online healthcare companion, connecting you with doctors and health services from the comfort of your home.</p>
+            <div class="features">
+                <div class="feature">
+                    <h3>Online Appointments</h3>
+                    <p>Skip the long queues and book your appointments online with ease.</p>
                 </div>
-    
-                <div class="question">
-                    <h3>What problem does it solve?</h3>
-                    <p>Patients find it difficult to reach healthcare locations in-person due to long queues and anxiety-inducing environments.</p>
+                <div class="feature">
+                    <h3>Health Records</h3>
+                    <p>Access and manage your health records anytime, anywhere.</p>
                 </div>
-                <div class="question">
-                    <h3>How is this problem currently solved?</h3>
-                    <p>Patients currently go to the clinic, wait for a ticket, deal with ticket queues, phone receptionists, and rely on Google or word of mouth for information.</p>
+                <div class="feature">
+                    <h3>Find Health Services</h3>
+                    <p>Locate nearby healthcare facilities and services using our integrated map.</p>
                 </div>
-                <div class="question">
-                    <h3>How will this project make life better?</h3>
-                    <p>HealthAce eliminates annoying hospital lines and reduces hospital anxiety by providing online appointments, health record management, and easy access to health services.</p>
+                <div class="feature">
+                    <h3>Feedback</h3>
+                    <p>Share your experiences and help improve healthcare services for everyone.</p>
                 </div>
+                <div class="feature">
+                    <h3>Community Forum</h3>
+                    <p>Join health discussions, attend virtual events, and interact with experts.</p>
+                </div>
+                <div class="feature">
+                    <h3>Supportive Chatbot</h3>
+                    <p>Get quick answers to common health questions with our friendly chatbot.</p>
+                </div>
+            </div>
+            <div class="question">
+                <h3>What problem does it solve?</h3>
+                <p>Patients find it difficult to reach healthcare locations in-person due to long queues and anxiety-inducing environments.</p>
+            </div>
+            <div class="question">
+                <h3>How is this problem currently solved?</h3>
+                <p>Patients currently go to the clinic, wait for a ticket, deal with ticket queues, phone receptionists, and rely on Google or word of mouth for information.</p>
+            </div>
+            <div class="question">
+                <h3>How will this project make life better?</h3>
+                <p>HealthAce eliminates annoying hospital lines and reduces hospital anxiety by providing online appointments, health record management, and easy access to health services.</p>
+            </div>
         </div>
-
     </main>
     <footer>
         <p>HealthAce &copy; 2024</p>
