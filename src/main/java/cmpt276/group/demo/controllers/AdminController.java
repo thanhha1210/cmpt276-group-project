@@ -3,6 +3,7 @@ package cmpt276.group.demo.controllers;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
@@ -266,13 +267,45 @@ public class AdminController {
             }
         }
 
-        // Check the schedule time with real time
-        LocalDate currentDate = LocalDate.now();
-        LocalTime currentTime = LocalTime.now();
-        if (date.toLocalDate().isBefore(currentDate) || (date.toLocalDate().isEqual(currentDate) && startTime.toLocalTime().isBefore(currentTime))) {
+        // Check the schedule time with real time (USED IN LOCALHOST)
+        // LocalDate currentDate = LocalDate.now();
+        // LocalTime currentTime = LocalTime.now();
+        // if (date.toLocalDate().isBefore(currentDate) || (date.toLocalDate().isEqual(currentDate) && startTime.toLocalTime().isBefore(currentTime))) {
+        //     model.addAttribute("error5", "The schedule is behind the current date and time. Please enter a valid schedule");
+        //     return "admins/addSchedulePage";   
+        // }
+
+        // ---------------------------------------------USE LOCAL DATE TIME (ON RENDER)--------------------------------------------------//
+        // check schedule time with current time 
+        LocalDateTime current = LocalDateTime.now().minusHours(7);
+        LocalDateTime scheDateTime = LocalDateTime.of(date.toLocalDate(), startTime.toLocalTime());
+        if (scheDateTime.isBefore(current)) {
             model.addAttribute("error5", "The schedule is behind the current date and time. Please enter a valid schedule");
             return "admins/addSchedulePage";
-            
+        }
+        // ------------------------------------------------------------------------------------------------------------------------------//
+
+        // check if new sche conflict w/ existing doc's apt
+        List<Appointment> docAptList = appointmentRepo.findByDoctorUsername(doctorUsername);
+
+        // loop thru doc's apt list
+        for (Appointment apt : docAptList) {
+
+            // check new sche if it conflict w/ date time of apts in doc's apt
+            LocalTime newScheStartTime = startTime.toLocalTime();
+            LocalTime newScheEndTime = newScheStartTime.plusMinutes(duration);
+
+            // Get apt date and time in doc's apt list
+            LocalTime aptStartTime = apt.getStartTime().toLocalTime();
+            LocalTime aptEndTime = aptStartTime.plusMinutes(apt.getDuration());
+
+            if ((newScheStartTime.isBefore(aptStartTime) && newScheEndTime.isAfter(aptStartTime)) || 
+                (newScheStartTime.isAfter(aptStartTime) && newScheStartTime.isBefore(aptEndTime))) {
+
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                model.addAttribute("error6", "Schedule conflict with doctor's existing appointment. Please enter a valid schedule");
+                return "admins/addSchedulePage";
+            }
         }
 
         // Get doctorName based on doctorUsername
@@ -399,59 +432,102 @@ public class AdminController {
 
     // ----------------------------------------------Helper function----------------------------------------------
     // function to change appointment to past appointment
-    public void deleteSchedule() {
-        // Get the current date and time 
-        LocalDate currentDate = LocalDate.now();
-        LocalTime currentTime = LocalTime.now();
+    // USED IN LOCALHOST
+    // public void deleteSchedule() {
+    //     // Get the current date and time 
+    //     LocalDate currentDate = LocalDate.now();
+    //     LocalTime currentTime = LocalTime.now();
 
-        // Retrieve all appointments
-        List<Schedule> scheduleList = scheduleRepo.findAll();
+    //     // Retrieve all appointments
+    //     List<Schedule> scheduleList = scheduleRepo.findAll();
 
-        // Loop through schedule and delete if pass the current time
-        for (Schedule schedule : scheduleList) {
+    //     // Loop through schedule and delete if pass the current time
+    //     for (Schedule schedule : scheduleList) {
 
-            // Get date and time of each schedule in a list
-            LocalDate scheDate = schedule.getDate().toLocalDate();
-            LocalTime scheTime = schedule.getStartTime().toLocalTime();
-            if (scheDate.isBefore(currentDate) || (scheDate.isEqual(currentDate) && scheTime.isBefore(currentTime))) {
-                scheduleRepo.delete(schedule);
+    //         // Get date and time of each schedule in a list
+    //         LocalDate scheDate = schedule.getDate().toLocalDate();
+    //         LocalTime scheTime = schedule.getStartTime().toLocalTime();
+    //         if (scheDate.isBefore(currentDate) || (scheDate.isEqual(currentDate) && scheTime.isBefore(currentTime))) {
+    //             scheduleRepo.delete(schedule);
+    //         }
+    //     }
+    // }
+
+    // // function to change appointment to past appointment
+    // // USED IN LOCALHOST
+    // public void changeApt() {
+    //     // Get the current date
+    //     LocalDate currentDate = LocalDate.now();
+    //     LocalTime currentTime = LocalTime.now();
+    //     System.out.println(currentDate);
+    //     System.out.println(currentTime);
+
+    //     // Retrieve all appointments
+    //     List<Appointment> appointmentList = appointmentRepo.findAll();
+
+    //     // Loop through appointments and update status
+    //     for (Appointment apt : appointmentList) {
+            
+    //         // Get date and startTime of each appointment in a list
+    //         LocalDate aptDate = apt.getDate().toLocalDate();
+    //         LocalTime aptTime = apt.getStartTime().toLocalTime().plusMinutes(apt.getDuration());
+    //         System.out.println(aptDate);
+    //         System.out.println(aptTime);
+    //         if (aptDate.isBefore(currentDate) || (aptDate.isEqual(currentDate) && aptTime.isBefore(currentTime))) {
+
+    //             // Create a new PastAppointment
+    //             PastAppointment pastApt = 
+    //             new PastAppointment(apt.getDoctorName(), apt.getDoctorUsername(),
+    //                                 apt.getPatientName(), apt.getPatientUsername(),
+    //                                 apt.getDate(), apt.getStartTime(),
+    //                                 apt.getDuration(), apt.getDepartment());
+
+    //             // Add to pastApt
+    //             pastAppointmentRepo.save(pastApt);
+
+    //             // Delete from Apt
+    //             appointmentRepo.delete(apt);
+    //         }
+    //     }
+    // }
+
+    // USED ON RENDER
+    public void changeApt() {
+        LocalDateTime current = LocalDateTime.now().minusHours(7);
+
+        List<Appointment> AppointmentList = appointmentRepo.findAll();
+
+        for (Appointment appointment : AppointmentList) {
+            LocalDate appointmentDate = appointment.getDate().toLocalDate();
+            LocalTime appointmentTime = appointment.getStartTime().toLocalTime().plusMinutes(appointment.getDuration());
+            LocalDateTime aptDateTime = LocalDateTime.of(appointmentDate, appointmentTime);
+
+            if (aptDateTime.isBefore(current)) {
+                PastAppointment pastAppointment = 
+                new PastAppointment(appointment.getDoctorName(), appointment.getDoctorUsername(), 
+                                    appointment.getPatientName(), appointment.getPatientUsername(),
+                                    appointment.getDate(), appointment.getStartTime(),
+                                    appointment.getDuration(), appointment.getDepartment());
+                
+                // Add to pastAppointmentRepo
+                pastAppointmentRepo.save(pastAppointment);
+
+                // Delete from appointmentRepo
+                appointmentRepo.delete(appointment);
             }
         }
     }
 
-    // function to change appointment to past appointment
-    public void changeApt() {
-        // Get the current date
-        LocalDate currentDate = LocalDate.now();
-        LocalTime currentTime = LocalTime.now();
-        System.out.println(currentDate);
-        System.out.println(currentTime);
+    // USED ON RENDER
+    public void deleteSchedule() {
+        LocalDateTime current = LocalDateTime.now().minusHours(7);
 
-        // Retrieve all appointments
-        List<Appointment> appointmentList = appointmentRepo.findAll();
-
-        // Loop through appointments and update status
-        for (Appointment apt : appointmentList) {
-            
-            // Get date and startTime of each appointment in a list
-            LocalDate aptDate = apt.getDate().toLocalDate();
-            LocalTime aptTime = apt.getStartTime().toLocalTime().plusMinutes(apt.getDuration());
-            System.out.println(aptDate);
-            System.out.println(aptTime);
-            if (aptDate.isBefore(currentDate) || (aptDate.isEqual(currentDate) && aptTime.isBefore(currentTime))) {
-
-                // Create a new PastAppointment
-                PastAppointment pastApt = 
-                new PastAppointment(apt.getDoctorName(), apt.getDoctorUsername(),
-                                    apt.getPatientName(), apt.getPatientUsername(),
-                                    apt.getDate(), apt.getStartTime(),
-                                    apt.getDuration(), apt.getDepartment());
-
-                // Add to pastApt
-                pastAppointmentRepo.save(pastApt);
-
-                // Delete from Apt
-                appointmentRepo.delete(apt);
+        List<Schedule> scheduleList = scheduleRepo.findAll();
+        for (Schedule sche : scheduleList) {
+            // get sche local date time
+            LocalDateTime scheDateTime = LocalDateTime.of(sche.getDate().toLocalDate(), sche.getStartTime().toLocalTime());
+            if (scheDateTime.isBefore(current)) {
+                scheduleRepo.delete(sche);
             }
         }
     }
