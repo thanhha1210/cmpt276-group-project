@@ -119,7 +119,7 @@
                 <th>Username</th>
                 <th>Age</th>
                 <th>Phone number</th>
-                
+                <th></th>
             </thead>
             <tbody>
                 <tr th:each="patient, cnt:${patients}">
@@ -137,6 +137,13 @@
                     </td>
                     <td>
                         <span th:text="${patient.phone}"></span>
+                    </td>
+                    <td>
+                        <form action="/admins/deletePatient" method="post">
+                            <input type="hidden" name="username" th:value="${patient.username}">
+                            <button type="submit" class="btn delete-btn">DELETE</button>
+                        </form>
+                    </td>
                 </tr>
             </tbody>
         </table>

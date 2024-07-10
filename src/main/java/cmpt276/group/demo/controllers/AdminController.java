@@ -26,6 +26,7 @@ import cmpt276.group.demo.models.feedback.Feedback;
 import cmpt276.group.demo.models.feedback.FeedbackRepository;
 import cmpt276.group.demo.models.past_appointment.PastAppointment;
 import cmpt276.group.demo.models.past_appointment.PastAppointmentRepository;
+import cmpt276.group.demo.models.patient.Patient;
 import cmpt276.group.demo.models.patient.PatientRepository;
 import cmpt276.group.demo.models.schedule.Schedule;
 import cmpt276.group.demo.models.schedule.ScheduleRepository;
@@ -133,6 +134,21 @@ public class AdminController {
         model.addAttribute("patients", patientRepo.findAll());
         return "admins/viewPatientPage";
     }
+    // admin delete patient => all appointment with that patient will be delete
+    @PostMapping("/admins/deletePatient")
+    public String deletePatient(@RequestParam String username, Model model) {
+        Patient temp = patientRepo.findByUsername(username);
+        if (temp != null) {
+            patientRepo.delete(temp);
+            Appointment deleteApt = appointmentRepo.findByPatientUsername(username);
+            if (deleteApt != null) {
+                appointmentRepo.delete(deleteApt);
+            }
+        }
+        model.addAttribute("patients", patientRepo.findAll());
+        return "admins/viewPatientPage";
+    }
+
     // ------------------------------------------------------ View & delete appointment----------------------------------------
    
     // admin view appointment
