@@ -2,6 +2,7 @@ package cmpt276.group.demo.controllers;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -225,40 +226,67 @@ public class DoctorController {
   }
 
   // function to change appointment to past_appointment
-  public void changeApt() {
+  // public void changeApt() {
 
-    // Get the current date
-    LocalDate currentDate = LocalDate.now();
-    LocalTime currentTime = LocalTime.now();
-    System.out.println(currentDate);
-    System.out.println(currentTime);
+  //   // Get the current date
+  //   LocalDate currentDate = LocalDate.now();
+  //   LocalTime currentTime = LocalTime.now();
+  //   System.out.println(currentDate);
+  //   System.out.println(currentTime);
 
-    // Retrieve all appointments
-    List<Appointment> appointmentList = appointmentRepo.findAll();
+  //   // Retrieve all appointments
+  //   List<Appointment> appointmentList = appointmentRepo.findAll();
 
-    // Loop through appointments and update status
-    for (Appointment apt : appointmentList) {
+  //   // Loop through appointments and update status
+  //   for (Appointment apt : appointmentList) {
 
-      // Get date and startTime of each appointment in a list
-      LocalDate aptDate = apt.getDate().toLocalDate();
-      LocalTime aptTime = apt.getStartTime().toLocalTime().plusMinutes(apt.getDuration());
-      System.out.println(aptDate);
-      System.out.println(aptTime);
-      if (aptDate.isBefore(currentDate) || (aptDate.isEqual(currentDate) && aptTime.isBefore(currentTime))) {
+  //     // Get date and startTime of each appointment in a list
+  //     LocalDate aptDate = apt.getDate().toLocalDate();
+  //     LocalTime aptTime = apt.getStartTime().toLocalTime().plusMinutes(apt.getDuration());
+  //     System.out.println(aptDate);
+  //     System.out.println(aptTime);
+  //     if (aptDate.isBefore(currentDate) || (aptDate.isEqual(currentDate) && aptTime.isBefore(currentTime))) {
 
-        // Create a new PastAppointment
-        PastAppointment pastApt = new PastAppointment(apt.getDoctorName(), apt.getDoctorUsername(),
-            apt.getPatientName(), apt.getPatientUsername(),
-            apt.getDate(), apt.getStartTime(),
-            apt.getDuration(), apt.getDepartment());
+  //       // Create a new PastAppointment
+  //       PastAppointment pastApt = new PastAppointment(apt.getDoctorName(), apt.getDoctorUsername(),
+  //           apt.getPatientName(), apt.getPatientUsername(),
+  //           apt.getDate(), apt.getStartTime(),
+  //           apt.getDuration(), apt.getDepartment());
 
-        // Add to pastApt
-        pastAppointmentRepo.save(pastApt);
+  //       // Add to pastApt
+  //       pastAppointmentRepo.save(pastApt);
 
-        // Delete from Apt
-        appointmentRepo.delete(apt);
-      }
+  //       // Delete from Apt
+  //       appointmentRepo.delete(apt);
+  //     }
+  //   }
+  // }
+
+  // USED ON RENDER
+    public void changeApt() {
+        LocalDateTime current = LocalDateTime.now().minusHours(7);
+
+        List<Appointment> AppointmentList = appointmentRepo.findAll();
+
+        for (Appointment appointment : AppointmentList) {
+            LocalDate appointmentDate = appointment.getDate().toLocalDate();
+            LocalTime appointmentTime = appointment.getStartTime().toLocalTime().plusMinutes(appointment.getDuration());
+            LocalDateTime aptDateTime = LocalDateTime.of(appointmentDate, appointmentTime);
+
+            if (aptDateTime.isBefore(current)) {
+                PastAppointment pastAppointment = 
+                new PastAppointment(appointment.getDoctorName(), appointment.getDoctorUsername(), 
+                                    appointment.getPatientName(), appointment.getPatientUsername(),
+                                    appointment.getDate(), appointment.getStartTime(),
+                                    appointment.getDuration(), appointment.getDepartment());
+                
+                // Add to pastAppointmentRepo
+                pastAppointmentRepo.save(pastAppointment);
+
+                // Delete from appointmentRepo
+                appointmentRepo.delete(appointment);
+            }
+        }
     }
-  }
 
 }
