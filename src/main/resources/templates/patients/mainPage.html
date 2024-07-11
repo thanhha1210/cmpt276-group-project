@@ -406,7 +406,21 @@
             addMessageToChat('user', message);
             inputField.value = '';
 
-            // Send message to ChatGPT API, don't know how to do this yet
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+                addMessageToChat('assistant', data.message);
+            } catch (error) {
+                console.error('Error:', error);
+                addMessageToChat('assistant', 'Sorry, something went wrong.');
+            }
         }
 
         function addMessageToChat(sender, message) {
