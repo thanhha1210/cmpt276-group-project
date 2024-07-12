@@ -250,6 +250,33 @@
             overflow-y: auto;
             overflow-x: hidden;
             max-width: 300px;
+            max-height: 300px;
+        }
+        #chat-messages .message-container {
+            display: flex;
+            align-items: flex-start;
+            margin: 10px 0; /* Adjust the margin as needed */
+        }
+
+        #chat-messages .message-container img {
+            margin-top:16px;
+            width: 40px;
+            height: 40px;
+            margin-right: 20px; /* Adjust the space between the image and the message */
+        }
+
+        #chat-messages .message-container .message {
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        #chat-messages .message-container.user {
+            justify-content: flex-end;
+        }
+
+        #chat-messages .message-container.user .message {
+            background-color: #32302f;
+            color: white;
         }
 
         #chat-input {
@@ -425,11 +452,30 @@
 
         function addMessageToChat(sender, message) {
             const chatMessages = document.getElementById('chat-messages');
+            const messageContainer = document.createElement('div');
+            messageContainer.classList.add('message-container');
+
+            if (sender === 'assistant') {
+                const img = document.createElement('img');
+                img.src = '/img/medical-robot.png';
+                img.alt = 'Robot';
+                messageContainer.appendChild(img);
+            }else if (sender === 'user') {
+            messageContainer.classList.add('user'); 
+        }
+            
+
             const messageElement = document.createElement('div');
-            messageElement.classList.add(sender);
+            messageElement.classList.add('message');
             messageElement.textContent = message;
-            chatMessages.appendChild(messageElement);
+            messageContainer.appendChild(messageElement);
+
+            chatMessages.appendChild(messageContainer);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+            if(sender === 'user'){
+                messageElement.style.color = 'white'; 
+                messageElement.style.backgroundColor = '#32302f'; 
+            }
         }
     </script>
 
