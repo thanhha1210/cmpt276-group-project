@@ -27,21 +27,20 @@ public class LoginController {
     @Autowired
     private DoctorRepository doctorRepo;
     
-    @GetMapping("/users/login")
+
+    @GetMapping("/")
     public String getLogin(Model model, HttpServletRequest request, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");
         if (patient != null) {
             model.addAttribute("patient", patient);
             return "patients/mainPage";
         }
-
         Admin admin = (Admin) session.getAttribute("session_admin");
         if (admin != null) {
             model.addAttribute("admin", admin);
             return "admins/mainPage";
             //return "patients/mainPage";
         }
-
         Doctor doctor = (Doctor) session.getAttribute("session_doctor");
         if (doctor != null) {
             model.addAttribute("doctor", doctor);
@@ -50,7 +49,7 @@ public class LoginController {
         return "loginPage";
     }
     
-    @PostMapping("/users/login")
+    @PostMapping("/")
     public String login(@RequestParam Map<String, String> formData, Model model, HttpServletRequest request, HttpSession session) {
         String name = formData.get("username");
         String pwd = formData.get("password");
@@ -98,7 +97,7 @@ public class LoginController {
     @GetMapping("/users/logout")
     public String destroySession(HttpServletRequest request) {
         request.getSession().invalidate();
-        return "redirect:/index.html";
+        return "loginPage";
     }
 
 }

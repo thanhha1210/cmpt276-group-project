@@ -1,6 +1,12 @@
 package cmpt276.group.demo.models.patient;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,6 +25,10 @@ public class Patient {
     private int age;
     private String address;
     private String phone;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Column(name = "events_join")
+    private List<String> eventsJoin = new ArrayList<>();
 
     public Patient() { }
 
@@ -40,6 +50,22 @@ public class Patient {
     public String getPassword() {
         return password;
     }
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public List<String> getEventsJoin() {
+        return eventsJoin;
+    }
+
+    public void setEventsJoin(List<String> eventsJoin) {
+        this.eventsJoin = eventsJoin;
+    }
+
     public void setPassword(String password) {
         this.password = password;
     }
@@ -55,10 +81,10 @@ public class Patient {
     public void setAge(int age) {
         this.age = age;
     }
-    public String getPhonenumber() {
+    public String getPhoneNumber() {
         return phone;
     }
-    public void setPhonenumber(String phone) {
+    public void setPhoneNumber(String phone) {
         this.phone = phone;
     }
 

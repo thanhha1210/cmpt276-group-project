@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Doctors</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <style>
+          *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            border: 0;
+        }
+        body, input, button {
+            font-family: "Poppins", sans-serif;
+        }
+        body {
+            line-height: 1.5;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        .content {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header, main {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0F1B4C;
+        }
+        
+        .btn {
+            font-weight: 600;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .add-btn {
+            background-color: #0F1B4C;
+            color: #ffffff;
+            grid-column: span 2;
+            justify-self: center;
+        }
+
+        .exit-btn {
+            background-color: #f44336;
+            color: #ffffff;
+        }
+        .delete-btn {
+            background-color: #fff;
+            color: #f44336;
+        }
+        .delete-btn:hover {
+            text-decoration: underline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #dee2e6;
+            text-align: center;
+        }
+        th {
+            background-color: var(--secondary-color, #0F1B4C);
+            color: #fff;
+            font-weight: 600;
+        }
+        td {
+            font-size: 0.9rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header class="content" style="display: flex; justify-content: center; text-align: center; justify-content: space-between;">
+        <form action="/admins/getDashboard" method="get">
+            <input type="submit" value="HOME" class="btn exit-btn">
+        </form>
+        <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Patient List</h1>
+        <div></div>
+    </header>
+    <main class="content">
+        <table class="table-container">
+            <thead>
+                <th>#</th>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Age</th>
+                <th>Phone number</th>
+                <th></th>
+            </thead>
+            <tbody>
+                <tr th:each="patient, cnt:${patients}">
+                    <td>
+                        <span th:text="${cnt.count}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${patient.name}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${patient.username}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${patient.age}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${patient.phone}"></span>
+                    </td>
+                    <td>
+                        <form action="/admins/deletePatient" method="post">
+                            <input type="hidden" name="username" th:value="${patient.username}">
+                            <button type="submit" class="btn delete-btn">DELETE</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+   
+</body>
+</html>

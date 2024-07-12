@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doctor Mainpage</title>
+    <title>Patient Mainpage</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -198,34 +198,110 @@
         .hero-img {
             width: 50%;
         }
+
+        #chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999; /* Ensure it is in front of other content */
+        }
+
+        #chat-icon {
+            width: 50px;
+            height: 50px;
+            background-color: #007bff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #chat-window {
+            width: 300px;
+            height: 400px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            position: fixed; 
+            bottom: 80px; /* Adjust according to your preference */
+            right: 20px;
+            z-index: 9999; /* Ensure it is in front of other content */
+        }
+
+        #chat-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        #chat-messages {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            max-width: 300px;
+        }
+
+        #chat-input {
+            width: calc(100% - 40x);
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #chat-input + button {
+            margin: 10px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #chat-input + button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
-    <header class="fix-header">
+    <header>
         <div class="content">
             <nav class="navbar">
                 <div class="home">
-                    <form action="/doctors/getDashboard" method="get" >
+                    <form action="/patients/getDashboard" method="get">
                         <button class="btn home-btn">Dashboard</button>
                     </form>
                 </div>
-                <div class="feature" style="display: flex; justify-content: center;">
-                    <form action="/doctors/viewSchedule" method="get">
-                        <button class="btn schedule-btn">View My Schedule</button>
+                <div class="nav-item">
+                    <form action="/patients/viewSchedule" method="get">
+                        <button class="btn schedule-btn">Book appointment</button>
                     </form>
-                    
-                    <form action="/doctors/viewRecord" method="get">
-                        <button class="btn schedule-btn">Record</button>
+                    <form action="/patients/viewRecord" method="get">
+                        <button class="btn schedule-btn">Health record</button>
                     </form>
-
-                    <form action="/doctors/viewFeedback" method="get">
+                    <form action="/patients/viewFeedback" method="get">
                         <button class="btn schedule-btn">Feedback</button>
                     </form>
-
+                    <form action="/patients/viewEvent" method="get">
+                        <button class="btn schedule-btn">Forum</button>
+                    </form>
                 </div>
-                <div class="actions" style="display: flex; justify-content: center; margin-left: auto; gap: 30px;">
+                
+                <div class="actions">
                     <form action="/users/logout" method="get">
-                        <button class="btn logout-btn" >Log out</button>
+                        <button class="btn logout-btn">Log out</button>
                     </form>
                 </div>
             </nav>
@@ -290,9 +366,72 @@
                 </div>
         </div>
 
+        <!-- Chatbot Container -->
+        <div id="chatbot-container">
+            <div id="chat-icon" onclick="toggleChat()">💬</div>
+            <div id="chat-window" style="display: none;">
+                <div id="chat-header">Your HealthAce Assistant</div>
+                <div id="chat-messages"></div>
+                <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+
     </main>
     <footer>
         <p>HealthAce &copy; 2024</p>
     </footer>
+
+    <script>
+        function toggleChat() {
+            const chatWindow = document.getElementById('chat-window');
+            if (chatWindow.style.display === 'none') {
+                chatWindow.style.display = 'block';
+            } else {
+                chatWindow.style.display = 'none';
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const inputField = document.getElementById('chat-input');
+            const message = inputField.value;
+            if (message.trim() === '') return;
+
+            addMessageToChat('user', message);
+            inputField.value = '';
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+                addMessageToChat('assistant', data.message);
+            } catch (error) {
+                console.error('Error:', error);
+                addMessageToChat('assistant', 'Sorry, something went wrong.');
+            }
+        }
+
+        function addMessageToChat(sender, message) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageElement = document.createElement('div');
+            messageElement.classList.add(sender);
+            messageElement.textContent = message;
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    </script>
+
 </body>
 </html>

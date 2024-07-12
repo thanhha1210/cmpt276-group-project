@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Feedback</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <style>
+        /*--------------------------------Reset css-------------------------------------------------*/
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            border: 0;
+        }
+        body, input, button, select {
+            font-family: "Poppins", sans-serif;
+        }
+        body {
+            line-height: 1.5;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        .content {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header, main {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn {
+            font-weight: 600;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        #searchInput, #toggleView {
+            font-weight: 600;
+            padding: 10px 10px 10px 4px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            cursor: pointer;
+            background-color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        label {
+            font-size: 1.2em;
+        }
+
+        #toggleView {
+            background-color: #f8f9fa;
+            border: 1px solid #ccc;
+        }
+
+        #toggleView:hover {
+            background-color: #e2e6ea;
+        }
+
+        .add-btn {
+            background-color: #0F1B4C;
+            color: #ffffff;
+            grid-column: span 2;
+            justify-self: center;
+        }
+
+        .exit-btn {
+            background-color: #f44336;
+            color: #ffffff;
+        }
+        .delete-btn {
+            background-color: #fff;
+            color: #f44336;
+        }
+        .delete-btn:hover {
+            text-decoration: underline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #dee2e6;
+            text-align: center;
+        }
+        th {
+            background-color: var(--secondary-color, #0F1B4C);
+            color: #fff;
+            font-weight: 600;
+        }
+        td {
+            font-size: 0.9rem;
+        }
+
+        .centered-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        /* new css */
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0F1B4C;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .info-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .info {
+            flex: 1 1 calc(33% - 40px);
+            max-width: calc(33% - 40px);
+            box-sizing: border-box;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: transform 0.3s ease, scale 0.3s ease;
+        }
+        .info:hover {
+            flex: 1 1 100%;
+            transform: scale(1.05);
+            z-index: 1;
+            overflow-wrap: break-word;
+            overflow: visible;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .info-item > h3 {
+            min-width: 150px;
+            margin-right: 10px;
+        }
+        .desc {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: all 0.3s ease;
+        }
+        .info:hover .desc {
+            white-space: normal;
+            overflow: visible;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header class="content" style="display: flex; justify-content: space-between; text-align: center">
+      <form action="/patients/getDashboard" method="get">
+        <input type="submit" value="HOME" class="btn exit-btn">
+    </form>
+        <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px; margin-left: 60px;">Past Appointments</h1>
+        <div style="display: flex; align-items: center;">
+            <label for="toggleView">View: </label>
+            <select id="toggleView" style="margin-left: 8px;">
+                <option value="all">All</option>
+                <option value="none">None</option>
+            </select>
+        </div>
+    </header>
+    <main class="content">
+        <table class="table-container">
+            <thead>
+                <th>#</th>
+                <th>Doctor Name</th>
+                <th>Department</th>
+                <th>Date</th>
+                <th>Add Feedback</th>
+            </thead>
+            <tbody id="appointmentsBody">
+                <tr th:each="a, cnt : ${nonFeedbackList}">
+                    <td>
+                        <span th:text="${cnt.count}"></span>
+                    </td>
+
+                    <td>
+                        <span th:text="${a.doctorName}"></span>
+                    </td>
+
+                    <td>
+                        <span th:text="${a.department}"></span>
+                    </td>
+
+                    <td>
+                        <span th:text="${a.date}"></span>
+                    </td>
+
+                    <td>
+                        <form action="/patients/addFeedback" method="get">
+                            <input type="hidden" name="patientUsername" th:value="${a.patientUsername}">
+                            <input type="hidden" name="doctorUsername" th:value="${a.doctorUsername}">
+                            <input type="hidden" name="date" th:value="${a.date}">
+                            <input type="submit" class="btn " value="Add Feedback">
+                        </form>
+                  </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="centered-header">
+            <h1 style="font-weight: 700; font-size: 2.4em;">Feedback List</h1>
+        </div>
+        
+        <div class="content">
+            <div class="info-container">
+                <div th:each="fb : ${feedbackList}" class="info">
+                    <div>
+                        <div class="info-item">
+                            <h3>Date</h3>
+                            <span th:text="${fb.date}"></span>
+                        </div>
+
+                        <div class="info-item">
+                            <h3>Patient Name</h3>
+                            <span th:text="${fb.patientName}"></span>       
+                        </div>
+
+                        <div class="info-item">
+                            <h3>Doctor Name</h3>
+                            <span th:text="${fb.doctorName}"></span>       
+                        </div>
+    
+                        <div class="info-item">
+                            <h3>Department</h3>
+                            <span th:text="${fb.department}"></span>       
+                        </div>
+    
+                        <div class="info-item">
+                            <h3>Description</h3>
+                            <span th:text="${fb.description}" class="desc"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('toggleView').addEventListener('change', function() {
+            const tableBody = document.getElementById('appointmentsBody');
+            if (this.value === 'none') {
+                tableBody.style.display = 'none';
+            } else {
+                tableBody.style.display = 'table-row-group';
+            }
+        });
+    </script>
+</body>
+</html>

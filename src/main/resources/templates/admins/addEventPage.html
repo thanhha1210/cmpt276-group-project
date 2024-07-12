@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Doctor</title>
+    <title>Add Event</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -115,6 +115,16 @@
         .error, .success {
             animation: shake 0.4s;
         }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 12px 20px;
+            box-sizing: border-box;
+            border-radius: 4;
+            border: 2px solid #ccc;
+            resize: none;
+        }
+
          /* SHAKE ANIMATION*/
         @keyframes shake {
         25%{transform: translateX(-8px)}
@@ -136,60 +146,55 @@
 <body>
     <main class="container">
         <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 30px 0 0">
-            <form action="/admins/viewDoctor" method="get" style="padding: 10px; margin-top: -20px;">
+            <form action="/admins/viewEvent" method="get" style="padding: 10px; margin-top: -20px;">
                 <input type="submit" value="RETURN" class="btn exit-btn">
             </form>
             <div style="margin-right: 300px">
-                <h1>Add Doctor</h1>
+                <h1>Add Event</h1>
             </div>
-          
         </div>
        
-        <form action="/admins/addDoctor" method="post">
+        <form action="/admins/addEvent" method="post">
             <div>
-                <label for="name">Name</label>
-                <input type="text" id="name" name="name" placeholder="Name">
+                <label for="eventCode">Event Code</label>
+                <input type="text" id="eventCode" name="eventCode" placeholder="E100">
             </div>
             <div>
-                <label for="age">Age</label>
-                <input type="number" id="age" name="age" min="20" placeholder="18">
+                <label for="eventName">Event Name</label>
+                <input type="text" id="eventName" name="eventName" placeholder="Event 1">
             </div>
             <div>
-                <label for="address">Address</label>
-                <input type="text" id="address" name="address" placeholder="Address">
+                <label for="capacity">Capacity</label>
+                <input type="number" id="capacity" name="capacity" placeholder="100" min="10">
             </div>
             <div>
-                <label for="phone">Phone Number</label>
-                <input type="text" id="phone" name="phone" placeholder="888-888-8888">
+                <label for="date">Date </label>
+                <input type="date" id="date" name="date">
             </div>
             <div>
-                <label for="department">Department</label>
-                <select id="department" name="department">
-                    <option value="General">General</option>
-                    <option value="Cardiology">Cardiology</option>
-                    <option value="Dermatology">Dermatology</option>
-                    <option value="Pediatrics">Pediatrics</option>
-                    <option value="Orthopedics">Orthopedics</option>
-                    <option value="Ophthalmology">Ophthalmology</option>
-                </select>
+                <label for="time">Start Time </label>
+                <input type="time" id="startTime" name="startTime">
             </div>
             <div>
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" placeholder="example">
+                <label for="duration">Duration </label>
+                <input type="number" id="duration" name="duration">
             </div>
-            <div>
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Password">
+
+            <div class="desc" style=" grid-column: 1 / span 2;">
+                <label for="description" style="margin-bottom: 10px;">Description</label>
+                <textarea id="description" name="description" placeholder="Description" ></textarea>
             </div>
-            <button type="submit" class="btn add-btn">Create Account</button>
+        
+            <button type="submit" class="btn add-btn">Create Event</button>
+          
         </form>
         <div class="message-container" style="display: flex; justify-content: center; align-items: center; margin-top: 16px;">
             <span th:if="${error0}" class="error" th:text="${error0}"></span>
             <span th:if="${error1}" class="error" th:text="${error1}"></span>
-            <span th:if="${error2}" class="error" th:text="${error2}"></span>
             <span th:if="${success}" class="success" th:text="${success}"></span>
         </div>
     </main>
 </body>
 </html>
+
 

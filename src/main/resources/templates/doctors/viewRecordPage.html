@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>View Records</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+        <style>
+        /*--------------------------------Reset css-------------------------------------------------*/
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            border: 0;
+        }
+        body, input, button {
+            font-family: "Poppins", sans-serif;
+        }
+        body {
+            line-height: 1.5;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        .content {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header, main {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0F1B4C;
+        }
+        
+        .btn {
+            font-weight: 600;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+  
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        #searchInput {
+            font-weight: 600;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        .add-btn {
+            background-color: #0F1B4C;
+            color: #ffffff;
+            grid-column: span 2;
+            justify-self: center;
+        }
+
+        .exit-btn {
+            background-color: #f44336;
+            color: #ffffff;
+        }
+        .delete-btn {
+            background-color: #fff;
+            color: #f44336;
+        }
+        .delete-btn:hover {
+            text-decoration: underline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #dee2e6;
+            text-align: center;
+        }
+        th {
+            background-color: var(--secondary-color, #0F1B4C);
+            color: #fff;
+            font-weight: 600;
+        }
+        td {
+            font-size: 0.9rem;
+        }
+
+        </style>
+    </head>
+<body>
+
+    <header class="content" style="display: flex; justify-content: space-between; text-align: center">
+      <form action="/doctors/getDashboard" method="get">
+        <input type="submit" value="HOME" class="btn exit-btn">
+    </form>
+        <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Past Appointments</h1>
+        <div></div>
+    </header>
+    <main class="content">
+        <table class="table-container">
+            <thead>
+                <th>#</th>
+                <th>Doctor Name</th>
+                <th>Patient Name</th>
+                <th>Date</th>
+                <th>Start time</th>
+                <th>Duration</th>
+                <th></th>
+            </thead>
+            <tbody>
+                <tr th:each="a, cnt : ${appointments}">
+                    <td>
+                        <span th:text="${cnt.count}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${a.doctorName}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${a.patientName}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${a.date}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${a.startTime}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${a.duration}"></span>
+                    </td>
+                    <td>
+                      <form action="/doctors/addRecord" method="get">
+                          <input type="hidden" name="patientUsername" th:value="${a.patientUsername}">
+                          <input type="hidden" name="doctorUsername" th:value="${a.doctorUsername}">
+                          <input type="hidden" name="date" th:value="${a.date}">
+                          <input type="submit" class="btn " value="Add Record">
+                      </form>
+                  </td>
+                </tr>
+            </tbody>
+        </table>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px;">
+            <div></div>
+            <h1 style="font-weight: 700; font-size: 2.4em;  display: inline-block; margin-left: 300px;">Records</h1>
+            <div class="search-container" style="display: inline-block;">
+                <input type="text" id="searchInput" placeholder="Patient name">
+                <button onclick="searchRecord()" class="btn" style="margin-left: 12px;">Search</button>
+            </div>      
+        </div>
+        
+        <table class="table-container" id="recordsTable">
+            <thead>
+                <th>#</th>
+            <th>Patient Name</th>
+            <th>Date</th>
+            <th>Expand Record</th>
+
+            </thead>
+            <tbody>
+                <tr th:each="r, cnt : ${records}">
+                    <td>
+                        <span th:text="${cnt.count}"></span>
+                    </td>
+
+                    <td>
+                        <span th:text="${r.patientName}"></span>
+                    </td> 
+                    <td>
+                        <span th:text="${r.date}"></span>
+                    </td>
+                   <td>
+                        <form action="/doctors/expandRecord" method="get">
+                            <input type="hidden" name="patientUsername" th:value="${r.patientUsername}">
+                            <input type="hidden" name="patientName" th:value="${r.patientName}">
+                            <input type="hidden" name="doctorUsername" th:value="${r.doctorUsername}">
+                            <input type="hidden" name="date" th:value="${r.date}">
+                            <input type="hidden" name="description" th:value="${r.description}">
+                            <input type="submit" class="btn " value="Expand Record">
+                        </form>
+                   </td>
+
+                </tr>
+            </tbody>
+        </table>
+
+    </main>
+
+    <script>
+        function searchRecord() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const table = document.getElementById('recordsTable');
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                const patientName = cells[1] ? cells[1].innerText.toLowerCase() : '';
+
+                if (patientName.includes(input)) {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
