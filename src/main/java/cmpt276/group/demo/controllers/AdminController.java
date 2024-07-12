@@ -5,6 +5,7 @@ import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -266,14 +267,16 @@ public class AdminController {
                 return "admins/addSchedulePage";
             }
         }
-
-        // Check the schedule time with real time (USED IN LOCALHOST)
-        // LocalDate currentDate = LocalDate.now();
-        // LocalTime currentTime = LocalTime.now();
-        // if (date.toLocalDate().isBefore(currentDate) || (date.toLocalDate().isEqual(currentDate) && startTime.toLocalTime().isBefore(currentTime))) {
-        //     model.addAttribute("error5", "The schedule is behind the current date and time. Please enter a valid schedule");
-        //     return "admins/addSchedulePage";   
-        // }
+        // USED IN LOCALHOST
+        /* 
+        // Check the schedule time with real time 
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+        if (date.toLocalDate().isBefore(currentDate) || (date.toLocalDate().isEqual(currentDate) && startTime.toLocalTime().isBefore(currentTime))) {
+            model.addAttribute("error5", "The schedule is behind the current date and time. Please enter a valid schedule");
+            return "admins/addSchedulePage";   
+        }
+        */
 
         // ---------------------------------------------USE LOCAL DATE TIME (ON RENDER)--------------------------------------------------//
         // check schedule time with current time 
@@ -338,8 +341,8 @@ public class AdminController {
     // go to view event page
     @GetMapping("/admins/viewEvent")
     public String viewEvent(Model model) {
-        List<Event> events = eventRepo.findAll();
-        model.addAttribute("events", events);
+        autoChangeEvent();
+        categorizeEvent(model);
         return "admins/viewEventPage";
     }
 
@@ -370,15 +373,19 @@ public class AdminController {
         int  duration = Integer.parseInt(formData.get("duration"));
         
         if (eventRepo.findByEventCode(eventCode) != null) {
-            model.addAttribute("error1", "This event code existed");
+            model.addAttribute("error0", "This event code existed");
             return "admins/addEventPage";
         }
 
         Event newEvent = new Event(eventCode, eventName, capacity, description, date, startTime, duration);
+
+        if (!checkValidEvent(newEvent)) {
+            model.addAttribute("error1", "The event is behind the current date and time. Please enter a valid time for event");
+            return "admins/addEventPage";
+        }
         eventRepo.save(newEvent);
-        List<Event> events = eventRepo.findAll();
-        model.addAttribute("events", events);
         model.addAttribute("success", "You create an event successfully");
+        categorizeEvent(model);
         return "admins/addEventPage";
     }
 
@@ -387,8 +394,7 @@ public class AdminController {
     public String deleteEvent(@RequestParam String eventCode, Model model) {
         Event deleteEvent = eventRepo.findByEventCode(eventCode); 
         eventRepo.delete(deleteEvent);
-        List<Event> events = eventRepo.findAll();
-        model.addAttribute("events", events);
+        categorizeEvent(model);
         return "admins/viewEventPage";
     }
     
@@ -399,6 +405,14 @@ public class AdminController {
         model.addAttribute("event", displayEvent);
         return "admins/displayEventPage";
     }
+
+     // display pass event
+     @GetMapping("/admins/displayPassEvent")
+     public String displayPassEvent(@RequestParam String eventCode, Model model) {
+        Event displayEvent = eventRepo.findByEventCode(eventCode);
+        model.addAttribute("event", displayEvent);
+        return "admins/displayPassEventPage";
+     }
 
     // edit event
     @PostMapping("/admins/editEvent")
@@ -419,6 +433,55 @@ public class AdminController {
 
     }
 
+    // helper function to check event
+    public boolean checkValidEvent(Event event) {
+         // check schedule time with current time 
+        //LocalDateTime current = LocalDateTime.now();
+        LocalDateTime current = LocalDateTime.now().minusHours(7);
+        LocalDateTime evenDateTime = LocalDateTime.of(event.getDate().toLocalDate(), event.getStartTime().toLocalTime());
+        if (evenDateTime.isBefore(current)) {
+            return false;
+        }
+        return true;
+    }
+
+    // helper function to check pass
+    public void autoChangeEvent() {
+        // check schedule time with current time 
+        List<Event> events = eventRepo.findAll();
+        //LocalDateTime current = LocalDateTime.now();
+        LocalDateTime current = LocalDateTime.now().minusHours(7);
+      
+
+        for (Event event : events) {
+            LocalDateTime evenDateTime = LocalDateTime.of(event.getDate().toLocalDate(), event.getStartTime().toLocalTime());
+            if (evenDateTime.isBefore(current)) {
+                event.setPast(true);
+                eventRepo.save(event);
+            }
+        }
+   }
+
+   // helper function to caegorize event list
+   public void categorizeEvent(Model model) {
+        List<Event> unpassEvents = new ArrayList<>();
+        List<Event> passEvents = new ArrayList<>();
+        List<Event> events = eventRepo.findAll();
+
+        for (Event e : events) {
+            if (e.isPast()) {
+                passEvents.add(e);
+            }
+            else {
+                unpassEvents.add(e);
+            }
+        }
+        Collections.sort(passEvents);
+        Collections.sort(unpassEvents);
+        model.addAttribute("passEvents", passEvents);
+        model.addAttribute("unpassEvents", unpassEvents);
+   }
+
     // ----------------------------------------------View all patients' feedback------------------------------------
     @GetMapping("/admins/viewFeedback")
     public String getMethodName(Model model) {
@@ -433,63 +496,68 @@ public class AdminController {
     // ----------------------------------------------Helper function----------------------------------------------
     // function to change appointment to past appointment
     // USED IN LOCALHOST
-    // public void deleteSchedule() {
-    //     // Get the current date and time 
-    //     LocalDate currentDate = LocalDate.now();
-    //     LocalTime currentTime = LocalTime.now();
+    /*
+    public void deleteSchedule() {
+        // Get the current date and time 
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
 
-    //     // Retrieve all appointments
-    //     List<Schedule> scheduleList = scheduleRepo.findAll();
+        // Retrieve all appointments
+        List<Schedule> scheduleList = scheduleRepo.findAll();
 
-    //     // Loop through schedule and delete if pass the current time
-    //     for (Schedule schedule : scheduleList) {
+        // Loop through schedule and delete if pass the current time
+        for (Schedule schedule : scheduleList) {
 
-    //         // Get date and time of each schedule in a list
-    //         LocalDate scheDate = schedule.getDate().toLocalDate();
-    //         LocalTime scheTime = schedule.getStartTime().toLocalTime();
-    //         if (scheDate.isBefore(currentDate) || (scheDate.isEqual(currentDate) && scheTime.isBefore(currentTime))) {
-    //             scheduleRepo.delete(schedule);
-    //         }
-    //     }
-    // }
+            // Get date and time of each schedule in a list
+            LocalDate scheDate = schedule.getDate().toLocalDate();
+            LocalTime scheTime = schedule.getStartTime().toLocalTime();
+            if (scheDate.isBefore(currentDate) || (scheDate.isEqual(currentDate) && scheTime.isBefore(currentTime))) {
+                scheduleRepo.delete(schedule);
+            }
+        }
+    }
+    */
 
-    // // function to change appointment to past appointment
-    // // USED IN LOCALHOST
-    // public void changeApt() {
-    //     // Get the current date
-    //     LocalDate currentDate = LocalDate.now();
-    //     LocalTime currentTime = LocalTime.now();
-    //     System.out.println(currentDate);
-    //     System.out.println(currentTime);
+    // function to change appointment to past appointment
+    // USED IN LOCALHOST
+    /*
+    public void changeApt() {
+        // Get the current date
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+        System.out.println(currentDate);
+        System.out.println(currentTime);
 
-    //     // Retrieve all appointments
-    //     List<Appointment> appointmentList = appointmentRepo.findAll();
+        // Retrieve all appointments
+        List<Appointment> appointmentList = appointmentRepo.findAll();
 
-    //     // Loop through appointments and update status
-    //     for (Appointment apt : appointmentList) {
+        // Loop through appointments and update status
+        for (Appointment apt : appointmentList) {
             
-    //         // Get date and startTime of each appointment in a list
-    //         LocalDate aptDate = apt.getDate().toLocalDate();
-    //         LocalTime aptTime = apt.getStartTime().toLocalTime().plusMinutes(apt.getDuration());
-    //         System.out.println(aptDate);
-    //         System.out.println(aptTime);
-    //         if (aptDate.isBefore(currentDate) || (aptDate.isEqual(currentDate) && aptTime.isBefore(currentTime))) {
+            // Get date and startTime of each appointment in a list
+            LocalDate aptDate = apt.getDate().toLocalDate();
+            LocalTime aptTime = apt.getStartTime().toLocalTime().plusMinutes(apt.getDuration());
+            System.out.println(aptDate);
+            System.out.println(aptTime);
+            if (aptDate.isBefore(currentDate) || (aptDate.isEqual(currentDate) && aptTime.isBefore(currentTime))) {
 
-    //             // Create a new PastAppointment
-    //             PastAppointment pastApt = 
-    //             new PastAppointment(apt.getDoctorName(), apt.getDoctorUsername(),
-    //                                 apt.getPatientName(), apt.getPatientUsername(),
-    //                                 apt.getDate(), apt.getStartTime(),
-    //                                 apt.getDuration(), apt.getDepartment());
+                // Create a new PastAppointment
+                PastAppointment pastApt = 
+                new PastAppointment(apt.getDoctorName(), apt.getDoctorUsername(),
+                                    apt.getPatientName(), apt.getPatientUsername(),
+                                    apt.getDate(), apt.getStartTime(),
+                                    apt.getDuration(), apt.getDepartment());
 
-    //             // Add to pastApt
-    //             pastAppointmentRepo.save(pastApt);
+                // Add to pastApt
+                pastAppointmentRepo.save(pastApt);
 
-    //             // Delete from Apt
-    //             appointmentRepo.delete(apt);
-    //         }
-    //     }
-    // }
+                // Delete from Apt
+                appointmentRepo.delete(apt);
+            }
+        }
+    }
+     */
+    
 
     // USED ON RENDER
     public void changeApt() {

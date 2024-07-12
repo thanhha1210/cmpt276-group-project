@@ -124,7 +124,7 @@
             <input type="submit" value="HOME" class="btn exit-btn">
         </form>
         <div>
-            <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Events</h1>
+            <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Book Events</h1>
         </div>
         <div></div>
     </header>
@@ -133,7 +133,7 @@
         <div class="content">
             <div class="info-container">
                 <div th:each="event : ${booked}" class="info">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; ">
+                    <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; ">
                         <div class="info-item">
                             <h3>Event Name</h3>
                             <span th:text="${event.eventName}"></span>
@@ -168,14 +168,16 @@
                 </div>
             </div>
         </div>
-        <div style="margin: 50px;">
-           
+
+        <div>
+            <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Events</h1>
         </div>
+
         <!-- Unbooked section -->
         <div class="content">
             <div class="info-container">
                 <div th:each="event : ${unbooked}" class="info">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; ">
+                    <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; ">
                         <div class="info-item">
                             <h3>Event Name</h3>
                             <span th:text="${event.eventName}"></span>

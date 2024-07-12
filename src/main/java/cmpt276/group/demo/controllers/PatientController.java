@@ -159,62 +159,68 @@ public class PatientController {
     
     // Helper function
     // function to change appointment to past appointment (USED IN LOCALHOST)
-    // public void deleteSchedule() {
-    //     // Get the current date and time 
-    //     LocalDate currentDate = LocalDate.now();
-    //     LocalTime currentTime = LocalTime.now();
+    /*
+    public void deleteSchedule() {
+        // Get the current date and time 
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
 
-    //     // Retrieve all appointments
-    //     List<Schedule> scheduleList = scheduleRepo.findAll();
+        // Retrieve all appointments
+        List<Schedule> scheduleList = scheduleRepo.findAll();
 
-    //     // Loop through schedule and delete if pass the current time
-    //     for (Schedule schedule : scheduleList) {
+        // Loop through schedule and delete if pass the current time
+        for (Schedule schedule : scheduleList) {
 
-    //         // Get date and time of each schedule in a list
-    //         LocalDate scheDate = schedule.getDate().toLocalDate();
-    //         LocalTime scheTime = schedule.getStartTime().toLocalTime();
-    //         if (scheDate.isBefore(currentDate) || (scheDate.isEqual(currentDate) && scheTime.isBefore(currentTime))) {
-    //             scheduleRepo.delete(schedule);
-    //         }
-    //     }
-    // }
+            // Get date and time of each schedule in a list
+            LocalDate scheDate = schedule.getDate().toLocalDate();
+            LocalTime scheTime = schedule.getStartTime().toLocalTime();
+            if (scheDate.isBefore(currentDate) || (scheDate.isEqual(currentDate) && scheTime.isBefore(currentTime))) {
+                scheduleRepo.delete(schedule);
+            }
+        }
+    }
+    */
+   
 
     // // function to change appointment to past appointment (USED IN LOCALHOST)
-    // public void changeApt() {
-    //     // Get the current date
-    //     LocalDate currentDate = LocalDate.now();
-    //     LocalTime currentTime = LocalTime.now();
-    //     System.out.println(currentDate);
-    //     System.out.println(currentTime);
-    //     // Retrieve all appointments
-    //     List<Appointment> appointmentList = appointmentRepo.findAll();
+    /*
+     public void changeApt() {
+        // Get the current date
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+        System.out.println(currentDate);
+        System.out.println(currentTime);
+        // Retrieve all appointments
+        List<Appointment> appointmentList = appointmentRepo.findAll();
 
-    //     // Loop through appointments and update status
-    //     for (Appointment apt : appointmentList) {
+        // Loop through appointments and update status
+        for (Appointment apt : appointmentList) {
             
-    //         // Get date and startTime of each appointment in a list
-    //         LocalDate aptDate = apt.getDate().toLocalDate();
-    //         LocalTime aptTime = apt.getStartTime().toLocalTime().plusMinutes(apt.getDuration());
-    //         System.out.println(aptDate);
-    //         System.out.println(aptTime);
-    //         if (aptDate.isBefore(currentDate) || (aptDate.isEqual(currentDate) && aptTime.isBefore(currentTime))) {
+            // Get date and startTime of each appointment in a list
+            LocalDate aptDate = apt.getDate().toLocalDate();
+            LocalTime aptTime = apt.getStartTime().toLocalTime().plusMinutes(apt.getDuration());
+            System.out.println(aptDate);
+            System.out.println(aptTime);
+            if (aptDate.isBefore(currentDate) || (aptDate.isEqual(currentDate) && aptTime.isBefore(currentTime))) {
 
-    //             // Create a new PastAppointment
-    //             PastAppointment pastApt = 
-    //             new PastAppointment(apt.getDoctorName(), apt.getDoctorUsername(),
-    //                                 apt.getPatientName(), apt.getPatientUsername(),
-    //                                 apt.getDate(), apt.getStartTime(),
-    //                                 apt.getDuration(), apt.getDepartment());
+                // Create a new PastAppointment
+                PastAppointment pastApt = 
+                new PastAppointment(apt.getDoctorName(), apt.getDoctorUsername(),
+                                    apt.getPatientName(), apt.getPatientUsername(),
+                                    apt.getDate(), apt.getStartTime(),
+                                    apt.getDuration(), apt.getDepartment());
 
-    //             // Add to pastApt
-    //             pastAppointmentRepo.save(pastApt);
+                // Add to pastApt
+                pastAppointmentRepo.save(pastApt);
 
-    //             // Delete from Apt
-    //             appointmentRepo.delete(apt);
-    //         }
-    //     }
-    // }
+                // Delete from Apt
+                appointmentRepo.delete(apt);
+            }
+        }
+    }
 
+    */
+    
     // USED ON RENDER
     public void changeApt() {
         LocalDateTime current = LocalDateTime.now().minusHours(7);
@@ -279,12 +285,8 @@ public class PatientController {
         if (patient == null) {
             return "loginPage";
         }
-        List<Event> bookedEvent = new ArrayList<>();
-        List<Event> unBookedEvent = new ArrayList<>();
-        categorizeList(patient.getUsername(), bookedEvent, unBookedEvent);
-        
-        model.addAttribute("booked", bookedEvent);
-        model.addAttribute("unbooked", unBookedEvent);
+        autoChangeEvent();
+        categorizeEvent(model, patient.getUsername());
         return "patients/viewEventPage";
     }
 
@@ -300,18 +302,13 @@ public class PatientController {
         if (event.getCurrentNum() < event.getCapacity()) {
             patient.getEventsJoin().add(event.getEventCode());
             event.getPatients().add(patient.getUsername());
-            event.setCurrentNum(event.getPatients().size());
+            event.setCurrentNum(event.getCurrentNum() + 1);
     
             patientRepo.save(patient); // Save patient to update the join table
             eventRepo.save(event); // Save event to update the current number
         }
 
-        List<Event> bookedEvent = new ArrayList<>();
-        List<Event> unBookedEvent = new ArrayList<>();
-        categorizeList(patient.getUsername(), bookedEvent, unBookedEvent);
-        
-        model.addAttribute("booked", bookedEvent);
-        model.addAttribute("unbooked", unBookedEvent);
+        categorizeEvent(model, patient.getUsername());
         return "patients/viewEventPage";
     }
 
@@ -320,45 +317,93 @@ public class PatientController {
     @PostMapping("/patients/deleteEvent")
     public String deleteEvent(@RequestParam String eventCode, Model model, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");
+        Event event = eventRepo.findByEventCode(eventCode);
         if (patient == null) {
             return "loginPage";
         }
+        updateDelete(patient, event);     
+        categorizeEvent(model, patient.getUsername());
+        return "patients/viewEventPage";
+    }
+    // helper function to update delete event 
+    public void updateDelete(Patient patient, Event event) {
+        List<String> patients = new ArrayList<>();
+        List<String> events = new ArrayList<>();
 
-        Event event = eventRepo.findByEventCode(eventCode);
-        patient.getEventsJoin().remove(event.getEventCode());
-        event.getPatients().remove(patient.getUsername());
-        event.setCurrentNum(event.getPatients().size());
+        List<String> oldPatients = event.getPatients();
+        List<String> oldEvents = patient.getEventsJoin();
+
+        for (String s : oldPatients) {
+            if (!s.equals(patient.getUsername())) {
+                patients.add(s);
+            }
+        }
+
+        for (String s : oldEvents) {
+            if (!s.equals(event.getEventCode())) {
+                events.add(s);
+            }
+        }
+
+        patient.setEventsJoin(events);
+        event.setPatients(patients);
+        event.setCurrentNum(patients.size());
 
         patientRepo.save(patient); // Save patient to update the join table
         eventRepo.save(event); // Save event to update the current number
-       
-        List<Event> bookedEvent = new ArrayList<>();
-        List<Event> unBookedEvent = new ArrayList<>();
-        categorizeList(patient.getUsername(), bookedEvent, unBookedEvent);
-        
-        model.addAttribute("booked", bookedEvent);
-        model.addAttribute("unbooked", unBookedEvent);
-        return "patients/viewEventPage";
+
     }
-    
-    // helper categorizeList
-    public void categorizeList(String username, List<Event> bookedEvent, List<Event> unBookedEvent) {
+    // helper function to check pass
+    public void autoChangeEvent() {
+        // check schedule time with current time 
         List<Event> events = eventRepo.findAll();
-        for (Event e : events) {
-            boolean check = false;
-            for (String name : e.getPatients()) {
-                if (name.equals(username)) {
-                    bookedEvent.add(e);
-                    check = true;
-                    break;
-                }
+        //LocalDateTime current = LocalDateTime.now();
+        LocalDateTime current = LocalDateTime.now().minusHours(7);
+        
+
+        for (Event event : events) {
+            LocalDateTime evenDateTime = LocalDateTime.of(event.getDate().toLocalDate(), event.getStartTime().toLocalTime());
+            if (evenDateTime.isBefore(current)) {
+                event.setPast(true);
+                eventRepo.save(event);
             }
-            if (!check) {
-                unBookedEvent.add(e);
-            }
-          
         }
     }
+    // helper function to find whether patient book that event
+    public boolean checkBook(Event e, String username) {
+        List<String> patients = e.getPatients();
+        for (String p : patients) {
+            if (p.equals(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // helper function to caegorize event list
+    public void categorizeEvent(Model model, String username) {
+        List<Event> bookEvents = new ArrayList<>();
+        List<Event> unBookEvents = new ArrayList<>();
+        List<Event> events = eventRepo.findAll();
+
+        for (Event e : events) {
+            if (!e.isPast()) {
+                if (checkBook(e, username)) {
+                    bookEvents.add(e);
+                }
+                else {
+                    unBookEvents.add(e);
+                }
+            }
+        
+        }
+        Collections.sort(bookEvents);
+        Collections.sort(unBookEvents);
+        model.addAttribute("booked", bookEvents);
+        model.addAttribute("unbooked", unBookEvents);
+    }
+
+   
     
     //-------------------------------------Feedback------------------------------------------------
      @GetMapping("/patients/viewFeedback")

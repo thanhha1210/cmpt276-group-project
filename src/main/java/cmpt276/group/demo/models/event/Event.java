@@ -16,7 +16,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "events")
-public class Event {
+public class Event implements Comparable<Event> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int eid;
@@ -43,6 +43,17 @@ public class Event {
 
     @Column(name="is_past")
     private boolean isPast;
+
+
+    @Override
+    public int compareTo(Event o) {
+        if (!this.date.equals(o.getDate())) {
+            return this.date.compareTo(o.getDate());
+        }
+        else {
+            return this.startTime.compareTo(o.getStartTime());
+        }
+    }
 
     public Event() {}
 
