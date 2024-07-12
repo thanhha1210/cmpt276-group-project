@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
+import com.google.api.client.googleapis.auth.oauth2.GoogleRefreshTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -114,18 +115,35 @@ public class GMailer {
     }
 
     /**
+     * Refresh the access token if it has expired.
+     */
+    private void refreshCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException, GeneralSecurityException {
+        if (credentials.getExpiresInSeconds() <= 60) {
+            GoogleRefreshTokenRequest refreshTokenRequest = new GoogleRefreshTokenRequest(
+                    HTTP_TRANSPORT,
+                    JSON_FACTORY,
+                    credentials.getRefreshToken(),
+                    GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(GMailer.class.getResourceAsStream(CREDENTIALS_FILE_PATH))).getDetails().getClientId(),
+                    GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(GMailer.class.getResourceAsStream(CREDENTIALS_FILE_PATH))).getDetails().getClientSecret()
+            );
+            GoogleTokenResponse tokenResponse = refreshTokenRequest.execute();
+            credentials.setAccessToken(tokenResponse.getAccessToken());
+        }
+    }
+
+    /**
      * Build and return a Gmail service instance using the stored credentials.
      */
     public Gmail getService() throws IOException, GeneralSecurityException {
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        return new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+        credentials = getCredentials(HTTP_TRANSPORT);
+        refreshCredentials(HTTP_TRANSPORT);
+        return new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credentials)
                 .setApplicationName(APPLICATION_NAME)
                 .build();
     }
 
-    /**
-     * Create the email content to be sent.
-     */
+    
     public static MimeMessage createBookEmail(Patient patient, Event event) throws Exception {
         String to = patient.getUsername();
         String subject = "Confirmation registering for " + event.getEventName();
@@ -136,16 +154,14 @@ public class GMailer {
         Session session = Session.getDefaultInstance(props, null);
         MimeMessage email = new MimeMessage(session);
 
-        email.setFrom(new InternetAddress("HealthAce100@gmail.com"));
+        email.setFrom(new InternetAddress("healthace.donotreply@gmail.com"));
         email.addRecipient(javax.mail.Message.RecipientType.TO, new InternetAddress(to));
         email.setSubject(subject);
         email.setText(body);
         return email;
     }
 
-    /**
-     * Create the email content to be sent.
-     */
+    
     public static MimeMessage createDeleteEmail(Patient patient, Event event) throws Exception {
         String to = patient.getUsername();
         String subject = "Confirmation of unbooking for " + event.getEventName();
@@ -156,16 +172,14 @@ public class GMailer {
         Session session = Session.getDefaultInstance(props, null);
         MimeMessage email = new MimeMessage(session);
 
-        email.setFrom(new InternetAddress("HealthAce100@gmail.com"));
+        email.setFrom(new InternetAddress("healthace.donotreply@gmail.com"));
         email.addRecipient(javax.mail.Message.RecipientType.TO, new InternetAddress(to));
         email.setSubject(subject);
         email.setText(body);
         return email;
     }
 
-     /**
-     * Send the email using the Gmail service.
-     */
+   
     public static void sendEmail(Gmail service, MimeMessage emailContent) throws Exception {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         emailContent.writeTo(buffer);
@@ -178,18 +192,14 @@ public class GMailer {
         service.users().messages().send("me", message).execute();
     }
 
-    /**
-     * Send an email to the given patient about the given event.
-     */
+    
     public void sendBookMail(Patient patient, Event event) throws Exception {
         Gmail service = getService();
         MimeMessage emailContent = createBookEmail(patient, event);
         sendEmail(service, emailContent);
     }
 
-    /**
-     * Send an email to the given patient about the given event.
-     */
+    
     public void sendDeleteMail(Patient patient, Event event) throws Exception {
         Gmail service = getService();
         MimeMessage emailContent = createDeleteEmail(patient, event);

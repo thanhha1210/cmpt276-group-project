@@ -19,6 +19,7 @@ public class OAuth2Controller {
             gMailer.storeAuthorizationCode(code);
         } catch (Exception e) {
             e.printStackTrace();
+            return "loginPage";
         }
         return "admins/mainPage";
     }
@@ -27,9 +28,10 @@ public class OAuth2Controller {
         try {
             String authorizationUrl = gMailer.getAuthorizationUrl();
             return "redirect:" + authorizationUrl;
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             e.printStackTrace();
+            return "loginPage";  // Handle this appropriately in your application
         }
-        return "loginPage";  // Handle this appropriately in your application
     }
 }
