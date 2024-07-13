@@ -39,7 +39,7 @@ public class Event implements Comparable<Event> {
     private Time startTime;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    private List<String> patients = new ArrayList<>();
+    private List<String> patients;
 
     @Column(name="is_past")
     private boolean isPast;
@@ -68,6 +68,7 @@ public class Event implements Comparable<Event> {
         this.currentNum = 0;
         this.patients = null;
         this.isPast = false;
+        this.patients = new ArrayList<>();
     }
 
     public int getCapacity() {

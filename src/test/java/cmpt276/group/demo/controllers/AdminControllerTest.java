@@ -26,6 +26,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import cmpt276.group.demo.models.Department;
 import cmpt276.group.demo.models.admin.Admin;
@@ -33,6 +34,7 @@ import cmpt276.group.demo.models.appointment.Appointment;
 import cmpt276.group.demo.models.appointment.AppointmentRepository;
 import cmpt276.group.demo.models.doctor.Doctor;
 import cmpt276.group.demo.models.doctor.DoctorRepository;
+import cmpt276.group.demo.models.event.Event;
 import cmpt276.group.demo.models.event.EventRepository;
 import cmpt276.group.demo.models.feedback.FeedbackRepository;
 import cmpt276.group.demo.models.past_appointment.PastAppointment;
@@ -633,6 +635,168 @@ public class AdminControllerTest {
         ;
         verify(scheduleRepo, times(1)).delete(any(Schedule.class));
     }
+
+
+    //------------------------------------------Test add, view, delete event----------------------------------------------------
+    // 1A. Test admin add event - success
+   @Test
+    public void testValidAddEvent() throws Exception {
+        Event e1 = new Event("E101", "Event 101", 10, "This is new event", Date.valueOf("2024-12-08"), Time.valueOf("10:00:00"), 90);
+
+        List<Event> events = new ArrayList<>();
+        when(eventRepo.findByEventCode("E101")).thenReturn(null);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/admins/addEvent")
+                                            .param("eventCode", "E101")
+                                            .param("eventName", "Event 101")
+                                            .param("description", "This is new event")
+                                            .param("date", "2024-12-08")
+                                            .param("startTime", "10:00")
+                                            .param("capacity", "10")
+                                            .param("duration", "90"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admins/addEventPage"))
+                .andExpect(model().attributeExists("success"))
+                .andExpect(model().attributeDoesNotExist("error0"))
+                .andExpect(model().attributeDoesNotExist("error1"))
+                .andExpect(model().attributeDoesNotExist("error2"));
+
+        verify(eventRepo, times(1)).save(any(Event.class));
+    }
+
+    // 1B. Test admin add event - Error 0: lack fields
+    @Test
+    public void testInvalidAddEvent1() throws Exception {
+        Event e1 = new Event("E101", "Event 101", 10, "This is new event", Date.valueOf("2024-12-08"), Time.valueOf("10:00:00"), 90);
+
+        List<Event> events = new ArrayList<>();
+        when(eventRepo.findByEventCode("E101")).thenReturn(null);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/admins/addEvent")
+                                            .param("eventCode", "E101")
+                                            .param("eventName", "Event 101")
+                                            .param("description", "This is new event")
+                                            .param("date", "")
+                                            .param("startTime", "10:00")
+                                            .param("capacity", "10")
+                                            .param("duration", "90"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admins/addEventPage"))
+                .andExpect(model().attributeExists("error0"))
+                .andExpect(model().attributeDoesNotExist("success"))
+                .andExpect(model().attributeDoesNotExist("error1"))
+                .andExpect(model().attributeDoesNotExist("error2"));
+
+        verify(eventRepo, times(0)).save(any(Event.class));
+    }
+    @Test
+    public void testInvalidAddEvent2() throws Exception {
+        Event e1 = new Event("E101", "Event 101", 10, "This is new event", Date.valueOf("2024-12-08"), Time.valueOf("10:00:00"), 90);
+
+        List<Event> events = new ArrayList<>();
+        when(eventRepo.findByEventCode("E101")).thenReturn(null);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/admins/addEvent")
+                                            .param("eventCode", "E101")
+                                            .param("eventName", "Event 101")
+                                            .param("description", "This is new event")
+                                            .param("date", "2024-12-08")
+                                            .param("startTime", "")
+                                            .param("capacity", "10")
+                                            .param("duration", "90"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admins/addEventPage"))
+                .andExpect(model().attributeExists("error0"))
+                .andExpect(model().attributeDoesNotExist("success"))
+                .andExpect(model().attributeDoesNotExist("error1"))
+                .andExpect(model().attributeDoesNotExist("error2"));
+
+        verify(eventRepo, times(0)).save(any(Event.class));
+    }
+
+    // 1C. Test admin add event - Error 1: event code exists
+
+    @Test
+    public void testInvalidAddEvent3() throws Exception {
+        Event e1 = new Event("E101", "Event 101", 10, "This is new event", Date.valueOf("2024-12-08"), Time.valueOf("10:00:00"), 90);
+
+        List<Event> events = new ArrayList<>();
+        when(eventRepo.findByEventCode("E101")).thenReturn(e1);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/admins/addEvent")
+                                            .param("eventCode", "E101")
+                                            .param("eventName", "Event 102")
+                                            .param("description", "This is new event")
+                                            .param("date", "2024-12-08")
+                                            .param("startTime", "10:00")
+                                            .param("capacity", "10")
+                                            .param("duration", "90"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admins/addEventPage"))
+                .andExpect(model().attributeExists("error1"))
+                .andExpect(model().attributeDoesNotExist("success"))
+                .andExpect(model().attributeDoesNotExist("error0"))
+                .andExpect(model().attributeDoesNotExist("error2"));
+
+        verify(eventRepo, times(0)).save(any(Event.class));
+    }
+
+
+    // 1D. Test admin add event - Error 2: behind current time
+    @Test
+    public void testInvalidAddEvent4() throws Exception {
+        Event e1 = new Event("E101", "Event 101", 10, "This is new event", Date.valueOf("2023-12-08"), Time.valueOf("10:00:00"), 90);
+
+        List<Event> events = new ArrayList<>();
+        when(eventRepo.findByEventCode("E101")).thenReturn(null);
+
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/admins/addEvent")
+                                            .param("eventCode", "E101")
+                                            .param("eventName", "Event 102")
+                                            .param("description", "This is new event")
+                                            .param("date", "2023-12-08")
+                                            .param("startTime", "10:00")
+                                            .param("capacity", "10")
+                                            .param("duration", "90"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admins/addEventPage"))
+                .andExpect(model().attributeExists("error2"))
+                .andExpect(model().attributeDoesNotExist("success"))
+                .andExpect(model().attributeDoesNotExist("error0"))
+                .andExpect(model().attributeDoesNotExist("error1"));
+
+        verify(eventRepo, times(0)).save(any(Event.class));
+    }
+
+    // 2. Test admin delete event
+    @Test
+    public void testDeleteEvent() throws Exception {
+        Event e1 = new Event("E101", "Event 101", 10, "This is new event", Date.valueOf("2024-12-08"), Time.valueOf("10:00:00"), 90);
+        Event e2 = new Event("E102", "Event 102", 10, "This is new event", Date.valueOf("2024-12-09"), Time.valueOf("10:00:00"), 90);
+        Event e3 = new Event("E103", "Event 103", 10, "This is new event", Date.valueOf("2024-12-10"), Time.valueOf("10:00:00"), 90);
+    
+        List<Event> events = new ArrayList<>();
+        events.add(e2);
+        events.add(e3);
+    
+        
+        when(eventRepo.findByEventCode("E101")).thenReturn(e1);
+        when(eventRepo.findAll()).thenReturn(events);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/admins/deleteEvent")
+                                              .param("eventCode", "E101"))
+               .andExpect(status().isOk())
+               .andExpect(view().name("admins/viewEventPage"))
+               .andExpect(model().attribute("unpassEvents", hasSize(2)));
+        
+        verify(eventRepo, times(1)).delete(any(Event.class));
+    }
+    
+
+
+
+
 
 
 }
