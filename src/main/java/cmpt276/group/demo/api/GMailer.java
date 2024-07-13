@@ -39,7 +39,7 @@ import cmpt276.group.demo.models.patient.Patient;
 @Component
 public class GMailer {
 
-    private static final String APPLICATION_NAME = "Sending email";
+    private static final String APPLICATION_NAME = "HealthAce healthcare service";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
     private static final List<String> SCOPES = Collections.singletonList(GmailScopes.GMAIL_SEND);
@@ -50,20 +50,27 @@ public class GMailer {
 
     private Credential credentials;
 
-    /**
-     * Load stored credentials or initiate the OAuth2 flow to obtain new credentials.
+      /**
+     * Creates an authorized Credential object.
+     *
+     * @param HTTP_TRANSPORT The network HTTP Transport.
+     * @return An authorized Credential object.
+     * @throws IOException If the credentials.json file cannot be found.
      */
     private Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException, GeneralSecurityException {
+        // if have the token already -> no need to take
         if (credentials != null) {
             return credentials;
         }
 
+        // load client secret
         InputStream in = GMailer.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
         if (in == null) {
             throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
         }
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
+        // build flow and trigger user authorization request
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
                 .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
