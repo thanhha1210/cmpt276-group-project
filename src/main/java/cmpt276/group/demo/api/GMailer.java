@@ -44,7 +44,7 @@ public class GMailer {
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
     private static final List<String> SCOPES = Collections.singletonList(GmailScopes.GMAIL_SEND);
     private static final String CREDENTIALS_FILE_PATH = "/gmail_credential.json";
-    private static final String REDIRECT_URI = "http://localhost:8080/oauth2callback";
+    private static final String REDIRECT_URI = "https://cmpt276-group-project.onrender.com/oauth2callback";
 
     private static final Logger logger = LoggerFactory.getLogger(GMailer.class);
 
@@ -154,8 +154,10 @@ public class GMailer {
     public static MimeMessage createBookEmail(Patient patient, Event event) throws Exception {
         String to = patient.getUsername();
         String subject = "Confirmation registering for " + event.getEventName();
-        String body = "You are successfully registered for " + event.getEventName() + ".\n This event will be on " + event.getDate() + " at " + event.getStartTime() +
-                      ".\nThank you for registering for our consultation event.";
+        String body = "You are successfully registered for " + event.getEventName() +
+                        ".\nThis event will be on " + event.getDate() + " at " + event.getStartTime() +
+                        ".\nThank you for registering for our consultation event" +
+                        ".\nBest regards, \nHealthAce Service";
 
         Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
@@ -172,8 +174,10 @@ public class GMailer {
     public static MimeMessage createDeleteEmail(Patient patient, Event event) throws Exception {
         String to = patient.getUsername();
         String subject = "Confirmation of unbooking for " + event.getEventName();
-        String body = "You have successfully unbooked from " + event.getEventName() + ". This event was scheduled for " + event.getDate() + " at " + event.getStartTime() +
-                      ".\nThank you for letting us know.";
+        String body = "You have successfully unbooked from " + event.getEventName() + 
+                      ".\nThis event was scheduled for " + event.getDate() + " at " + event.getStartTime() +
+                      ".\nThank you for letting us know" + 
+                      ".\nBest regards, \nHealthAce Service";
 
         Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
