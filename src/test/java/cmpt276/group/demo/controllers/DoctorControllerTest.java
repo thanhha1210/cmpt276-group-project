@@ -125,6 +125,7 @@ public class DoctorControllerTest {
                .andExpect(model().attribute("feedbackList", feedbackList));
     }
 
+
     @Test
     public void testAddRecord() throws Exception {
         Doctor d1 = new Doctor("d1", "password", "doctor1", 40, "123 Main St", "123-456-7890", Department.Cardiology);

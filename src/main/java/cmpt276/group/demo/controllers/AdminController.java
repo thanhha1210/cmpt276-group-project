@@ -373,14 +373,14 @@ public class AdminController {
         int  duration = Integer.parseInt(formData.get("duration"));
         
         if (eventRepo.findByEventCode(eventCode) != null) {
-            model.addAttribute("error0", "This event code existed");
+            model.addAttribute("error1", "This event code existed");
             return "admins/addEventPage";
         }
 
         Event newEvent = new Event(eventCode, eventName, capacity, description, date, startTime, duration);
 
         if (!checkValidEvent(newEvent)) {
-            model.addAttribute("error1", "The event is behind the current date and time. Please enter a valid time for event");
+            model.addAttribute("error2", "The event is behind the current date and time. Please enter a valid time for event");
             return "admins/addEventPage";
         }
         eventRepo.save(newEvent);
@@ -393,7 +393,11 @@ public class AdminController {
     @PostMapping("/admins/deleteEvent")
     public String deleteEvent(@RequestParam String eventCode, Model model) {
         Event deleteEvent = eventRepo.findByEventCode(eventCode); 
-        eventRepo.delete(deleteEvent);
+         
+        if (deleteEvent != null) {
+            eventRepo.delete(deleteEvent);
+        }
+       
         categorizeEvent(model);
         return "admins/viewEventPage";
     }
@@ -435,7 +439,7 @@ public class AdminController {
 
     // helper function to check event
     public boolean checkValidEvent(Event event) {
-         // check schedule time with current time 
+        // check schedule time with current time 
         //LocalDateTime current = LocalDateTime.now();
         LocalDateTime current = LocalDateTime.now().minusHours(7);
         LocalDateTime evenDateTime = LocalDateTime.of(event.getDate().toLocalDate(), event.getStartTime().toLocalTime());
