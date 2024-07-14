@@ -8,6 +8,7 @@ import cmpt276.group.demo.models.feedback.Feedback;
 import cmpt276.group.demo.models.feedback.FeedbackRepository;
 import cmpt276.group.demo.models.past_appointment.PastAppointment;
 import cmpt276.group.demo.models.past_appointment.PastAppointmentRepository;
+import cmpt276.group.demo.models.patient.Patient;
 import cmpt276.group.demo.models.patient.PatientRepository;
 import cmpt276.group.demo.models.record.Record;
 import cmpt276.group.demo.models.record.RecordRepository;
@@ -71,6 +72,23 @@ public class DoctorControllerTest {
 
     @MockBean
     private FeedbackRepository feedbackRepo;
+
+    // test doctor log in - POST - Valid
+    @Test
+    public void testValidLogin() throws Exception {
+        Doctor doctor = new Doctor("d1", "123", "doc1", 20, "123St", "123", Department.General);
+        when(doctorRepo.findByUsernameAndPassword("d1", "123")).thenReturn(doctor);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/")
+                .sessionAttr("session_doctor", doctor)
+                .param("username", "d1")
+                .param("password", "123")
+                .param("role", "doctor"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.view().name("doctors/mainPage"))
+            .andExpect(MockMvcResultMatchers.model().attributeExists("doctor"))
+            .andExpect(MockMvcResultMatchers.model().attribute("doctor", doctor));
+    }
 
     @Test
     public void testGetDashboard() throws Exception {

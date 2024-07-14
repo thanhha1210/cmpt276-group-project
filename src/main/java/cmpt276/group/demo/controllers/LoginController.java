@@ -49,7 +49,7 @@ public class LoginController {
         return "loginPage";
     }
     
-    @PostMapping("/")
+    @PostMapping("/")   // added test
     public String login(@RequestParam Map<String, String> formData, Model model, HttpServletRequest request, HttpSession session) {
         String name = formData.get("username");
         String pwd = formData.get("password");

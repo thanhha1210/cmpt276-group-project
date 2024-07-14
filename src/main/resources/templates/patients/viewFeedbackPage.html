@@ -120,13 +120,13 @@
         td {
             font-size: 0.9rem;
         }
-
+/* 
         .centered-header {
             display: flex;
             justify-content: center;
             align-items: center;
             margin-top: 30px;
-        }
+        } */
 
         /* new css */
         h1 {
@@ -182,9 +182,38 @@
             overflow: visible;
         }
 
+        .search-container {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+        }
+        
+        .search-container input[type="text"] {
+            padding: 10px;
+            border-radius: 6px 0 0 6px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+        
+        .search-container button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 0 6px 6px 0;
+            background-color: #0F1B4C;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .search-container button:hover {
+            background-color: #092b63;
+        }
+
     </style>
 </head>
-<body>
+<body style="margin-bottom: 20px;">
 
     <header class="content" style="display: flex; justify-content: space-between; text-align: center">
       <form action="/patients/getDashboard" method="get">
@@ -238,9 +267,15 @@
             </tbody>
         </table>
 
-        <div class="centered-header">
-            <h1 style="font-weight: 700; font-size: 2.4em;">Feedback List</h1>
-        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; margin-top: 30px;">
+            <div style="flex: 1; text-align: center; padding-left: 380px;">
+                <span style="font-weight: 700; font-size: 2.4em;">Feedback List</span>
+            </div>
+            <div class="search-container" style="flex: 1; display: flex; justify-content: flex-end;">
+                <input type="text" id="searchInput" placeholder="Doctor name" style="border: 1px solid #ccc; padding: 8px; border-radius: 6px; font-size: 1em; font-weight: 400; border-width: 2px;">
+                <button onclick="searchRecord()" class="btn" style="margin-left: 12px;">Search</button>
+            </div>
+        </div>        
         
         <div class="content">
             <div class="info-container">
@@ -258,7 +293,7 @@
 
                         <div class="info-item">
                             <h3>Doctor Name</h3>
-                            <span th:text="${fb.doctorName}"></span>       
+                            <span th:text="${fb.doctorName}" class="doctorName"></span>       
                         </div>
     
                         <div class="info-item">
@@ -285,6 +320,21 @@
                 tableBody.style.display = 'table-row-group';
             }
         });
+
+        function searchRecord() {
+            var input = document.getElementById('searchInput').value.toLowerCase();
+            var feedbacks = document.getElementsByClassName('info');
+
+            for (let i = 0; i < feedbacks.length; i++) {
+                let doctorName = feedbacks[i].getElementsByClassName('doctorName')[0].innerText.toLowerCase();
+                if (doctorName.includes(input)) {
+                    feedbacks[i].style.display = '';
+                }
+                else {
+                    feedbacks[i].style.display = 'none';
+                }
+            }
+        }
     </script>
 </body>
 </html>

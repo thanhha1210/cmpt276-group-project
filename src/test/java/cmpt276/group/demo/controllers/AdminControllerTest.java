@@ -30,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import cmpt276.group.demo.models.Department;
 import cmpt276.group.demo.models.admin.Admin;
+import cmpt276.group.demo.models.admin.AdminRepository;
 import cmpt276.group.demo.models.appointment.Appointment;
 import cmpt276.group.demo.models.appointment.AppointmentRepository;
 import cmpt276.group.demo.models.doctor.Doctor;
@@ -46,10 +47,13 @@ import cmpt276.group.demo.models.schedule.Schedule;
 import cmpt276.group.demo.models.schedule.ScheduleRepository;
 
 
-@WebMvcTest(AdminController.class)
+@WebMvcTest(controllers = {AdminController.class, LoginController.class})
 public class AdminControllerTest {
 
     public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
+
+    @MockBean
+    private AdminRepository adminRepo;
 
     @MockBean
     private PatientRepository patientRepo;
@@ -74,6 +78,24 @@ public class AdminControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    // -------------------------------------------Test Login ----------------------------------------------
+     // 1A. test admin log in - POST - Valid
+    @Test
+    public void testValidLogin() throws Exception {
+        Admin admin = new Admin("a1", "123");
+        when(adminRepo.findByUsernameAndPassword("a1", "123")).thenReturn(admin);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/")
+                .sessionAttr("session_admin", admin)
+                .param("username", "a1")
+                .param("password", "123")
+                .param("role", "admin"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.view().name("admins/mainPage"))
+            .andExpect(MockMvcResultMatchers.model().attributeExists("admin"))
+            .andExpect(MockMvcResultMatchers.model().attribute("admin", admin));
+    }
 
     // -------------------------------------------Test get dashboard ----------------------------------------------
      // 1A. test patient view dashboard - GET - Valid
@@ -643,7 +665,6 @@ public class AdminControllerTest {
         Feedback f1 = new Feedback("doctor1", "d1", "patient1", "p1", Date.valueOf("2023-05-08"), Department.valueOf("General"), "Good doctor");
         Feedback f2 = new Feedback("doctor1", "d1", "patient1", "p1", Date.valueOf("2023-05-15"), Department.valueOf("General"), "Nice doctor");
 
-<<<<<<< HEAD
         List<Feedback> feedbackList = new ArrayList<>();
         feedbackList.add(f1);
         feedbackList.add(f2);
@@ -657,7 +678,6 @@ public class AdminControllerTest {
                 .andExpect(model().attribute("feedbackList", hasSize(2)));
         verify(feedbackRepo, times(1)).findAll();
     }
-=======
     //------------------------------------------Test add, view, delete event----------------------------------------------------
     // 1A. Test admin add event - success
    @Test
@@ -813,12 +833,4 @@ public class AdminControllerTest {
         
         verify(eventRepo, times(1)).delete(any(Event.class));
     }
-    
-
-
-
-
-
-
->>>>>>> 3b327bb8e1b2a625a767073178794981241dbbec
 }

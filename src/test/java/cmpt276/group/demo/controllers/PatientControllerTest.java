@@ -28,6 +28,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import cmpt276.group.demo.DemoApplication;
 import cmpt276.group.demo.models.Department;
@@ -48,7 +49,7 @@ import cmpt276.group.demo.models.record.RecordRepository;
 import cmpt276.group.demo.models.schedule.Schedule;
 import cmpt276.group.demo.models.schedule.ScheduleRepository;
 
-@WebMvcTest(controllers = PatientController.class)
+@WebMvcTest(controllers = {PatientController.class, LoginController.class})     // import multiple controllers if needed
 @ContextConfiguration(classes = DemoApplication.class)
 public class PatientControllerTest {
 
@@ -103,13 +104,23 @@ public class PatientControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    //------------------------------------Test Login--------------------------------------
+    // ------------------------------------Test Login--------------------------------------
     // 0. test patient log in - POST - Valid
-    // @Test
-    // public void testValidLogin() throws Exception {
-    //     Patient p1 = new Patient("p1", "123", "patient1", 20, "123St", "123");
-    //     mockMvc.perform(Mock)
-    // }
+    @Test
+    public void testValidLogin() throws Exception {
+        Patient p1 = new Patient("p1", "123", "patient1", 20, "123St", "123");
+        when(patientRepo.findByUsernameAndPassword("p1", "123")).thenReturn(p1);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/")
+                .sessionAttr("session_patient", p1)
+                .param("username", "p1")
+                .param("password", "123")
+                .param("role", "patient"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.view().name("patients/mainPage"))
+            .andExpect(MockMvcResultMatchers.model().attributeExists("patient"))
+            .andExpect(MockMvcResultMatchers.model().attribute("patient", p1));
+    }
 
     //------------------------------------Test getDashboard--------------------------------------
     // 1A. test patient view dashboard - GET - Valid
