@@ -8,6 +8,7 @@ import cmpt276.group.demo.models.feedback.Feedback;
 import cmpt276.group.demo.models.feedback.FeedbackRepository;
 import cmpt276.group.demo.models.past_appointment.PastAppointment;
 import cmpt276.group.demo.models.past_appointment.PastAppointmentRepository;
+import cmpt276.group.demo.models.patient.Patient;
 import cmpt276.group.demo.models.patient.PatientRepository;
 import cmpt276.group.demo.models.record.Record;
 import cmpt276.group.demo.models.record.RecordRepository;
@@ -23,6 +24,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.sql.Date;
 import java.sql.Time;
@@ -30,6 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -68,6 +72,23 @@ public class DoctorControllerTest {
 
     @MockBean
     private FeedbackRepository feedbackRepo;
+
+    // test doctor log in - POST - Valid
+    @Test
+    public void testValidLogin() throws Exception {
+        Doctor doctor = new Doctor("d1", "123", "doc1", 20, "123St", "123", Department.General);
+        when(doctorRepo.findByUsernameAndPassword("d1", "123")).thenReturn(doctor);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/")
+                .sessionAttr("session_doctor", doctor)
+                .param("username", "d1")
+                .param("password", "123")
+                .param("role", "doctor"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.view().name("doctors/mainPage"))
+            .andExpect(MockMvcResultMatchers.model().attributeExists("doctor"))
+            .andExpect(MockMvcResultMatchers.model().attribute("doctor", doctor));
+    }
 
     @Test
     public void testGetDashboard() throws Exception {
@@ -181,4 +202,27 @@ public class DoctorControllerTest {
                .andExpect(model().attribute("record", hasProperty("description", is("updated description"))))
                .andExpect(model().attribute("success", "Change patient description successfully!"));
     }
+
+    // test doctor view patients' feedback - GET - case 1: doctor already log in
+    @Test 
+    public void testValidViewFeedback() throws Exception {
+        Feedback f1 = new Feedback("doctor1", "d1", "patient1", "p1", Date.valueOf("2023-05-08"), Department.valueOf("General"), "Good doctor");
+        Feedback f2 = new Feedback("doctor1", "d1", "patient1", "p1", Date.valueOf("2023-05-15"), Department.valueOf("General"), "Nice doctor");
+        Doctor doc = new Doctor("d1", "123", "doctor1", 22, "123", "123", Department.General);
+
+        List<Feedback> feedbackList = new ArrayList<>();
+        feedbackList.add(f1);
+        feedbackList.add(f2);
+
+        when(feedbackRepo.findByDoctorUsername(doc.getUsername())).thenReturn(feedbackList);
+        mockMvc.perform(MockMvcRequestBuilders.get("/doctors/viewFeedback")
+            .sessionAttr("session_doctor", doc))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.view().name("doctors/viewFeedbackPage"))
+            .andExpect(model().attribute("feedbackList", feedbackList))
+            .andExpect(model().attribute("doctor", doc));
+
+        verify(feedbackRepo, times(1)).findByDoctorUsername("d1");
+    }
+
 }

@@ -486,8 +486,8 @@ public class AdminController {
         model.addAttribute("unpassEvents", unpassEvents);
    }
 
-    // ----------------------------------------------View all patients' feedback------------------------------------
-    @GetMapping("/admins/viewFeedback")
+    // ----------------------------------------------View all patients' feedback------------------------------------ 
+    @GetMapping("/admins/viewFeedback") // added test
     public String getMethodName(Model model) {
         // view all feedback
         List<Feedback> feedbackList = feedbackRepo.findAll();

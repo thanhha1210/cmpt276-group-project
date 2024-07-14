@@ -33,6 +33,8 @@ import cmpt276.group.demo.models.record.Record;
 import cmpt276.group.demo.models.record.RecordRepository;
 import cmpt276.group.demo.models.schedule.Schedule;
 import cmpt276.group.demo.models.schedule.ScheduleRepository;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -282,7 +284,7 @@ public class PatientController {
    
     
     //-------------------------------------Feedback------------------------------------------------
-     @GetMapping("/patients/viewFeedback")
+     @GetMapping("/patients/viewFeedback")  // added test
     public String getFeedback(Model model, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");
         if (patient == null) {
@@ -307,7 +309,7 @@ public class PatientController {
         return "patients/viewFeedbackPage";
     }    
 
-    @GetMapping("/patients/addFeedback")
+    @GetMapping("/patients/addFeedback")  // added test
     public String getAddFeedbackPage(HttpSession session, Model model, @RequestParam Map<String, String> formData) {
         Patient patient = (Patient) session.getAttribute("session_patient");
         if (patient == null) {
@@ -323,8 +325,8 @@ public class PatientController {
     }
     
 
-    @PostMapping("/patients/addFeedback")
-    public String addFeedbackPage(@RequestParam Map<String, String> formData, HttpSession session, Model model) {
+    @PostMapping("/patients/addFeedback")   // added test
+    public String addFeedbackPage(@RequestParam Map<String, String> formData, HttpSession session, Model model, HttpServletResponse response) {
         Patient patient = (Patient) session.getAttribute("session_patient");
         if (patient == null) {
             return "loginPage";
@@ -338,6 +340,7 @@ public class PatientController {
 
         if (feedbackStr.trim().isEmpty()) {
             model.addAttribute("nonFeedbackPastApt", pastApt);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             model.addAttribute("error0", "Please fill the feedback form!");
             return "patients/addFeedbackPage";
         }
@@ -368,7 +371,4 @@ public class PatientController {
         model.addAttribute("nonFeedbackList", nonFeedbackPastAptList);
         return "patients/viewFeedbackPage";
     }
-
-
-
 }

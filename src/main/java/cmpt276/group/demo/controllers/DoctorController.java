@@ -196,7 +196,7 @@ public class DoctorController {
 
   //--------------------------------------------View patients' feedback------------------------------------------------
 
-  @GetMapping("/doctors/viewFeedback")
+  @GetMapping("/doctors/viewFeedback") // added test
   public String viewFeedbackPage(HttpSession session, Model model) {
     Doctor doctor = (Doctor) session.getAttribute("session_doctor");
     if (doctor == null) {
