@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Mainpage</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset CSS */
+        html, body, div, span, h1, h2, h3, a, form, label, tr, th, td, header {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            font-size: 100%;
+            font: inherit;
+            vertical-align: baseline;
+            
+        }
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+        body, input, header {
+            font-family: "Poppins", sans-serif;
+            line-height: 1.5em;
+            background-color: #fff;
+        }
+
+        /* Container */
+        .content, .content-main {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            background: #fff;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 12px;
+            border: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            line-height: 21px;
+            text-align: center;
+            color: #0F1B4C;
+            background-color: transparent;
+            cursor: pointer;
+            transition: opacity 0.3s, text-decoration 0.3s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            text-decoration: underline;
+        }
+
+        .logout-btn {
+            padding: 12px;
+            border-radius: 8px;
+            background-color: #0F1B4C;
+            color: #ffffff;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #0D164A;
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+
+        /* Header Styles */
+        header {
+            /* padding-top: 26px; */
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background: #fff;
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            padding: 6px 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            margin-left: auto;
+            gap: 30px;
+        }
+        /* Content */
+        .content-main h2 {
+            color: #333;
+            font-weight: 800;
+            font-size: 1.6em;
+        }
+        .content-main p {
+            line-height: 1.6;
+        }
+        .content-main .features {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .content-main .feature {
+            flex: 1;
+            margin: 10px;
+            padding: 20px;
+            border-radius: 5px;
+            background: linear-gradient(135deg, #2329d3, #27d983);
+            opacity: 0.9;
+        }
+        h3 {
+            margin-top: 0;
+            font-weight: 500;
+            font-size: 1.2em;
+        }
+        .content-main .question {
+            margin: 20px 0;
+        }
+        footer {
+            background: #0F1B4C;
+            color: #fff;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 30px;
+        }
+        .feature > p {
+            color: #fff;
+        }
+        .feature > h3 {
+            color: #67f011;
+        }
+        .features > .feature {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .features > .feature:hover {
+            opacity: 0.9;
+            /* transform: translateY(-2px); */
+            transform: scale(1.1);
+        }
+
+        /*Hero tag*/
+        .hero {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .hero-wrap {
+            margin-bottom: 60px;
+        }
+        .hero .info {
+            width: 50%;
+        }
+        .hero .sub-title {
+            color: #687690;
+            font-size: 1.2rem;
+            line-height: 1.5; 
+            letter-spacing: 0.01em;
+        }
+
+        .hero .title {
+            color: #000336;
+            font-size: 2.2rem;
+            font-weight: 700;
+            line-height: 1.19;
+            margin-top: 8px; 
+        }
+
+        .hero .desc {
+            color: #687690;
+            font-size: 1.2rem;
+            font-weight: 400;
+            line-height: 1.78;
+            margin-top: 30px;
+        }
+
+        .hero .btn {
+            width: 170px;
+            margin-top: 55px;
+            border-radius: 12px;
+        }
+
+        .hero-img {
+            width: 50%;
+        }
+
+        #chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999; /* Ensure it is in front of other content */
+        }
+
+        #chat-icon {
+            width: 50px;
+            height: 50px;
+            background-color: #007bff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #chat-window {
+            width: 300px;
+            height: 400px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            position: fixed; 
+            bottom: 80px; /* Adjust according to your preference */
+            right: 20px;
+            z-index: 9999; /* Ensure it is in front of other content */
+        }
+
+        #chat-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        #chat-messages {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            max-width: 300px;
+        }
+
+        #chat-input {
+            width: calc(100% - 40x);
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #chat-input + button {
+            margin: 10px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #chat-input + button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="content">
+            <nav class="navbar">
+                <div class="home">
+                    <form action="/patients/getDashboard" method="get">
+                        <button class="btn home-btn">Dashboard</button>
+                    </form>
+                </div>
+                <div class="nav-item">
+                    <form action="/patients/viewSchedule" method="get">
+                        <button class="btn schedule-btn">Book appointment</button>
+                    </form>
+                    <form action="/patients/viewRecord" method="get">
+                        <button class="btn schedule-btn">Health record</button>
+                    </form>
+                    <form action="/patients/viewFeedback" method="get">
+                        <button class="btn schedule-btn">Feedback</button>
+                    </form>
+                    <form action="/patients/viewEvent" method="get">
+                        <button class="btn schedule-btn">Forum</button>
+                    </form>
+                </div>
+                
+                <div class="actions">
+                    <form action="/users/logout" method="get">
+                        <button class="btn logout-btn">Log out</button>
+                    </form>
+                </div>
+            </nav>
+        </div>
+    </header>
+    <main class="content-main">
+         <!-- Hero-wrap -->
+         <div class="hero-wrap">
+                <div class="hero">
+                    <div class="info">
+                        <h1 class="title">Welcome to HealthAce</h1>
+                        <p class="sub-title">Discover a place you'd love to check your health.</p>
+                        <p class="desc">Access to a comprehensive and reliable healthcare services with just some simple clicks</p>
+                       
+                    </div>
+                    <img src="/img/hospital.jpg" alt="Discover a place you'll love to live." class="hero-img">
+                </div>
+        </div>
+        <div class="container">
+            
+                <h2>About us</h2>
+                <p>HealthAce is your online healthcare companion, connecting you with doctors and health services from the comfort of your home.</p>
+    
+                <div class="features">
+                    <div class="feature">
+                        <h3>Online Appointments</h3>
+                        <p>Skip the long queues and book your appointments online with ease.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>Health Records</h3>
+                        <p>Access and manage your health records anytime, anywhere.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>Find Health Services</h3>
+                        <p>Locate nearby healthcare facilities and services using our integrated map.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>Feedback</h3>
+                        <p>Share your experiences and help improve healthcare services for everyone.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>Community Forum</h3>
+                        <p>Join health discussions, attend virtual events, and interact with experts.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>Supportive Chatbot</h3>
+                        <p>Get quick answers to common health questions with our friendly chatbot.</p>
+                    </div>
+                </div>
+    
+                <div class="question">
+                    <h3>What problem does it solve?</h3>
+                    <p>Patients find it difficult to reach healthcare locations in-person due to long queues and anxiety-inducing environments.</p>
+                </div>
+                <div class="question">
+                    <h3>How is this problem currently solved?</h3>
+                    <p>Patients currently go to the clinic, wait for a ticket, deal with ticket queues, phone receptionists, and rely on Google or word of mouth for information.</p>
+                </div>
+                <div class="question">
+                    <h3>How will this project make life better?</h3>
+                    <p>HealthAce eliminates annoying hospital lines and reduces hospital anxiety by providing online appointments, health record management, and easy access to health services.</p>
+                </div>
+        </div>
+
+        <!-- Chatbot Container -->
+        <div id="chatbot-container">
+            <div id="chat-icon" onclick="toggleChat()">💬</div>
+            <div id="chat-window" style="display: none;">
+                <div id="chat-header">Your HealthAce Assistant</div>
+                <div id="chat-messages"></div>
+                <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()">Send</button>
+                <input type="email" id="user-email" placeholder="Enter your email">
+                <button onclick="sendChatLog()">Send Chat Log</button>
+                <span id="email-sent-confirmation" style="display: none; color: green; font-size: 24px;">✔</span>
+            </div>
+        </div>
+
+    </main>
+    <footer>
+        <p>HealthAce &copy; 2024</p>
+    </footer>
+
+    <script>
+        function toggleChat() {
+            const chatWindow = document.getElementById('chat-window');
+            if (chatWindow.style.display === 'none') {
+                chatWindow.style.display = 'block';
+            } else {
+                chatWindow.style.display = 'none';
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const inputField = document.getElementById('chat-input');
+            const message = inputField.value;
+            if (message.trim() === '') return;
+
+            addMessageToChat('user', message);
+            inputField.value = '';
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+                addMessageToChat('assistant', data.message);
+            } catch (error) {
+                console.error('Error:', error);
+                addMessageToChat('assistant', 'Sorry, something went wrong.');
+            }
+        }
+
+        function addMessageToChat(sender, message) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageElement = document.createElement('div');
+            messageElement.classList.add(sender);
+            messageElement.textContent = message;
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function sendChatLog() {
+            const email = document.getElementById('user-email').value;
+            const confirmationElement = document.getElementById('email-sent-confirmation');
+            
+            if (email.trim() === '') {
+                alert('Please enter your email.');
+                return;
+            }
+
+            const response = await fetch('/api/sendChatLog', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `email=${encodeURIComponent(email)}`,
+            });
+            const result = await response.text();
+
+            if (response.ok) {
+                confirmationElement.style.display = 'inline'; // Show the green checkmark
+                setTimeout(() => {
+                    confirmationElement.style.display = 'none'; // Hide the checkmark after 3 seconds
+                }, 3000);
+            } else {
+                alert('Failed to send chat log. Please try again.');
+            }
+        }
+    </script>
+
+</body>
+</html>
