@@ -34,6 +34,7 @@ import cmpt276.group.demo.models.appointment.AppointmentRepository;
 import cmpt276.group.demo.models.doctor.Doctor;
 import cmpt276.group.demo.models.doctor.DoctorRepository;
 import cmpt276.group.demo.models.event.EventRepository;
+import cmpt276.group.demo.models.feedback.Feedback;
 import cmpt276.group.demo.models.feedback.FeedbackRepository;
 import cmpt276.group.demo.models.past_appointment.PastAppointment;
 import cmpt276.group.demo.models.past_appointment.PastAppointmentRepository;
@@ -634,5 +635,23 @@ public class AdminControllerTest {
         verify(scheduleRepo, times(1)).delete(any(Schedule.class));
     }
 
+// 4. Test admin view feedback - GET
+    @Test 
+    public void testValidViewFeedback() throws Exception {
+        Feedback f1 = new Feedback("doctor1", "d1", "patient1", "p1", Date.valueOf("2023-05-08"), Department.valueOf("General"), "Good doctor");
+        Feedback f2 = new Feedback("doctor1", "d1", "patient1", "p1", Date.valueOf("2023-05-15"), Department.valueOf("General"), "Nice doctor");
 
+        List<Feedback> feedbackList = new ArrayList<>();
+        feedbackList.add(f1);
+        feedbackList.add(f2);
+
+        when(feedbackRepo.findAll()).thenReturn(feedbackList);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/admins/viewFeedback"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.view().name("admins/viewFeedbackPage"))
+                .andExpect(model().attribute("feedbackList", feedbackList))
+                .andExpect(model().attribute("feedbackList", hasSize(2)));
+        verify(feedbackRepo, times(1)).findAll();
+    }
 }
