@@ -833,4 +833,53 @@ public class AdminControllerTest {
         
         verify(eventRepo, times(1)).delete(any(Event.class));
     }
+
+    // 3A. Test admin modify event - Case 1 : success
+    @Test
+    public void testValidEditEvent() throws Exception {
+        Event e1 = new Event("E101", "Event 101", 10, "This is new event", Date.valueOf("2023-12-08"), Time.valueOf("10:00:00"), 90);
+
+        List<Event> events = new ArrayList<>();
+        when(eventRepo.findByEventCode("E101")).thenReturn(e1);
+
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/admins/editEvent")
+                                            .param("eventCode", "E101")
+                                            .param("description", "This is an edit description")
+                        )            
+                .andExpect(status().isOk())
+                .andExpect(view().name("admins/displayEventPage"))
+                .andExpect(model().attributeExists("success"))
+                .andExpect(model().attribute("event", allOf(
+                    hasProperty("eventCode", is("E101")),
+                    hasProperty("description", is("This is an edit description"))
+                )));
+
+        verify(eventRepo, times(1)).save(any(Event.class));
+    }
+
+    // 3B. Test admin modify event - Case 2 : error - lack description
+    @Test
+    public void testInvalidEditEvent() throws Exception {
+        Event e1 = new Event("E101", "Event 101", 10, "This is new event", Date.valueOf("2023-12-08"), Time.valueOf("10:00:00"), 90);
+
+        List<Event> events = new ArrayList<>();
+        when(eventRepo.findByEventCode("E101")).thenReturn(e1);
+
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/admins/editEvent")
+                                            .param("eventCode", "E101")
+                                            .param("description", "")
+                        )            
+                .andExpect(status().isOk())
+                .andExpect(view().name("admins/displayEventPage"))
+                .andExpect(model().attributeExists("error0"))
+                .andExpect(model().attribute("event", allOf(
+                    hasProperty("eventCode", is("E101")),
+                    hasProperty("description", is("This is new event"))
+                )));
+
+        verify(eventRepo, times(0)).save(any(Event.class));
+    }
+
 }
