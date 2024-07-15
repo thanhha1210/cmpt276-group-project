@@ -80,7 +80,7 @@ public class AdminControllerTest {
     private MockMvc mockMvc;
 
     // -------------------------------------------Test Login ----------------------------------------------
-     // 1A. test admin log in - POST - Valid
+    // 1A. test admin log in - POST - Valid
     @Test
     public void testValidLogin() throws Exception {
         Admin admin = new Admin("a1", "123");
@@ -96,6 +96,21 @@ public class AdminControllerTest {
             .andExpect(MockMvcResultMatchers.model().attributeExists("admin"))
             .andExpect(MockMvcResultMatchers.model().attribute("admin", admin));
     }
+
+    // 1B. test admin log in - POST - Invalid (ie missing fields)
+    @Test
+    public void testInvalidLogin() throws Exception {
+        Admin admin = new Admin("a1", "123");
+        when(adminRepo.findByUsernameAndPassword("a1", "123")).thenReturn(admin);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/")
+                .param("username", "")      // empty field
+                .param("password", "123")
+                .param("role", "admin"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.view().name("loginPage"))
+            .andExpect(MockMvcResultMatchers.model().attributeDoesNotExist("admin"));
+    }    
 
     // -------------------------------------------Test get dashboard ----------------------------------------------
      // 1A. test patient view dashboard - GET - Valid

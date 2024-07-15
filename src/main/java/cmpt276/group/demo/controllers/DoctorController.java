@@ -60,17 +60,20 @@ public class DoctorController {
   @GetMapping("/doctors/getDashboard")
   public String getDashboard(Model model, HttpSession session) {
     Doctor doctor = (Doctor) session.getAttribute("session_doctor");
+    if (doctor == null) {
+      return "loginPage";
+    }
     model.addAttribute("doctor", doctor);
     return "doctors/mainPage";
   }
-
-  // -------------------------------------Book appointment------------------------------------------
 
   // -------------------------------------View record----------------------------------------------
   @GetMapping("/doctors/viewRecord")
   public String viewRecord(Model model, HttpSession session) {
     Doctor doctor = (Doctor) session.getAttribute("session_doctor");
-    model.addAttribute("doctor", doctor);
+    if (doctor == null) {
+      return "loginPage";
+    }
     changeApt();
     List<PastAppointment> pastAppointments = findNotRecord(doctor.getUsername());
     Collections.sort(pastAppointments);
@@ -116,6 +119,7 @@ public class DoctorController {
     if (description.trim().equals("")) {
       model.addAttribute("error0", "Please fill the description form!");
       model.addAttribute("pastApt", pastApt);
+      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
       return "doctors/addRecordPage";
     }
 
@@ -154,7 +158,7 @@ public class DoctorController {
   }
 
   @PostMapping("/doctors/editRecord")
-  public String editSchedule(@RequestParam Map<String, String> formData, Model model, HttpSession session) {
+  public String editSchedule(@RequestParam Map<String, String> formData, Model model, HttpSession session, HttpServletResponse response) {
       Doctor doctor = (Doctor) session.getAttribute("session_doctor");
       model.addAttribute("doctor", doctor);
 
@@ -170,6 +174,7 @@ public class DoctorController {
           model.addAttribute("doctorName", doctor.getName());  
           model.addAttribute("record", editRecord);
           model.addAttribute("error0", "Please fill the description form!");
+          response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
           return "doctors/expandRecordPage";
       }
 
@@ -186,6 +191,9 @@ public class DoctorController {
   @GetMapping("/doctors/viewSchedule")
   public String viewBookedAppointments(Model model, HttpSession session) {
     Doctor doctor = (Doctor) session.getAttribute("session_doctor");
+    if (doctor == null) {
+      return "loginPage";
+    }
     model.addAttribute("doctor", doctor);
 
     List<Appointment> appointments = appointmentRepo.findByDoctorUsername(doctor.getUsername());

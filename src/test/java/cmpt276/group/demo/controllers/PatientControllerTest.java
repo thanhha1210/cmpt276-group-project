@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
@@ -15,6 +16,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,6 +28,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import com.google.common.util.concurrent.ExecutionError;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -49,7 +54,7 @@ import cmpt276.group.demo.models.record.RecordRepository;
 import cmpt276.group.demo.models.schedule.Schedule;
 import cmpt276.group.demo.models.schedule.ScheduleRepository;
 
-@WebMvcTest(controllers = {PatientController.class, LoginController.class})     // import multiple controllers if needed
+@WebMvcTest(controllers = {PatientController.class, LoginController.class, SignupController.class})     // import multiple controllers if needed
 @ContextConfiguration(classes = DemoApplication.class)
 public class PatientControllerTest {
 
@@ -104,8 +109,100 @@ public class PatientControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    //------------------------------------Test Signup--------------------------------------
+    // test patient sign up - POST - SUCCESS 
+    @Test
+    public void testValidSignup() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/patients/signup")
+            // not sign in yet => no session
+            .param("username", "p1")
+            .param("password", "123")
+            .param("name", "patient1")
+            .param("age", "20")
+            .param("address", "123")
+            .param("phone", "123"))
+            .andExpect(MockMvcResultMatchers.status().is(201))
+            .andExpect(MockMvcResultMatchers.view().name("patients/mainPage"))
+            .andExpect(model().attributeExists("patient"))
+            .andExpect(model().attributeDoesNotExist("error0"))
+            .andExpect(model().attributeDoesNotExist("error1"))
+            .andExpect(model().attributeDoesNotExist("error2"));
+
+        verify(patientRepo, times(1)).save(any(Patient.class));
+        verify(patientRepo, times(1)).findByUsername("p1");
+    }
+
+    // test patient sign up - POST - INVALID: empty fields 
+    @Test
+    public void testInvalidSignup1() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/patients/signup")
+            // not sign in yet => no session
+            .param("username", "")      // empty
+            .param("password", "123")
+            .param("name", "patient1")
+            .param("age", "20")
+            .param("address", "")       // empty
+            .param("phone", "123"))
+            .andExpect(MockMvcResultMatchers.status().is(400))
+            .andExpect(MockMvcResultMatchers.view().name("patients/signupPage"))
+            .andExpect(model().attributeDoesNotExist("patient"))
+            .andExpect(model().attributeExists("error0"))
+            .andExpect(model().attributeDoesNotExist("error1"))
+            .andExpect(model().attributeDoesNotExist("error2"));
+
+        verify(patientRepo, times(0)).save(any(Patient.class));
+        verify(patientRepo, times(0)).findByUsername("p1");
+    }
+
+    // test patient sign up - POST - INVALID: age <= 0
+    @Test
+    public void testInvalidSignup2() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/patients/signup")
+            // not sign in yet => no session
+            .param("username", "p1")      
+            .param("password", "123")
+            .param("name", "patient1")
+            .param("age", "-20")
+            .param("address", "123")       
+            .param("phone", "123"))
+            .andExpect(MockMvcResultMatchers.status().is(400))
+            .andExpect(MockMvcResultMatchers.view().name("patients/signupPage"))
+            .andExpect(model().attributeDoesNotExist("patient"))
+            .andExpect(model().attributeExists("error1"))
+            .andExpect(model().attributeDoesNotExist("error0"))
+            .andExpect(model().attributeDoesNotExist("error2"));
+
+        verify(patientRepo, times(0)).save(any(Patient.class));
+        verify(patientRepo, times(0)).findByUsername("p1");
+    }
+
+    // test patient sign up - POST - INVALID: username already exists
+    @Test
+    public void testInvalidSignup3() throws Exception {
+        Patient patient = new Patient("p1", "123", "patient1", 18, "123", "123");
+        when(patientRepo.findByUsername("p1")).thenReturn(patient);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/patients/signup")
+        // not sign in yet => no session
+            .param("username", "p1")      
+            .param("password", "123")
+            .param("name", "patient1")
+            .param("age", "20")
+            .param("address", "123")       
+            .param("phone", "123"))
+            .andExpect(MockMvcResultMatchers.status().is(400))
+            .andExpect(MockMvcResultMatchers.view().name("patients/signupPage"))
+            .andExpect(model().attributeDoesNotExist("patient"))
+            .andExpect(model().attributeExists("error2"))
+            .andExpect(model().attributeDoesNotExist("error0"))
+            .andExpect(model().attributeDoesNotExist("error1"));
+
+        verify(patientRepo, times(0)).save(any(Patient.class));
+        verify(patientRepo, times(1)).findByUsername("p1");
+    }
+
     // ------------------------------------Test Login--------------------------------------
-    // 0. test patient log in - POST - Valid
+    // 0A. test patient log in - POST - Valid
     @Test
     public void testValidLogin() throws Exception {
         Patient p1 = new Patient("p1", "123", "patient1", 20, "123St", "123");
@@ -120,6 +217,21 @@ public class PatientControllerTest {
             .andExpect(MockMvcResultMatchers.view().name("patients/mainPage"))
             .andExpect(MockMvcResultMatchers.model().attributeExists("patient"))
             .andExpect(MockMvcResultMatchers.model().attribute("patient", p1));
+    }
+
+    // 0B. test patient log in - POST - Invalid (ie missing fields)
+    @Test
+    public void testInvalidLogin() throws Exception {
+        Patient p1 = new Patient("p1", "123", "patient1", 20, "123St", "123");
+        when(patientRepo.findByUsernameAndPassword("p1", "123")).thenReturn(p1);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/")
+                .param("username", "p1")
+                .param("password", "")
+                .param("role", ""))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.view().name("loginPage"))
+            .andExpect(MockMvcResultMatchers.model().attributeDoesNotExist("patient"));
     }
 
     //------------------------------------Test getDashboard--------------------------------------
