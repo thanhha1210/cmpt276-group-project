@@ -243,6 +243,34 @@
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
         }
+        #chat-input-container {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+
+        #chat-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #chat-input + button {
+            margin-left: 10px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #chat-input + button:hover {
+            background-color: #0056b3;
+        }
+
 
         #chat-messages {
             flex: 1;
@@ -399,8 +427,10 @@
             <div id="chat-window" style="display: none;">
                 <div id="chat-header">Your HealthAce Assistant</div>
                 <div id="chat-messages"></div>
-                <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
-                <button onclick="sendMessage()">Send</button>
+                <div id="chat-input-container">
+                    <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
+                    <button onclick="sendMessage()">Send</button>
+                </div>
             </div>
         </div>
 
