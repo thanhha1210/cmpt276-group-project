@@ -221,14 +221,28 @@ public class PatientControllerTest {
 
     // 0B. test patient log in - POST - Invalid (ie missing fields)
     @Test
-    public void testInvalidLogin() throws Exception {
+    public void testInvalidLogin1() throws Exception {
         Patient p1 = new Patient("p1", "123", "patient1", 20, "123St", "123");
         when(patientRepo.findByUsernameAndPassword("p1", "123")).thenReturn(p1);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/")
                 .param("username", "p1")
-                .param("password", "")
-                .param("role", ""))
+                .param("password", "")      // empty field
+                .param("role", ""))         // empty field
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.view().name("loginPage"))
+            .andExpect(MockMvcResultMatchers.model().attributeDoesNotExist("patient"));
+    }
+
+    // 0C. test patient log in - POST - Invalid (ie wrong username or password)
+    @Test
+    public void testInvalidLogin2() throws Exception {
+        when(patientRepo.findByUsernameAndPassword("p2", "123")).thenReturn(null);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/")
+                .param("username", "p2")
+                .param("password", "123")
+                .param("role", "patient"))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.view().name("loginPage"))
             .andExpect(MockMvcResultMatchers.model().attributeDoesNotExist("patient"));

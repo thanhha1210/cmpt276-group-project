@@ -6,6 +6,8 @@ import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.print.Doc;
+
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
@@ -13,6 +15,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -80,7 +84,7 @@ public class AdminControllerTest {
     private MockMvc mockMvc;
 
     // -------------------------------------------Test Login ----------------------------------------------
-    // 1A. test admin log in - POST - Valid
+    // 0A. test admin log in - POST - Valid
     @Test
     public void testValidLogin() throws Exception {
         Admin admin = new Admin("a1", "123");
@@ -97,9 +101,9 @@ public class AdminControllerTest {
             .andExpect(MockMvcResultMatchers.model().attribute("admin", admin));
     }
 
-    // 1B. test admin log in - POST - Invalid (ie missing fields)
+    // 0B. test admin log in - POST - Invalid (ie missing fields)
     @Test
-    public void testInvalidLogin() throws Exception {
+    public void testInvalidLogin1() throws Exception {
         Admin admin = new Admin("a1", "123");
         when(adminRepo.findByUsernameAndPassword("a1", "123")).thenReturn(admin);
 
@@ -110,10 +114,24 @@ public class AdminControllerTest {
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.view().name("loginPage"))
             .andExpect(MockMvcResultMatchers.model().attributeDoesNotExist("admin"));
-    }    
+    }
+    
+    // 0C. test admin log in - POST - Invalid (ie wrong username or password)
+    @Test 
+    public void testInvalidLogin2() throws Exception {
+        when(adminRepo.findByUsernameAndPassword("a2", "123")).thenReturn(null);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/")
+                .param("username", "a2")
+                .param("password", "123")
+                .param("role", "admin"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.view().name("loginPage"))
+            .andExpect(MockMvcResultMatchers.model().attributeDoesNotExist("admin"));
+    }
 
     // -------------------------------------------Test get dashboard ----------------------------------------------
-     // 1A. test patient view dashboard - GET - Valid
+    // 1A. test patient view dashboard - GET - Valid
     @Test
     public void testValidViewDashboard() throws Exception {
         Admin a1 = new Admin("admin", "123");
@@ -296,7 +314,7 @@ public class AdminControllerTest {
         verify(doctorRepo, times(1)).delete(any(Doctor.class));
     }
 
-    // -----------------------------------------Test view patient-----------------------------------------------
+    // -----------------------------------------Test view & delete patient-----------------------------------------------
     // 1. Test admin view patient - get - case 1: success
     @Test
     public void testValidViewPatient() throws Exception {
@@ -316,6 +334,43 @@ public class AdminControllerTest {
                 .andExpect(MockMvcResultMatchers.view().name("admins/viewPatientPage"))
                 .andExpect(model().attribute("patients", patients))
         ;
+    }
+
+    // 2. Test admin delete patient - post - case 1: success
+    @Test
+    public void testValidDeletePatient() throws Exception {
+        Patient p1 = new Patient("p1", "123", "patient1", 20, "123St", "123");
+        Patient p2 = new Patient("p2", "123", "patient2", 30, "123St", "123");
+        Patient p3 = new Patient("p3", "123", "patient1", 40, "123St", "123");
+
+        Doctor doctor = new Doctor("d1", "123", "doctor1", 30, "123", "123", Department.General);
+        // String doctorName, String doctorUsername, String patientName, String patientUsername, Date date, Time startTime, int duration, Department department
+        Appointment apt = new Appointment("doctor1", "d1", "patient1", "p1", Date.valueOf("2024-03-02"), Time.valueOf("10:00:00"), 30, Department.General);
+
+        when(patientRepo.findByUsername("p1")).thenReturn(p1);
+        when(appointmentRepo.findByPatientUsername("p1")).thenReturn(apt);
+
+        List<Patient> patients = new ArrayList<>();
+        patients.add(p2);
+        patients.add(p3);
+
+        when(patientRepo.findAll()).thenReturn(patients);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/admins/deletePatient")
+                .param("username", "p1"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.view().name("admins/viewPatientPage"))
+            .andExpect(model().attribute("patients", patients))
+            .andExpect(model().attribute("patients", hasSize(2)))
+            .andExpect(model().attribute("patients", not(hasItem(allOf(
+                hasProperty("username", is(p1.getUsername()))
+            )))));
+            
+        verify(patientRepo, times(1)).findByUsername("p1");
+        verify(patientRepo, times(1)).delete(any(Patient.class));
+        verify(appointmentRepo, times(1)).findByPatientUsername("p1");
+        verify(appointmentRepo, times(1)).delete(any(Appointment.class));
+        verify(patientRepo, times(1)).findAll();
     }
     
     // ------------------------------------Test view & delete appointment--------------------------------------
