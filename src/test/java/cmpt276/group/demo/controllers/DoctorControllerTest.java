@@ -94,12 +94,26 @@ public class DoctorControllerTest {
 
     // test doctor log in - POST - Invalid (ie missing fields)
     @Test
-    public void testInvalidLogin() throws Exception {
+    public void testInvalidLogin1() throws Exception {
         Doctor doctor = new Doctor("d1", "123", "doc1", 20, "123St", "123", Department.General);
         when(doctorRepo.findByUsernameAndPassword("d1", "123")).thenReturn(doctor);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/")
                 .param("username", "")      // empty field
+                .param("password", "123")
+                .param("role", "doctor"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.view().name("loginPage"))
+            .andExpect(MockMvcResultMatchers.model().attributeDoesNotExist("doctor"));
+    }
+
+    // test doctor log in - POST - Invalid (ie wrong username or password)
+    @Test
+    public void testInvalidLogin2() throws Exception {
+        when(doctorRepo.findByUsernameAndPassword("d2", "123")).thenReturn(null);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/")
+                .param("username", "d2")      
                 .param("password", "123")
                 .param("role", "doctor"))
             .andExpect(MockMvcResultMatchers.status().isOk())
@@ -189,19 +203,19 @@ public class DoctorControllerTest {
                .andExpect(model().attributeDoesNotExist("appointments"));
     }
 
-    @Test
-    public void testViewFeedbackPage() throws Exception {
-        Doctor d1 = new Doctor("d1", "password", "doctor1", 40, "123 Main St", "123-456-7890", Department.Pediatrics);
-        List<Feedback> feedbackList = new ArrayList<>();
-        when(feedbackRepo.findByDoctorUsername(d1.getUsername())).thenReturn(feedbackList);
+    // @Test
+    // public void testViewFeedbackPage() throws Exception {
+    //     Doctor d1 = new Doctor("d1", "password", "doctor1", 40, "123 Main St", "123-456-7890", Department.Pediatrics);
+    //     List<Feedback> feedbackList = new ArrayList<>();
+    //     when(feedbackRepo.findByDoctorUsername(d1.getUsername())).thenReturn(feedbackList);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/doctors/viewFeedback")
-                                              .sessionAttr("session_doctor", d1))
-               .andExpect(status().isOk())
-               .andExpect(view().name("doctors/viewFeedbackPage"))
-               .andExpect(model().attribute("doctor", d1))
-               .andExpect(model().attribute("feedbackList", feedbackList));
-    }
+    //     mockMvc.perform(MockMvcRequestBuilders.get("/doctors/viewFeedback")
+    //                                           .sessionAttr("session_doctor", d1))
+    //            .andExpect(status().isOk())
+    //            .andExpect(view().name("doctors/viewFeedbackPage"))
+    //            .andExpect(model().attribute("doctor", d1))
+    //            .andExpect(model().attribute("feedbackList", feedbackList));
+    // }
 
     // test doctor add record - GET 
     @Test
@@ -381,5 +395,4 @@ public class DoctorControllerTest {
 
         verify(feedbackRepo, times(1)).findByDoctorUsername("d1");
     }
-
 }
