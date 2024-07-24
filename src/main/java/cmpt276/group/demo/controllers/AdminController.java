@@ -1,5 +1,7 @@
 package cmpt276.group.demo.controllers;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDate;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import cmpt276.group.demo.models.Department;
+import cmpt276.group.demo.models.admin.Admin;
+import cmpt276.group.demo.models.admin.AdminRepository;
 import cmpt276.group.demo.models.appointment.Appointment;
 import cmpt276.group.demo.models.appointment.AppointmentRepository;
 import cmpt276.group.demo.models.doctor.Doctor;
@@ -33,6 +37,7 @@ import cmpt276.group.demo.models.patient.PatientRepository;
 import cmpt276.group.demo.models.schedule.Schedule;
 import cmpt276.group.demo.models.schedule.ScheduleRepository;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class AdminController {
@@ -41,6 +46,8 @@ public class AdminController {
     private PatientRepository patientRepo;
     @Autowired
     private DoctorRepository doctorRepo;
+    @Autowired
+    private AdminRepository adminRepo;
     @Autowired
     private ScheduleRepository scheduleRepo;
     @Autowired
@@ -53,28 +60,44 @@ public class AdminController {
     private FeedbackRepository feedbackRepo;
 
     // ------------------------------------------------------Get Dashboard--------------------------------------------------
-    // get dashboard (added test)
+   
     @GetMapping("/admins/getDashboard") 
-    public String getDashboard(Model model) {
+    public String getDashboard(Model model, HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("session_admin");
+        if (admin == null) {
+            return "loginPage";
+        }
         return "admins/mainPage";
     }
 
     // -----------------------------------------------------View & add, delete doctor-----------------------------------------------
     // admin go to view doctor page (added test)
     @GetMapping("/admins/viewDoctor")
-    public String viewDoctor(Model model) {
+    public String viewDoctor(Model model, HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("session_admin");
+        if (admin == null) {
+            return "loginPage";
+        }
         model.addAttribute("doctors", doctorRepo.findAll());
         return "admins/viewDoctorPage";
     }
 
     @GetMapping("/admins/addDoctor")
-    public String addDoctorPage(Model model) {
+    public String addDoctorPage(Model model, HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("session_admin");
+        if (admin == null) {
+            return "loginPage";
+        }
         model.addAttribute("doctors", doctorRepo.findAll());
         return "admins/addDoctorPage";
     }
 
     @PostMapping("/admins/addDoctor")
-    public String registerDoctor(@RequestParam Map<String, String> formData, HttpServletResponse response, Model model) {
+    public String registerDoctor(@RequestParam Map<String, String> formData, HttpServletResponse response, Model model, HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("session_admin");
+        if (admin == null) {
+            return "loginPage";
+        }
         String username = formData.get("username");
         String password = formData.get("password");
         String name = formData.get("name");
@@ -110,7 +133,11 @@ public class AdminController {
     }
     // admin delete doctor => all schedule & appointment with that doctor will be delete
     @PostMapping("/admins/deleteDoctor")
-    public String deleteDoctor(@RequestParam String username, Model model) {
+    public String deleteDoctor(@RequestParam String username, Model model, HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("session_admin");
+        if (admin == null) {
+            return "loginPage";
+        }
         Doctor temp = doctorRepo.findByUsername(username);
         List<Appointment> deleteList= appointmentRepo.findByDoctorUsername(username);
         for (int i = 0; i < deleteList.size(); i++) {
@@ -132,13 +159,21 @@ public class AdminController {
 
     // ------------------------------------------------------ View & delete patient----------------------------------------
     @GetMapping("/admins/viewPatient")
-    public String viewPatient(Model model) {
+    public String viewPatient(Model model, HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("session_admin");
+        if (admin == null) {
+            return "loginPage";
+        }
         model.addAttribute("patients", patientRepo.findAll());
         return "admins/viewPatientPage";
     }
     // admin delete patient => all appointment with that patient will be delete
     @PostMapping("/admins/deletePatient")
-    public String deletePatient(@RequestParam String username, Model model) {
+    public String deletePatient(@RequestParam String username, Model model, HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("session_admin");
+        if (admin == null) {
+            return "loginPage";
+        }
         Patient temp = patientRepo.findByUsername(username);
         if (temp != null) {
             patientRepo.delete(temp);
@@ -155,7 +190,11 @@ public class AdminController {
    
     // admin view appointment
     @GetMapping("/admins/viewAppointment")
-    public String viewAppointment(Model model) {
+    public String viewAppointment(Model model, HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("session_admin");
+        if (admin == null) {
+            return "loginPage";
+        }
         changeApt();
         List<Appointment> appointments = appointmentRepo.findAll();
         Collections.sort(appointments);
@@ -169,7 +208,11 @@ public class AdminController {
 
     // admin delete appointment (+)
     @PostMapping("/admins/deleteAppointment")
-    public String deleteAppointment(@RequestParam Map<String, String> apt, Model model, HttpServletResponse response) {
+    public String deleteAppointment(@RequestParam Map<String, String> apt, Model model, HttpServletResponse response, HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("session_admin");
+        if (admin == null) {
+            return "loginPage";
+        }
         String doctorUsername = apt.get("doctorUsername");
         Date date = Date.valueOf(apt.get("date"));
         Time startTime = Time.valueOf(apt.get("startTime"));
@@ -195,7 +238,11 @@ public class AdminController {
    
     // go to schedule page
     @GetMapping("/admins/viewSchedule")
-    public String viewSchedule(Model model) {
+    public String viewSchedule(Model model, HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("session_admin");
+        if (admin == null) {
+            return "loginPage";
+        }
         deleteSchedule();
         List<Schedule> schedules = scheduleRepo.findAll();
         Collections.sort(schedules);
@@ -205,13 +252,21 @@ public class AdminController {
 
     // go to addSchedulePage
     @GetMapping("/admins/addSchedule")
-    public String addSchedulePage(Model model) {
+    public String addSchedulePage(Model model, HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("session_admin");
+        if (admin == null) {
+            return "loginPage";
+        }
         return "admins/addSchedulePage";
     }
 
     // admin add schedule (+)
     @PostMapping("/admins/addSchedule")
-    public String addSchedule(@RequestParam Map<String, String> scheduleInfo, HttpServletResponse response, Model model) {
+    public String addSchedule(@RequestParam Map<String, String> scheduleInfo, HttpServletResponse response, Model model, HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("session_admin");
+        if (admin == null) {
+            return "loginPage";
+        }
         String doctorUsername = scheduleInfo.get("doctorUsername");
 
         // Check if any field is empty
@@ -322,7 +377,11 @@ public class AdminController {
 
     // delete button in viewSchedulePage (+)
     @PostMapping("/admins/deleteSchedule")
-    public String deleteSchedule(@RequestParam Map<String, String> scheduleInfo, Model model) {
+    public String deleteSchedule(@RequestParam Map<String, String> scheduleInfo, Model model, HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("session_admin");
+        if (admin == null) {
+            return "loginPage";
+        }
         String doctorUsername = scheduleInfo.get("doctorUsername");
         Date date = Date.valueOf(scheduleInfo.get("date"));
         Time startTime = Time.valueOf(scheduleInfo.get("startTime"));
@@ -340,7 +399,11 @@ public class AdminController {
     // ------------------------------------------------------ View, add & delete event---------------------------------------------
     // go to view event page
     @GetMapping("/admins/viewEvent")
-    public String viewEvent(Model model) {
+    public String viewEvent(Model model, HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("session_admin");
+        if (admin == null) {
+            return "loginPage";
+        }
         autoChangeEvent();
         categorizeEvent(model);
         return "admins/viewEventPage";
@@ -348,13 +411,21 @@ public class AdminController {
 
     // go to add event page
     @GetMapping("/admins/addEvent") 
-    public String addEventPage(Model model) {
+    public String addEventPage(Model model, HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("session_admin");
+        if (admin == null) {
+            return "loginPage";
+        }
         return "admins/addEventPage";
     }
     
     // add event
     @PostMapping("/admins/addEvent")
-    public String addEvent(@RequestParam Map<String, String> formData, Model model, HttpServletResponse response) {
+    public String addEvent(@RequestParam Map<String, String> formData, Model model, HttpServletResponse response, HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("session_admin");
+        if (admin == null) {
+            return "loginPage";
+        }
         //TODO: process POST request
       
         if (formData.get("startTime").trim().isEmpty() || formData.get("date").trim().isEmpty() ||formData.get("eventCode").trim().isEmpty() || formData.get("eventName").trim().isEmpty() || 
@@ -386,12 +457,20 @@ public class AdminController {
         eventRepo.save(newEvent);
         model.addAttribute("success", "You create an event successfully");
         categorizeEvent(model);
+
+
+        
+
         return "admins/addEventPage";
     }
 
     // delete event
     @PostMapping("/admins/deleteEvent")
-    public String deleteEvent(@RequestParam String eventCode, Model model) {
+    public String deleteEvent(@RequestParam String eventCode, Model model, HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("session_admin");
+        if (admin == null) {
+            return "loginPage";
+        }
         Event deleteEvent = eventRepo.findByEventCode(eventCode); 
          
         if (deleteEvent != null) {
@@ -404,7 +483,11 @@ public class AdminController {
     
     // display event
     @GetMapping("/admins/displayEvent")
-    public String displayEvent(@RequestParam String eventCode, Model model) {
+    public String displayEvent(@RequestParam String eventCode, Model model, HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("session_admin");
+        if (admin == null) {
+            return "loginPage";
+        }
         Event displayEvent = eventRepo.findByEventCode(eventCode);
         model.addAttribute("event", displayEvent);
         return "admins/displayEventPage";
@@ -412,7 +495,11 @@ public class AdminController {
 
      // display pass event
      @GetMapping("/admins/displayPassEvent")
-     public String displayPassEvent(@RequestParam String eventCode, Model model) {
+     public String displayPassEvent(@RequestParam String eventCode, Model model, HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("session_admin");
+        if (admin == null) {
+            return "loginPage";
+        }
         Event displayEvent = eventRepo.findByEventCode(eventCode);
         model.addAttribute("event", displayEvent);
         return "admins/displayPassEventPage";
@@ -420,7 +507,11 @@ public class AdminController {
 
     // edit event
     @PostMapping("/admins/editEvent")
-    public String editEvent(@RequestParam Map<String, String> formData, Model model) {
+    public String editEvent(@RequestParam Map<String, String> formData, Model model, HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("session_admin");
+        if (admin == null) {
+            return "loginPage";
+        }
         Event editEvent = eventRepo.findByEventCode(formData.get("eventCode"));
         String description = formData.get("description");
         if (description.trim().isEmpty()) {
@@ -441,6 +532,7 @@ public class AdminController {
     public boolean checkValidEvent(Event event) {
         // check schedule time with current time 
         //LocalDateTime current = LocalDateTime.now();
+       
         LocalDateTime current = LocalDateTime.now().minusHours(7);
         LocalDateTime evenDateTime = LocalDateTime.of(event.getDate().toLocalDate(), event.getStartTime().toLocalTime());
         if (evenDateTime.isBefore(current)) {

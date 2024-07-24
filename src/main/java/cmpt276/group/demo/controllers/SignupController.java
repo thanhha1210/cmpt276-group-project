@@ -46,9 +46,16 @@ public class SignupController {
             model.addAttribute("error1", "Please enter a valid age");
             return "patients/signupPage";
         }
+
         if (patientRepo.findByUsername(username) != null) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             model.addAttribute("error2", "This username already exists. Please enter another username!");
+            return "patients/signupPage";
+        }
+
+        if (password.length() < 6) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            model.addAttribute("error3", "Weak password! Please enter password has length >= 6");
             return "patients/signupPage";
         }
 
