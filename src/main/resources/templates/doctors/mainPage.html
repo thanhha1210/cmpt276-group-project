@@ -204,12 +204,10 @@
     <header class="fix-header">
         <div class="content">
             <nav class="navbar">
-                <div class="home">
+                <div class="feature" style="display: flex; justify-content: center;">
                     <form action="/doctors/getDashboard" method="get" >
                         <button class="btn home-btn">Dashboard</button>
                     </form>
-                </div>
-                <div class="feature" style="display: flex; justify-content: center;">
                     <form action="/doctors/viewSchedule" method="get">
                         <button class="btn schedule-btn">View My Schedule</button>
                     </form>
@@ -221,9 +219,13 @@
                     <form action="/doctors/viewFeedback" method="get">
                         <button class="btn schedule-btn">Feedback</button>
                     </form>
-
                 </div>
                 <div class="actions" style="display: flex; justify-content: center; margin-left: auto; gap: 30px;">
+                    <form action="/doctors/editInformation" method="get">
+                        <button class="btn schedule-btn">
+                            <img src="/img/settings.svg" alt="setting">
+                        </button>
+                    </form>
                     <form action="/users/logout" method="get">
                         <button class="btn logout-btn" >Log out</button>
                     </form>

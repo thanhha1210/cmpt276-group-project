@@ -334,7 +334,7 @@
     <header>
         <div class="content">
             <nav class="navbar">
-                <div class="nav-item">
+                < class="nav-item">
                     <form action="/patients/getDashboard" method="get">
                         <button class="btn home-btn">Dashboard</button>
                     </form>
@@ -350,17 +350,15 @@
                     <form action="/patients/viewEvent" method="get">
                         <button class="btn schedule-btn">Forum</button>
                     </form>
-                    <div style="">
-                        <form action="/patients/editInformation" method="get">
-                            <button class="btn schedule-btn">
-                                <img src="/img/settings.svg" style="" alt="">
-                            </button>
-                        </form>
-                    </div>
-                   
+      
                 </div>
                 
                 <div class="actions">
+                    <form action="/patients/editInformation" method="get">
+                        <button class="btn schedule-btn">
+                            <img src="/img/settings.svg" alt="setting">
+                        </button>
+                    </form>
                     <form action="/users/logout" method="get">
                         <button class="btn logout-btn">Log out</button>
                     </form>

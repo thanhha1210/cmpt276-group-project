@@ -59,10 +59,10 @@ public class Doctor {
     public void setAge(int age) {
         this.age = age;
     }
-    public String getPhonenumber() {
+    public String getPhone() {
         return phone;
     }
-    public void setPhonenumber(String phone) {
+    public void setPhone(String phone) {
         this.phone = phone;
     }
 
