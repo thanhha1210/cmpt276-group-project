@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.google.api.client.http.HttpResponse;
+
 import cmpt276.group.demo.models.Department;
 import cmpt276.group.demo.models.admin.Admin;
 import cmpt276.group.demo.models.admin.AdminRepository;
@@ -26,6 +28,7 @@ import cmpt276.group.demo.models.patient.Patient;
 import cmpt276.group.demo.models.patient.PatientRepository;
 import cmpt276.group.demo.models.room.Room;
 import cmpt276.group.demo.models.room.RoomRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 
@@ -65,7 +68,7 @@ public class EmergencyController {
     }
     
     @PostMapping("/admins/addEmergency")
-    public String addEmergency(Model model, @RequestParam Map<String, String> formData, HttpSession session) {
+    public String addEmergency(Model model, @RequestParam Map<String, String> formData, HttpSession session, HttpServletResponse response) {
         Admin admin = (Admin) session.getAttribute("session_admin");
         if (admin == null) {
             return "loginPage";
@@ -73,6 +76,7 @@ public class EmergencyController {
         if (formData.get("patientUsername").isBlank() || formData.get("doctorUsername").isBlank() || formData.get("severity").isBlank() || formData.get("room").isBlank()) {
             categorizeEmergency(model);
             model.addAttribute("error0", "Please enter all the form!");
+            response.setStatus(400);
             return "admins/addEmergencyPage";
         }
         String patientUsername = formData.get("patientUsername");
@@ -82,6 +86,7 @@ public class EmergencyController {
 
         if (patientRepo.findByUsername(patientUsername) != null) {
             categorizeEmergency(model);
+            response.setStatus(400);
             model.addAttribute("error1", "Username exist. Please choose another username!");
             return "admins/addEmergencyPage";
         }
@@ -96,7 +101,9 @@ public class EmergencyController {
         r.setAvailable(false);
         
         emergencyRepo.save(newEmergency);
+        roomRepo.save(r);
         categorizeEmergency(model);
+        response.setStatus(201);
         return "admins/viewEmergencyPage";
     }
 
