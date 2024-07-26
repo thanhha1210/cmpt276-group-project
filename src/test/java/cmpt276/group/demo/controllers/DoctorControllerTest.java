@@ -395,4 +395,86 @@ public class DoctorControllerTest {
 
         verify(feedbackRepo, times(1)).findByDoctorUsername("d1");
     }
+
+    // ----------------------------------------------------Edit information----------------------------------------------------------------
+    // 1A. Test valid edit - Case 1: Success
+    @Test
+    public void testValidEdit() throws Exception {
+        Doctor d1 = new Doctor("d1", "password", "doctor1", 40, "123 Main St", "123-456-7890", Department.Cardiology);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/doctors/editInformation")
+                                            .sessionAttr("session_doctor", d1)
+                                            .param("name", "new name")
+                                            .param("age", "30")
+                                            .param("address", "123")
+                                            .param("phone", "123"))
+            .andExpect(MockMvcResultMatchers.status().is(200))
+            .andExpect(MockMvcResultMatchers.view().name("doctors/editInformationPage"))
+            .andExpect(model().attributeDoesNotExist("error0"))
+            .andExpect(model().attributeDoesNotExist("error1"))
+            .andExpect(model().attribute("doctor", allOf(
+                hasProperty("name",is("new name")),
+                hasProperty("age",is(30)),
+                hasProperty("address",is("123")),
+                hasProperty("phone",is("123"))
+            )))    
+            ;
+
+        verify(doctorRepo, times(1)).save(any(Doctor.class));
+    }
+
+    // 1B. Test valid edit - Case 2: unsuccessfully - lack field
+    @Test
+    public void testInvalidEdit1() throws Exception {
+        Doctor d1 = new Doctor("d1", "password", "doctor1", 40, "123 Main St", "123-456-7890", Department.Cardiology);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/doctors/editInformation")
+                                            .sessionAttr("session_doctor", d1)
+                                            .param("name", "")
+                                            .param("age", "30")
+                                            .param("address", "123")
+                                            .param("phone", "123"))
+            .andExpect(MockMvcResultMatchers.status().is(400))
+            .andExpect(MockMvcResultMatchers.view().name("doctors/editInformationPage"))
+            .andExpect(model().attributeExists("error0"))
+            .andExpect(model().attributeDoesNotExist("success"))
+            .andExpect(model().attributeDoesNotExist("error1"))
+            .andExpect(model().attribute("doctor", allOf(
+                hasProperty("name",is("doctor1")),
+                hasProperty("age",is(40)),
+                hasProperty("address",is("123 Main St")),
+                hasProperty("phone",is("123-456-7890"))
+            )))    
+            ;
+
+        verify(doctorRepo, times(0)).save(any(Doctor.class));
+    }
+
+    
+    // 1B. Test valid edit - Case 3: unsuccessfully - invalid age
+    @Test
+    public void testInvalidEdit2() throws Exception {
+        Doctor d1 = new Doctor("d1", "password", "doctor1", 40, "123 Main St", "123-456-7890", Department.Cardiology);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/doctors/editInformation")
+                                            .sessionAttr("session_doctor", d1)
+                                            .param("name", "patient1")
+                                            .param("age", "-30")
+                                            .param("address", "123")
+                                            .param("phone", "123"))
+            .andExpect(MockMvcResultMatchers.status().is(400))
+            .andExpect(MockMvcResultMatchers.view().name("doctors/editInformationPage"))
+            .andExpect(model().attributeExists("error1"))
+            .andExpect(model().attributeDoesNotExist("success"))
+            .andExpect(model().attributeDoesNotExist("error0"))
+            .andExpect(model().attribute("doctor", allOf(
+                hasProperty("name",is("doctor1")),
+                hasProperty("age",is(40)),
+                hasProperty("address",is("123 Main St")),
+                hasProperty("phone",is("123-456-7890"))
+            )))    
+            ;
+
+        verify(doctorRepo, times(0)).save(any(Doctor.class));
+    }
 }

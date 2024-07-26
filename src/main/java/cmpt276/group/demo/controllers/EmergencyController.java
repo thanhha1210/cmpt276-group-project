@@ -160,7 +160,7 @@ public class EmergencyController {
         }
 
         List<Room> avaiRooms = roomRepo.findByIsAvailable(true);
-        
+
         model.addAttribute("avaiDoctors", avaiDoctors);
         model.addAttribute("avaiRooms", avaiRooms);
         model.addAttribute("curEmergency", currentEmergency);
@@ -171,7 +171,5 @@ public class EmergencyController {
         Patient p = new Patient(userName, "123456", "TBD", 20, "TBD", "TBD");
         patientRepo.save(p);
     }
-
-    
 
 }

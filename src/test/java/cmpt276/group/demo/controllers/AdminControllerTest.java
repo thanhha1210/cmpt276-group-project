@@ -6,8 +6,6 @@ import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.print.Doc;
-
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
@@ -15,8 +13,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -134,7 +130,7 @@ public class AdminControllerTest {
     // 1A. test patient view dashboard - GET - Valid
     @Test
     public void testValidViewDashboard() throws Exception {
-        Admin a1 = new Admin("admin", "123");
+        Admin a1 = new Admin("admin", "123456");
         
         mockMvc.perform(MockMvcRequestBuilders.get("/admins/getDashboard")
                                                 .sessionAttr("session_admin", a1))
@@ -147,6 +143,7 @@ public class AdminControllerTest {
     // 1. Test admin view doctor - GET - case 1: success
     @Test
     public void testValidViewDoctor() throws Exception {
+        Admin a1 = new Admin("admin", "123456");
         Doctor d1 = new Doctor("Doc1", "123", "Doctor 1", 25, "123st", "888-888-8888", Department.General);
         Doctor d2 = new Doctor("Doc2", "123", "Doctor 2", 20, "123st", "888-888-8888", Department.Cardiology);
         Doctor d3 = new Doctor("Doc3", "123", "Doctor 3", 30, "123st", "888-888-8888", Department.Orthopedics);
@@ -158,7 +155,9 @@ public class AdminControllerTest {
 
         when(doctorRepo.findAll()).thenReturn(doctors);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/admins/viewDoctor"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/admins/viewDoctor")
+                                            .sessionAttr("session_admin", a1)
+                        )
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.view().name("admins/viewDoctorPage"))
         ;
@@ -167,8 +166,10 @@ public class AdminControllerTest {
     // 2A. Test admin add doctor - POST - case 1: success
     @Test
     public void testValidAddDoctor() throws Exception {
+        Admin a1 = new Admin("admin", "123456");
         Doctor d1 = new Doctor("Doc1", "password", "Doctor 1", 30, "123st", "888-888-8888", Department.General);
         mockMvc.perform(MockMvcRequestBuilders.post("/admins/addDoctor")
+                                            .sessionAttr("session_admin", a1)
                                             .param("username", "Doc1")
                                             .param("password", "password")
                                             .param("name", "Doctor 1")
@@ -195,7 +196,9 @@ public class AdminControllerTest {
     // 2B. Test admin add doctor - POST - case 2: error 0 - lack field
     @Test
     public void testInvalidAddDoctor1() throws Exception {
+        Admin a1 = new Admin("admin", "123456");
         mockMvc.perform(MockMvcRequestBuilders.post("/admins/addDoctor")
+                                            .sessionAttr("session_admin", a1)
                                             .param("username", "Doc1")
                                             .param("password", "")
                                             .param("name", "Doctor 1")
@@ -219,7 +222,9 @@ public class AdminControllerTest {
     // 2C. Test admin add doctor - POST - case 3: error 1 -  age < 0
     @Test
     public void testInvalidAddDoctor2() throws Exception {
+        Admin a1 = new Admin("admin", "123456");
         mockMvc.perform(MockMvcRequestBuilders.post("/admins/addDoctor")
+                                            .sessionAttr("session_admin", a1)
                                             .param("username", "Doc1")
                                             .param("password", "password")
                                             .param("name", "Doctor 1")
@@ -244,10 +249,11 @@ public class AdminControllerTest {
     @Test
     public void testInvalidAddDoctor3() throws Exception {
         Doctor d1 = new Doctor("Doc1", "123", "Exist doc", 40, "123st", "888-123-1234", Department.Ophthalmology);
-
+        Admin a1 = new Admin("admin", "123456");
         when(doctorRepo.findByUsername("Doc1")).thenReturn(d1);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/admins/addDoctor")
+                                            .sessionAttr("session_admin", a1)
                                             .param("username", "Doc1")
                                             .param("password", "password")
                                             .param("name", "Doctor 1")
@@ -272,6 +278,8 @@ public class AdminControllerTest {
     // 3. Test admin delete doctor - POST - case 1 : all schedule and appointment associate will be delete
     @Test
     public void testValidDeleteDoctor() throws Exception {
+        Admin ad1 = new Admin("admin", "123456");
+
         Doctor d1 = new Doctor("d1", "123", "doctor 1", 40, "123st", "888-123-1234", Department.Ophthalmology);
         Doctor d2 = new Doctor("d2", "123", "doctor 2", 40, "123st", "888-123-1234", Department.Ophthalmology);
         Doctor d3 = new Doctor("d3", "123", "doctor 3", 40, "123st", "888-123-1234", Department.Ophthalmology);
@@ -297,7 +305,8 @@ public class AdminControllerTest {
         when(doctorRepo.findAll()).thenReturn(doctors);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/admins/deleteDoctor")
-                                            .param("username","d1")                        
+                                            .param("username","d1")  
+                                            .sessionAttr("session_admin", ad1)                      
                         )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.view().name("admins/viewDoctorPage"))
@@ -318,6 +327,8 @@ public class AdminControllerTest {
     // 1. Test admin view patient - get - case 1: success
     @Test
     public void testValidViewPatient() throws Exception {
+        Admin ad1 = new Admin("admin", "123456");
+
         Patient p1 = new Patient("p1", "123", "patient1", 20, "123St", "123");
         Patient p2 = new Patient("p2", "123", "patient2", 30, "123St", "123");
         Patient p3 = new Patient("p3", "123", "patient1", 40, "123St", "123");
@@ -329,7 +340,9 @@ public class AdminControllerTest {
 
         when(patientRepo.findAll()).thenReturn(patients);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/admins/viewPatient"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/admins/viewPatient")
+                                                .sessionAttr("session_admin", ad1)       
+                    )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.view().name("admins/viewPatientPage"))
                 .andExpect(model().attribute("patients", patients))
@@ -339,6 +352,8 @@ public class AdminControllerTest {
     // 2. Test admin delete patient - post - case 1: success
     @Test
     public void testValidDeletePatient() throws Exception {
+        Admin ad1 = new Admin("admin", "123456");
+
         Patient p1 = new Patient("p1", "123", "patient1", 20, "123St", "123");
         Patient p2 = new Patient("p2", "123", "patient2", 30, "123St", "123");
         Patient p3 = new Patient("p3", "123", "patient1", 40, "123St", "123");
@@ -357,6 +372,7 @@ public class AdminControllerTest {
         when(patientRepo.findAll()).thenReturn(patients);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/admins/deletePatient")
+                .sessionAttr("session_admin", ad1)  
                 .param("username", "p1"))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.view().name("admins/viewPatientPage"))
@@ -377,6 +393,8 @@ public class AdminControllerTest {
     // 1. Test admin view appointment - get - case 1: success
     @Test
     public void testValidViewAppointment() throws Exception {
+        Admin ad1 = new Admin("admin", "123456");
+
         Appointment a1 = new Appointment("doctor1", "d1", "patient1", "p1", Date.valueOf("2025-06-30"), Time.valueOf("09:00:00"), 30, Department.General);
         Appointment a2 = new Appointment("doctor1", "d1", "patient1", "p1", Date.valueOf("2025-10-30"), Time.valueOf("08:00:00"), 30, Department.Ophthalmology);
         Appointment a3 = new Appointment("doctor1", "d1", "patient1", "p1", Date.valueOf("2025-11-5"), Time.valueOf("12:30:00"), 30, Department.Orthopedics);
@@ -395,7 +413,9 @@ public class AdminControllerTest {
         when(appointmentRepo.findAll()).thenReturn(appointments);
         when(pastAppointmentRepo.findAll()).thenReturn(pastAppointments);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/admins/viewAppointment"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/admins/viewAppointment")
+                                                .sessionAttr("session_admin", ad1)  
+                        )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.view().name("admins/viewAppointmentPage"))
                 .andExpect(model().attribute("appointments", appointments))
@@ -406,6 +426,8 @@ public class AdminControllerTest {
     // 2. Test admin delete appointment - post - case 1: success 
     @Test
     public void testValidDeleteAppointment() throws Exception {
+        Admin ad1 = new Admin("admin", "123456");
+
         Appointment a1 = new Appointment("doctor1", "d1", "patient1", "p1", Date.valueOf("2025-06-30"), Time.valueOf("09:00:00"), 30, Department.General);
         Appointment a2 = new Appointment("doctor1", "d1", "patient1", "p1", Date.valueOf("2025-10-30"), Time.valueOf("08:00:00"), 30, Department.Ophthalmology);
         Appointment a3 = new Appointment("doctor1", "d1", "patient1", "p1", Date.valueOf("2025-11-5"), Time.valueOf("12:30:00"), 30, Department.Orthopedics);
@@ -425,6 +447,7 @@ public class AdminControllerTest {
         when(appointmentRepo.findByDoctorUsernameAndDateAndStartTime(a1.getDoctorUsername(), a1.getDate(), a1.getStartTime())).thenReturn(a1);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/admins/deleteAppointment")
+                                                .sessionAttr("session_admin", ad1)  
                                                 .param("doctorUsername", "d1")
                                                 .param("date", "2025-06-30")
                                                 .param("startTime", "09:00:00")
@@ -444,6 +467,8 @@ public class AdminControllerTest {
     // 1.  Test admin view schedule
     @Test
     public void testValidViewSchedule() throws Exception {
+        Admin ad1 = new Admin("admin", "123456");
+
         Schedule s1 = new Schedule("doctor1", "d1", Date.valueOf("2025-08-29"), Time.valueOf("10:00:00"), 10, Department.General);
         Schedule s2 = new Schedule("doctor1", "d1", Date.valueOf("2025-07-20"), Time.valueOf("10:00:00"), 10, Department.General);
         List<Schedule> schedules = new ArrayList<>();
@@ -451,7 +476,9 @@ public class AdminControllerTest {
         schedules.add(s2);
         when(scheduleRepo.findAll()).thenReturn(schedules);
       
-        mockMvc.perform(MockMvcRequestBuilders.get("/admins/viewSchedule"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/admins/viewSchedule")
+                                                .sessionAttr("session_admin", ad1) 
+                        )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.view().name("admins/viewSchedulePage"))
                 .andExpect(model().attribute("schedules", schedules))
@@ -462,6 +489,7 @@ public class AdminControllerTest {
     // 2A. Test admin add schedule - post - case 1 : success
     @Test
     public void testValidAddSchedule() throws Exception {
+        Admin ad1 = new Admin("admin", "123456");
         Schedule s1 = new Schedule("doctor1", "d1", Date.valueOf("2025-07-20"), Time.valueOf("10:00:00"), 10, Department.General);
         Doctor d1 = new Doctor("d1", "123", "doctor 1", 40, "123st", "888-123-1234", Department.Ophthalmology);
     
@@ -481,6 +509,7 @@ public class AdminControllerTest {
         Schedule newSche = new Schedule("doctor1", "d1", Date.valueOf("2025-08-29"), Time.valueOf("10:00:00"), 10, Department.General);
     
         mockMvc.perform(MockMvcRequestBuilders.post("/admins/addSchedule")
+                                            .sessionAttr("session_admin", ad1) 
                                             .param("doctorUsername", "d1")
                                             .param("duration", "10")
                                             .param("date", "2025-08-29")
@@ -508,6 +537,7 @@ public class AdminControllerTest {
     // 2B. Test admin add schedule - post - case 2 : error0 - lack field
     @Test
     public void testInvalidAddSchedule1() throws Exception {
+        Admin ad1 = new Admin("admin", "123456");
         Schedule s1 = new Schedule("doctor1", "d1", Date.valueOf("2025-07-20"), Time.valueOf("10:00:00"), 10, Department.General);
         Doctor d1 = new Doctor("d1", "123", "doctor 1", 40, "123st", "888-123-1234", Department.Ophthalmology);
     
@@ -528,6 +558,7 @@ public class AdminControllerTest {
         Schedule newSche = new Schedule("doctor1", "d1", Date.valueOf("2025-08-29"), Time.valueOf("10:00:00"), 10, Department.General);
     
         mockMvc.perform(MockMvcRequestBuilders.post("/admins/addSchedule")
+                                            .sessionAttr("session_admin", ad1) 
                                             .param("doctorUsername", "d1")
                                             .param("duration", "10")
                                             .param("date", "")
@@ -549,6 +580,7 @@ public class AdminControllerTest {
     // 2C. Test admin add schedule - post - case 3 : error1 - duration < 0
     @Test
     public void testInvalidAddSchedule2() throws Exception {
+        Admin ad1 = new Admin("admin", "123456");
         Schedule s1 = new Schedule("doctor1", "d1", Date.valueOf("2025-07-20"), Time.valueOf("10:00:00"), 10, Department.General);
         Doctor d1 = new Doctor("d1", "123", "doctor 1", 40, "123st", "888-123-1234", Department.Ophthalmology);
     
@@ -567,6 +599,7 @@ public class AdminControllerTest {
         Schedule newSche = new Schedule("doctor1", "d1", Date.valueOf("2025-08-29"), Time.valueOf("10:00:00"), 10, Department.General);
     
         mockMvc.perform(MockMvcRequestBuilders.post("/admins/addSchedule")
+                                            .sessionAttr("session_admin", ad1) 
                                             .param("doctorUsername", "d1")
                                             .param("duration", "-10")
                                             .param("date", "2025-08-29")
@@ -588,6 +621,7 @@ public class AdminControllerTest {
     // 2D. Test admin add schedule - post - case 4 : error2 - doctor doesn't exist 
     @Test
     public void testInvalidAddSchedule3() throws Exception {
+        Admin ad1 = new Admin("admin", "123456");
         Schedule s1 = new Schedule("doctor1", "d1", Date.valueOf("2025-07-20"), Time.valueOf("10:00:00"), 10, Department.General);
         Doctor d1 = new Doctor("d1", "123", "doctor 1", 40, "123st", "888-123-1234", Department.Ophthalmology);
     
@@ -606,6 +640,7 @@ public class AdminControllerTest {
         Schedule newSche = new Schedule("doctor1", "d1", Date.valueOf("2025-08-29"), Time.valueOf("10:00:00"), 10, Department.General);
     
         mockMvc.perform(MockMvcRequestBuilders.post("/admins/addSchedule")
+                                            .sessionAttr("session_admin", ad1) 
                                             .param("doctorUsername", "d0")
                                             .param("duration", "10")
                                             .param("date", "2025-08-29")
@@ -628,6 +663,7 @@ public class AdminControllerTest {
     // 2E. Test admin add schedule - post - case 5 : error3 - schedule already exist
     @Test
     public void testInvalidAddSchedule4() throws Exception {
+        Admin ad1 = new Admin("admin", "123456");
         Schedule s1 = new Schedule("doctor1", "d1", Date.valueOf("2025-07-20"), Time.valueOf("10:00:00"), 10, Department.General);
         Doctor d1 = new Doctor("d1", "123", "doctor 1", 40, "123st", "888-123-1234", Department.Ophthalmology);
     
@@ -647,6 +683,7 @@ public class AdminControllerTest {
         when(scheduleRepo.findByDoctorUsernameAndDate("d1", Date.valueOf("2025-08-29"))).thenReturn(sameDateSchedules);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/admins/addSchedule")
+                                            .sessionAttr("session_admin", ad1) 
                                             .param("doctorUsername", "d1")
                                             .param("duration", "10")
                                             .param("date", "2025-08-29")
@@ -668,6 +705,7 @@ public class AdminControllerTest {
     // 2F. Test admin add schedule - post - case 6 : error4 - time conflict
     @Test
     public void testInvalidAddSchedule5() throws Exception {
+        Admin ad1 = new Admin("admin", "123456");
         Schedule s1 = new Schedule("doctor1", "d1", Date.valueOf("2025-08-29"), Time.valueOf("09:55:00"), 20, Department.General);
         Doctor d1 = new Doctor("d1", "123", "doctor 1", 40, "123st", "888-123-1234", Department.Ophthalmology);
     
@@ -686,6 +724,7 @@ public class AdminControllerTest {
         when(scheduleRepo.findByDoctorUsernameAndDate("d1", Date.valueOf("2025-08-29"))).thenReturn(schedules);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/admins/addSchedule")
+                                            .sessionAttr("session_admin", ad1) 
                                             .param("doctorUsername", "d1")
                                             .param("duration", "10")
                                             .param("date", "2025-08-29")
@@ -707,6 +746,7 @@ public class AdminControllerTest {
     // 3. Test admin delete schedule
     @Test
     public void testValidDeleteSchedule() throws Exception {
+        Admin ad1 = new Admin("admin", "123456");
         Schedule s1 = new Schedule("doctor1", "d1", Date.valueOf("2025-08-29"), Time.valueOf("10:00:00"), 10, Department.General);
         Schedule deleteSche = new Schedule("doctor1", "d1", Date.valueOf("2025-07-20"), Time.valueOf("10:00:00"), 10, Department.General);
         
@@ -717,6 +757,7 @@ public class AdminControllerTest {
         when(scheduleRepo.findAll()).thenReturn(schedules);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/admins/deleteSchedule")
+                                            .sessionAttr("session_admin", ad1) 
                                             .param("doctorUsername", "d1")
                                             .param("date", "2025-07-20")
                                             .param("startTime", "10:00:00")
@@ -753,11 +794,12 @@ public class AdminControllerTest {
    @Test
     public void testValidAddEvent() throws Exception {
         Event e1 = new Event("E101", "Event 101", 10, "This is new event", Date.valueOf("2024-12-08"), Time.valueOf("10:00:00"), 90);
-
+        Admin ad1 = new Admin("admin", "123456");
         List<Event> events = new ArrayList<>();
         when(eventRepo.findByEventCode("E101")).thenReturn(null);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/admins/addEvent")
+                                            .sessionAttr("session_admin", ad1) 
                                             .param("eventCode", "E101")
                                             .param("eventName", "Event 101")
                                             .param("description", "This is new event")
@@ -779,11 +821,12 @@ public class AdminControllerTest {
     @Test
     public void testInvalidAddEvent1() throws Exception {
         Event e1 = new Event("E101", "Event 101", 10, "This is new event", Date.valueOf("2024-12-08"), Time.valueOf("10:00:00"), 90);
-
+        Admin ad1 = new Admin("admin", "123456");
         List<Event> events = new ArrayList<>();
         when(eventRepo.findByEventCode("E101")).thenReturn(null);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/admins/addEvent")
+                                            .sessionAttr("session_admin", ad1) 
                                             .param("eventCode", "E101")
                                             .param("eventName", "Event 101")
                                             .param("description", "This is new event")
@@ -803,11 +846,12 @@ public class AdminControllerTest {
     @Test
     public void testInvalidAddEvent2() throws Exception {
         Event e1 = new Event("E101", "Event 101", 10, "This is new event", Date.valueOf("2024-12-08"), Time.valueOf("10:00:00"), 90);
-
+        Admin ad1 = new Admin("admin", "123456");
         List<Event> events = new ArrayList<>();
         when(eventRepo.findByEventCode("E101")).thenReturn(null);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/admins/addEvent")
+                                            .sessionAttr("session_admin", ad1)
                                             .param("eventCode", "E101")
                                             .param("eventName", "Event 101")
                                             .param("description", "This is new event")
@@ -829,12 +873,14 @@ public class AdminControllerTest {
 
     @Test
     public void testInvalidAddEvent3() throws Exception {
+        Admin ad1 = new Admin("admin", "123456");
         Event e1 = new Event("E101", "Event 101", 10, "This is new event", Date.valueOf("2024-12-08"), Time.valueOf("10:00:00"), 90);
 
         List<Event> events = new ArrayList<>();
         when(eventRepo.findByEventCode("E101")).thenReturn(e1);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/admins/addEvent")
+                                            .sessionAttr("session_admin", ad1)
                                             .param("eventCode", "E101")
                                             .param("eventName", "Event 102")
                                             .param("description", "This is new event")
@@ -856,6 +902,7 @@ public class AdminControllerTest {
     // 1D. Test admin add event - Error 2: behind current time
     @Test
     public void testInvalidAddEvent4() throws Exception {
+        Admin ad1 = new Admin("admin", "123456");
         Event e1 = new Event("E101", "Event 101", 10, "This is new event", Date.valueOf("2023-12-08"), Time.valueOf("10:00:00"), 90);
 
         List<Event> events = new ArrayList<>();
@@ -863,6 +910,7 @@ public class AdminControllerTest {
 
 
         mockMvc.perform(MockMvcRequestBuilders.post("/admins/addEvent")
+                                            .sessionAttr("session_admin", ad1)
                                             .param("eventCode", "E101")
                                             .param("eventName", "Event 102")
                                             .param("description", "This is new event")
@@ -883,6 +931,8 @@ public class AdminControllerTest {
     // 2. Test admin delete event
     @Test
     public void testDeleteEvent() throws Exception {
+        Admin ad1 = new Admin("admin", "123456");
+
         Event e1 = new Event("E101", "Event 101", 10, "This is new event", Date.valueOf("2024-12-08"), Time.valueOf("10:00:00"), 90);
         Event e2 = new Event("E102", "Event 102", 10, "This is new event", Date.valueOf("2024-12-09"), Time.valueOf("10:00:00"), 90);
         Event e3 = new Event("E103", "Event 103", 10, "This is new event", Date.valueOf("2024-12-10"), Time.valueOf("10:00:00"), 90);
@@ -896,6 +946,7 @@ public class AdminControllerTest {
         when(eventRepo.findAll()).thenReturn(events);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/admins/deleteEvent")
+                                              .sessionAttr("session_admin", ad1)
                                               .param("eventCode", "E101"))
                .andExpect(status().isOk())
                .andExpect(view().name("admins/viewEventPage"))
@@ -907,6 +958,7 @@ public class AdminControllerTest {
     // 3A. Test admin modify event - Case 1 : success
     @Test
     public void testValidEditEvent() throws Exception {
+        Admin ad1 = new Admin("admin", "123456");
         Event e1 = new Event("E101", "Event 101", 10, "This is new event", Date.valueOf("2023-12-08"), Time.valueOf("10:00:00"), 90);
 
         List<Event> events = new ArrayList<>();
@@ -914,6 +966,7 @@ public class AdminControllerTest {
 
 
         mockMvc.perform(MockMvcRequestBuilders.post("/admins/editEvent")
+                                            .sessionAttr("session_admin", ad1)
                                             .param("eventCode", "E101")
                                             .param("description", "This is an edit description")
                         )            
@@ -931,6 +984,7 @@ public class AdminControllerTest {
     // 3B. Test admin modify event - Case 2 : error - lack description
     @Test
     public void testInvalidEditEvent() throws Exception {
+        Admin ad1 = new Admin("admin", "123456");
         Event e1 = new Event("E101", "Event 101", 10, "This is new event", Date.valueOf("2023-12-08"), Time.valueOf("10:00:00"), 90);
 
         List<Event> events = new ArrayList<>();
@@ -938,6 +992,7 @@ public class AdminControllerTest {
 
 
         mockMvc.perform(MockMvcRequestBuilders.post("/admins/editEvent")
+                                            .sessionAttr("session_admin", ad1)
                                             .param("eventCode", "E101")
                                             .param("description", "")
                         )            
