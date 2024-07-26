@@ -21,7 +21,7 @@ public class Doctor {
     private String address;
     private String phone;
     private Department department;
-
+    private double rate = 0;
 
     public Doctor() { }
 
@@ -81,5 +81,12 @@ public class Doctor {
     public void setAddress(String address) {
         this.address = address;
     }
-    
+
+    public double getRate() {
+        return rate;
+    }
+
+    public void setRate(double rate) {
+        this.rate = rate;
+    }
 }

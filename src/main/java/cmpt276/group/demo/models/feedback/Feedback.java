@@ -37,6 +37,8 @@ public class Feedback implements Comparable<Feedback>{
 
     private String description;
 
+    private double rate = 0;    
+
     public Feedback() { }
 
     public Feedback(String doctorName, String doctorUsername, String patientName, String patientUsername, Date date, Department department, String description) {
@@ -108,5 +110,13 @@ public class Feedback implements Comparable<Feedback>{
 
     public String getDescription() {
         return description;
+    }
+
+    public double getRate() {
+        return rate;
+    }
+
+    public void setRate(double rate) {
+        this.rate = rate;
     }
 }

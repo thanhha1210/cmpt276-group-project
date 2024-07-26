@@ -65,10 +65,12 @@ public class PastAppointment implements Comparable<PastAppointment>{
     @Override
     public int compareTo(PastAppointment o) {
         if (o.getDate() != this.date) {
-            return this.date.compareTo(o.getDate());
+            // return this.date.compareTo(o.getDate());
+            return o.getDate().compareTo(date);
         }
         else {
-            return this.startTime.compareTo(o.getStartTime());
+            // return this.startTime.compareTo(o.getStartTime());
+            return o.getStartTime().compareTo(startTime);
         }
     }
 

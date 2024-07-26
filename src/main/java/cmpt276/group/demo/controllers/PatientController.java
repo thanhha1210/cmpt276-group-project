@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Comparator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -33,7 +34,6 @@ import cmpt276.group.demo.models.record.Record;
 import cmpt276.group.demo.models.record.RecordRepository;
 import cmpt276.group.demo.models.schedule.Schedule;
 import cmpt276.group.demo.models.schedule.ScheduleRepository;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
@@ -134,6 +134,28 @@ public class PatientController {
         model.addAttribute("schedules", schedules);
         return "patients/viewSchedulePage";
     }
+
+    // Patient view past appointments (NOT ADD TEST)
+    @GetMapping("/patients/viewPastAppointment")
+    public String viewPastApt(HttpSession session, Model model) {
+        Patient patient = (Patient) session.getAttribute("session_patient");
+        if (patient == null) {
+            return "loginPage";
+        }
+        model.addAttribute("patient", patient);
+
+        List<PastAppointment> pastAptList = pastAppointmentRepo.findByPatientUsername(patient.getUsername());
+        List<PastAppointment> nonFeedbackPastApt = new ArrayList<>();
+        for (PastAppointment apt : pastAptList) {
+            if (!apt.isFeedback()) {
+                nonFeedbackPastApt.add(apt);
+            }
+        }
+        Collections.sort(nonFeedbackPastApt);
+        model.addAttribute("nonFeedbackList", nonFeedbackPastApt);
+        return "patients/viewPastAptPage";
+    }
+    
 
     // Patient deletes appointment (added test)
     @PostMapping("/patients/deleteAppointment")
@@ -277,37 +299,46 @@ public class PatientController {
         model.addAttribute("records", records);
         return "patients/viewRecordPage";
     }
-    
-    //-------------------------------------Event------------------------------------------------
-    
-
-   
-    
+        
     //-------------------------------------Feedback------------------------------------------------
-     @GetMapping("/patients/viewFeedback")  // added test
-    public String getFeedback(Model model, HttpSession session) {
+    // @GetMapping("/patients/viewFeedback")  // added test
+    // public String getFeedback(Model model, HttpSession session) {
+    //     Patient patient = (Patient) session.getAttribute("session_patient");
+    //     if (patient == null) {
+    //         return "loginPage";
+    //     }
+
+    //     // list of past apt that are not add to feedback 
+    //     List<PastAppointment> pastAptList = pastAppointmentRepo.findByPatientUsername(patient.getUsername());
+    //     List<PastAppointment> nonFeedbackPastAptList = new ArrayList<>();
+    //     for (PastAppointment pastApt : pastAptList) {
+    //         if (!pastApt.isFeedback()) {
+    //             nonFeedbackPastAptList.add(pastApt);
+    //         }
+    //     }
+
+    //     Collections.sort(nonFeedbackPastAptList);
+    //     model.addAttribute("nonFeedbackList", nonFeedbackPastAptList);
+
+    //     List<Feedback> feedbackList = feedbackRepo.findAll();
+    //     Collections.sort(feedbackList);
+    //     model.addAttribute("feedbackList", feedbackList);
+    //     return "patients/viewFeedbackPage";
+    // }    
+
+    @GetMapping("/patients/viewFeedback")   // NOT ADD TEST
+    public String viewFeedback(@RequestParam String doctorUsername, HttpSession session, Model model) {
         Patient patient = (Patient) session.getAttribute("session_patient");
         if (patient == null) {
             return "loginPage";
         }
 
-        // list of past apt that are not add to feedback 
-        List<PastAppointment> pastAptList = pastAppointmentRepo.findByPatientUsername(patient.getUsername());
-        List<PastAppointment> nonFeedbackPastAptList = new ArrayList<>();
-        for (PastAppointment pastApt : pastAptList) {
-            if (!pastApt.isFeedback()) {
-                nonFeedbackPastAptList.add(pastApt);
-            }
-        }
-
-        Collections.sort(nonFeedbackPastAptList);
-        model.addAttribute("nonFeedbackList", nonFeedbackPastAptList);
-
-        List<Feedback> feedbackList = feedbackRepo.findAll();
-        Collections.sort(feedbackList);
+        Doctor doctor = doctorRepo.findByUsername(doctorUsername);
+        List<Feedback> feedbackList = feedbackRepo.findByDoctorUsername(doctorUsername);
         model.addAttribute("feedbackList", feedbackList);
+        model.addAttribute("doctor", doctor);
         return "patients/viewFeedbackPage";
-    }    
+    }
 
     @GetMapping("/patients/addFeedback")  // added test
     public String getAddFeedbackPage(HttpSession session, Model model, @RequestParam Map<String, String> formData) {
@@ -323,7 +354,22 @@ public class PatientController {
         model.addAttribute("nonFeedbackPastApt", pastApt);
         return "patients/addFeedbackPage";
     }
-    
+
+    @GetMapping("/patients/viewRating")     // NOT ADD TEST
+    public String viewDocRating(Model model, HttpSession session) {
+        Patient patient = (Patient) session.getAttribute("session_patient");
+        if (patient == null) {
+            return "loginPage";
+        }
+
+        List<Doctor> doctors = doctorRepo.findAll();
+        Collections.sort(doctors, Comparator.comparing(Doctor::getName));
+        model.addAttribute("doctors", doctors);
+        for (Doctor doc : doctors) {
+            System.out.println("Doctor: " + doc.getName() + ", Rate: " + doc.getRate());
+        }
+        return "patients/viewRatingPage";
+    }
 
     @PostMapping("/patients/addFeedback")   // added test
     public String addFeedbackPage(@RequestParam Map<String, String> formData, HttpSession session, Model model, HttpServletResponse response) {
@@ -336,22 +382,36 @@ public class PatientController {
         String patientUsername = formData.get("patientUsername");
         Date date = Date.valueOf(formData.get("date"));
         String feedbackStr = formData.get("feedbackStr");
+        String rateStr = formData.get("rate");
         PastAppointment pastApt = pastAppointmentRepo.findByPatientUsernameAndDoctorUsernameAndDate(patientUsername, doctorUsername, date);
 
-        if (feedbackStr.trim().isEmpty()) {
+        if (rateStr == null || rateStr.isEmpty() || feedbackStr.trim().isEmpty()) {
             model.addAttribute("nonFeedbackPastApt", pastApt);
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             model.addAttribute("error0", "Please fill the feedback form!");
             return "patients/addFeedbackPage";
         }
 
-        // public Feedback(String doctorName, String doctorUsername, String patientName, String patientUsername, Date date, Department department, String feedback)
+        double rate = Double.parseDouble(rateStr);
         Doctor doc = doctorRepo.findByUsername(doctorUsername);
+        
+        // feedback rate is individual rate and doctor rate is the mean rate 
         Feedback newFeedback = new Feedback(doc.getName(), doctorUsername, patient.getName(), patientUsername, date, doc.getDepartment(), feedbackStr);
+        newFeedback.setRate(rate);
         feedbackRepo.save(newFeedback);
-        List<Feedback> feedbackList = feedbackRepo.findByPatientUsername(patientUsername);
-        Collections.sort(feedbackList);
-        model.addAttribute("feedbackList", feedbackList);
+
+        // Update the doctor's mean rating
+        // feedbacks here is updated (ie added new one to repo if any)
+        List<Feedback> feedbacks = feedbackRepo.findByDoctorUsername(doctorUsername);
+        double mean = calcAvg(feedbacks);     // rate in parameter is new rate & update rate is avg rate
+        doc.setRate(mean);
+        System.out.println("mean rate: " + doc.getRate());
+        doctorRepo.save(doc);
+
+        // List<Feedback> feedbackList = feedbackRepo.findByPatientUsername(patientUsername);
+        // Collections.sort(feedbackList);
+        // model.addAttribute("feedbackList", feedbackList);
+        model.addAttribute("doctor", doc);
 
         // update past apt 
         pastApt.setIsFeedback(true);
@@ -369,6 +429,19 @@ public class PatientController {
 
         Collections.sort(nonFeedbackPastAptList);
         model.addAttribute("nonFeedbackList", nonFeedbackPastAptList);
-        return "patients/viewFeedbackPage";
+        return "patients/viewPastAptPage";
+    }
+
+    public double calcAvg(List<Feedback> feedbackList) {
+        // feedbackList is updated (ie added new one to it)
+        double total = 0;
+        for (Feedback fb : feedbackList) {
+            total += fb.getRate();
+        }
+        int cnt = feedbackList.size();
+        double mean = total / cnt;
+
+        // Round to one decimal place
+        return Math.round(mean * 10.0) / 10.0;
     }
 }
