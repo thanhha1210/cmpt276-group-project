@@ -90,6 +90,7 @@
         }
         .info-item {
             display: flex;
+            align-items: center; /* Align items vertically in the center */
             justify-content: space-between;
             margin-bottom: 10px;
         }
@@ -107,7 +108,16 @@
             white-space: normal;
             overflow: visible;
         }
-            
+         
+        .rating-container {
+            display: flex;
+            align-items: center; /* Align text and stars vertically */
+        }
+        .rating {
+            font-size: 2em; /* Adjust this value to make stars bigger */
+            color: #ffb800; /* Color of stars */
+            margin-left: 10px; /* Space between text and stars */
+        }
     </style>
 </head>
 <body>
@@ -116,7 +126,7 @@
             <input type="submit" value="HOME" class="btn exit-btn">
         </form>
         <div>
-            <h1 th:text="${doctor.name}  + '\'s Feedback'" style="font-weight: 700; font-size: 2.4em; margin-top: 12px;"></h1>
+            <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Patients' Feedback</h1>
         </div>
         <div></div>
     </header>
@@ -125,6 +135,13 @@
         <div class="info-container">
             <div th:each="fb : ${feedbackList}" class="info">
                 <div>
+                    <div class="info-item" style="margin-bottom: 0px;">
+                        <h3>Rate</h3>
+                        <div class="rating-container">
+                            <span class="rating" th:text="${#strings.repeat('★', fb.rate) + #strings.repeat('☆', 5 - fb.rate)}"></span>
+                        </div>
+                    </div>
+
                     <div class="info-item">
                         <h3>Date</h3>
                         <span th:text="${fb.date}"></span>
@@ -143,6 +160,6 @@
             </div>
         </div>
     </main>
-   
 </body>
 </html>
+

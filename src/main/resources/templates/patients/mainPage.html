@@ -328,24 +328,61 @@
         #chat-input + button:hover {
             background-color: #0056b3;
         }
+
+        /* Dropdown Styles */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 190px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+        }
+
+        .dropdown-content form {
+            display: block;
+        }
+
+        .dropdown-content .btn {
+            width: 100%;
+            text-align: left;
+            padding: 12px 10px;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
     </style>
 </head>
 <body>
     <header>
         <div class="content">
             <nav class="navbar">
-                < class="nav-item">
+                <div class="nav-item">
                     <form action="/patients/getDashboard" method="get">
                         <button class="btn home-btn">Dashboard</button>
                     </form>
-                    <form action="/patients/viewSchedule" method="get">
-                        <button class="btn schedule-btn">Book appointment</button>
-                    </form>
+                    <div class="dropdown">
+                        <button class="btn">Appointment</button>
+                        <div class="dropdown-content">
+                            <form action="/patients/viewSchedule" method="get">
+                                <button class="btn schedule-btn">Book</button>
+                            </form>
+                            <form action="/patients/viewPastAppointment" method="get">
+                                <button class="btn schedule-btn">Past Appointments</button>
+                            </form>
+                        </div>
+                    </div>
                     <form action="/patients/viewRecord" method="get">
                         <button class="btn schedule-btn">Health record</button>
                     </form>
-                    <form action="/patients/viewFeedback" method="get">
-                        <button class="btn schedule-btn">Feedback</button>
+                    <form action="/patients/viewRating" method="get">
+                        <button class="btn schedule-btn">Rating</button>
                     </form>
                     <form action="/patients/viewEvent" method="get">
                         <button class="btn schedule-btn">Forum</button>
