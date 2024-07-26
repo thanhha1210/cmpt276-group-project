@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
@@ -16,7 +15,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,12 +26,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import com.google.common.util.concurrent.ExecutionError;
-
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import cmpt276.group.demo.DemoApplication;
 import cmpt276.group.demo.models.Department;
@@ -116,7 +110,7 @@ public class PatientControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/patients/signup")
             // not sign in yet => no session
             .param("username", "p1")
-            .param("password", "123")
+            .param("password", "123456")
             .param("name", "patient1")
             .param("age", "20")
             .param("address", "123")
@@ -806,6 +800,92 @@ public class PatientControllerTest {
         verify(pastAppointmentRepo, times(0)).save(any(PastAppointment.class));
         verify(pastAppointmentRepo, times(0)).findByPatientUsername("p1");
     }
+
+    // ----------------------------------------------------Edit information----------------------------------------------------------------
+    
+    // 1A. Test valid edit - Case 1: Success
+    @Test
+    public void testValidEdit() throws Exception {
+        Patient p1 = new Patient("p1", "123456", "TBD", 20, "TBD", "TBD");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/patients/editInformation")
+                                            .sessionAttr("session_patient", p1)
+                                            .param("name", "patient1")
+                                            .param("age", "30")
+                                            .param("address", "123")
+                                            .param("phone", "123"))
+            .andExpect(MockMvcResultMatchers.status().is(200))
+            .andExpect(MockMvcResultMatchers.view().name("patients/editInformationPage"))
+            .andExpect(model().attributeExists("patient"))
+            .andExpect(model().attributeDoesNotExist("error0"))
+            .andExpect(model().attributeDoesNotExist("error1"))
+            .andExpect(model().attribute("patient", allOf(
+                hasProperty("name",is("patient1")),
+                hasProperty("age",is(30)),
+                hasProperty("address",is("123")),
+                hasProperty("phone",is("123"))
+            )))    
+            ;
+
+        verify(patientRepo, times(1)).save(any(Patient.class));
+    }
+
+    // 1B. Test valid edit - Case 2: unsuccessfully - lack field
+    @Test
+    public void testInvalidEdit1() throws Exception {
+        Patient p1 = new Patient("p1", "123456", "TBD", 20, "TBD", "TBD");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/patients/editInformation")
+                                            .sessionAttr("session_patient", p1)
+                                            .param("name", "")
+                                            .param("age", "30")
+                                            .param("address", "123")
+                                            .param("phone", "123"))
+            .andExpect(MockMvcResultMatchers.status().is(400))
+            .andExpect(MockMvcResultMatchers.view().name("patients/editInformationPage"))
+            .andExpect(model().attributeExists("error0"))
+            .andExpect(model().attributeDoesNotExist("success"))
+            .andExpect(model().attributeDoesNotExist("error1"))
+            .andExpect(model().attribute("patient", allOf(
+                hasProperty("name",is("TBD")),
+                hasProperty("age",is(20)),
+                hasProperty("address",is("TBD")),
+                hasProperty("phone",is("TBD"))
+            )))    
+            ;
+
+        verify(patientRepo, times(0)).save(any(Patient.class));
+    }
+
+    
+    // 1B. Test valid edit - Case 3: unsuccessfully - invalid age
+    @Test
+    public void testInvalidEdit2() throws Exception {
+        Patient p1 = new Patient("p1", "123456", "TBD", 20, "TBD", "TBD");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/patients/editInformation")
+                                            .sessionAttr("session_patient", p1)
+                                            .param("name", "patient1")
+                                            .param("age", "-30")
+                                            .param("address", "123")
+                                            .param("phone", "123"))
+            .andExpect(MockMvcResultMatchers.status().is(400))
+            .andExpect(MockMvcResultMatchers.view().name("patients/editInformationPage"))
+            .andExpect(model().attributeExists("error1"))
+            .andExpect(model().attributeDoesNotExist("success"))
+            .andExpect(model().attributeDoesNotExist("error0"))
+            .andExpect(model().attribute("patient", allOf(
+                hasProperty("name",is("TBD")),
+                hasProperty("age",is(20)),
+                hasProperty("address",is("TBD")),
+                hasProperty("phone",is("TBD"))
+            )))    
+            ;
+
+        verify(patientRepo, times(0)).save(any(Patient.class));
+    }
+
+
 }
 
 

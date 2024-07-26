@@ -139,6 +139,7 @@
                     <th>#</th>
                     <th>Case ID</th>
                     <th>Doctor Username</th>
+                    <th>Patient Username</th>
                     <th>Date</th>
                     <th>Start time</th>
                     <th></th>
@@ -149,6 +150,7 @@
                     <td><span th:text="${cnt.count}"></span></td>
                     <td><span th:text="${e.emerId}"></span></td>
                     <td><span th:text="${e.doctorUsername}"></span></td>
+                    <td><span th:text="${e.username}"></span></td>
                     <td><span th:text="${e.date}"></span></td>
                     <td><span th:text="${e.startTime}"></span></td>
                     <td>
@@ -165,7 +167,7 @@
     
     <main class="content">
         <div>
-            <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Emergency List</h1>
+            <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Past Emergency Case</h1>
         </div>
         <table class="table-container" id="scheduleTable">
             <thead>
@@ -173,6 +175,7 @@
                     <th>#</th>
                     <th>Case ID</th>
                     <th>Doctor Username</th>
+                    <th>Patient Username</th>
                     <th>Date</th>
                     <th>Start time</th>
                     <th>Duration</th>
@@ -183,6 +186,7 @@
                     <td><span th:text="${cnt.count}"></span></td>
                     <td><span th:text="${e.emerId}"></span></td>
                     <td><span th:text="${e.doctorUsername}"></span></td>
+                    <td><span th:text="${e.username}"></span></td>
                     <td><span th:text="${e.date}"></span></td>
                     <td><span th:text="${e.startTime}"></span></td>
                     <td><span th:text="${e.duration}"></span></td>
