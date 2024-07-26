@@ -444,4 +444,58 @@ public class PatientController {
         // Round to one decimal place
         return Math.round(mean * 10.0) / 10.0;
     }
+
+    //---------------------------------------Edit Information-------------------------------------------
+
+    @GetMapping("patients/editInformation")
+    public String getEditPage(Model model, HttpSession session) {
+        Patient p = (Patient) session.getAttribute("session_patient");
+        if (p == null) {
+            return "loginPage";
+        }
+        model.addAttribute("patient", p);
+
+        return "patients/editInformationPage";
+    }
+
+    @PostMapping("patients/editInformation")
+    public String editSetting(Model model, @RequestParam Map<String, String> formData, HttpServletResponse response, HttpSession session) {
+        Patient p = (Patient) session.getAttribute("session_patient");
+        if (p == null) {
+            return "loginPage";
+        }
+        String ageStr = formData.get("age");
+        String name = formData.get("name");
+        String address = formData.get("address");
+        String phone = formData.get("phone");
+        if (name.trim().equals("") || address.trim().equals("") || phone.trim().equals("") || formData.get("age").isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            model.addAttribute("error0", "Please enter all the form!");
+            model.addAttribute("patient", p);
+            return "patients/editInformationPage";
+        }
+       
+        int age = Integer.parseInt(formData.get("age"));
+        if (age <= 0) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            model.addAttribute("error1", "Please enter a valid age");
+            model.addAttribute("patient", p);
+            return "patients/editInformationPage";
+        }
+
+
+        p.setName(name);
+        p.setAge(age);
+        p.setAddress(address);
+        p.setPhoneNumber(phone);
+        patientRepo.save(p);
+        response.setStatus(200);
+
+        model.addAttribute("success", "Successfully edit information");
+        model.addAttribute("patient", p);
+        return "patients/editInformationPage";
+    }
+
+
+
 }

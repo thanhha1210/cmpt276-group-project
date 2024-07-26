@@ -99,7 +99,7 @@
             display: flex;
             justify-content: center;
             margin-left: auto;
-            gap: 30px;
+            gap: 20px 30px;
         }
         /* Content */
         .content-main h2 {
@@ -387,9 +387,15 @@
                     <form action="/patients/viewEvent" method="get">
                         <button class="btn schedule-btn">Forum</button>
                     </form>
+      
                 </div>
                 
                 <div class="actions">
+                    <form action="/patients/editInformation" method="get">
+                        <button class="btn schedule-btn">
+                            <img src="/img/settings.svg" alt="setting">
+                        </button>
+                    </form>
                     <form action="/users/logout" method="get">
                         <button class="btn logout-btn">Log out</button>
                     </form>

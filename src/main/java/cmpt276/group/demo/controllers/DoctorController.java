@@ -26,6 +26,7 @@ import cmpt276.group.demo.models.feedback.Feedback;
 import cmpt276.group.demo.models.feedback.FeedbackRepository;
 import cmpt276.group.demo.models.past_appointment.PastAppointment;
 import cmpt276.group.demo.models.past_appointment.PastAppointmentRepository;
+import cmpt276.group.demo.models.patient.Patient;
 import cmpt276.group.demo.models.patient.PatientRepository;
 import cmpt276.group.demo.models.record.Record;
 import cmpt276.group.demo.models.record.RecordRepository;
@@ -295,6 +296,56 @@ public class DoctorController {
                 appointmentRepo.delete(appointment);
             }
         }
+    }
+
+    //---------------------------------------Edit Information-------------------------------------------
+    @GetMapping("/doctors/editInformation")
+    public String getEditPage(Model model, HttpSession session) {
+        Doctor d = (Doctor) session.getAttribute("session_doctor");
+        if (d == null) {
+            return "loginPage";
+        }
+        model.addAttribute("doctor", d);
+
+        return "doctors/editInformationPage";
+    }
+
+    @PostMapping("/doctors/editInformation")
+    public String editSetting(Model model, @RequestParam Map<String, String> formData, HttpServletResponse response, HttpSession session) {
+        Doctor d = (Doctor) session.getAttribute("session_doctor");
+        if (d == null) {
+            return "loginPage";
+        }
+        String ageStr = formData.get("age");
+        String name = formData.get("name");
+        String address = formData.get("address");
+        String phone = formData.get("phone");
+        if (name.trim().equals("") || address.trim().equals("") || phone.trim().equals("") || formData.get("age").isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            model.addAttribute("error0", "Please enter all the form!");
+            model.addAttribute("doctor", d);
+            return "doctors/editInformationPage";
+        }
+       
+        int age = Integer.parseInt(formData.get("age"));
+        if (age <= 0) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            model.addAttribute("error1", "Please enter a valid age");
+            model.addAttribute("doctor", d);
+            return "doctors/editInformationPage";
+        }
+
+
+        d.setName(name);
+        d.setAge(age);
+        d.setAddress(address);
+        d.setPhone(phone);
+        doctorRepo.save(d);
+        response.setStatus(200);
+
+        model.addAttribute("success", "Successfully edit information");
+        model.addAttribute("doctor", d);
+        return "doctors/editInformationPage";
     }
 
 }

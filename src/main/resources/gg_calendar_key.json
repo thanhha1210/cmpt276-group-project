@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "healthace",
+  "private_key_id": "1d0caba03a1e8c1d36802f840d772842b03f2325",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDf+pqB5yHTeJsu\nK8Wwy3jvwgampBcCJvQv/bcIOfVtekKIsheR+Dt/IUr6i7WiKp11BEWPn5SLUTjN\nYJzUdny/9C3GOnloBtAKird2Uf7KAAJ6MLQpEDyunWIZM6aw8OiwDZ0mtIZr+nv0\nG5agodJBZMnwpbxITzzOOUDMNTAf4/ZBdZwp/xHccNTQSObw4yW8qeFANGQo9N+C\n0wlYp5rG/16SradrGYW023Dp59Vg7DifMcWrJ9qYMNemPtcCKizVNTkNFkgvBK4m\nf8/i3/JvkTEWxX8E3gOp61btUo8M4sBi2Gt6rYT4yNawL5ZVsaYfjJHq1Sfb/6/c\np0VbUPBPAgMBAAECggEAEAvSUEErUrepbRbfYbRKFJSIHnMotNOZReuS1n40f481\nP2Qm583AEXJkqUDOFpv1TjdWoRypKzalRPgeyY04OxZMGzoAOFGDS7thZmgnF/iv\n32ooK2hJjfxM1V+2bvxrZzAqfzs1WtIGBFiKTjVvAewDGFWqALIwjy5Z3pIRlw8p\nqev3QeMIShmm73n7mRYiNLHEjJhqlkDC7MyzxCAwCkrx/8cjgtMWoAsa3G0+P09R\n56j0U2FGlpsGmhYKEXzd+yQx8F6FFH4bc4U9ccaNdVbB/L8Uy5w/MtZgE7IjRegg\nih1WFnj1DOiKUOdKzCQkYgWbuKcMbUBDReoMGUmUwQKBgQD/BZD3aF8D6tor030F\nr+RqPcKorzexHR26CGBjucvGm3ncPKYRIo5lHbFFXev9RueWYi1yzDpaKwHdSVCc\nHoVEhO42noLdtwogQF9AFIlFMd0Gjd+CnjxH5eNQRWbIN7pB6okh5OlMlXDlE2SM\nIeYV+YIzAS7QGwaWUQH0PAyjjwKBgQDg1o2Mtcu8pBXq5B6dwh91TiRR9sIhaX5x\nrnv1OeHq2BK19VB/UlWPYFr7yCw5j4g7+GWWJPxaJd5oQBa0r4XI8+BoqUX55yJZ\n1Jr9ElI/XNNFx0eErsPSTDzdVPNnFfcwXn1+pb+qj1SbB/tRsjsb7jVQPZWG36RC\nRkO1dvWHQQKBgQDw73RXmn7yN4bqEwQyREyb5z+qmOgX6Dc2lEVk0ptoR2mpHo+S\n7r/zXksmCyczAjM4TAc+Rx72I12+kE6dQOSNqL1aUwW2rQDfGZIj+4L5IbP9Rjqd\nsBupndLV+suxa50IO6pVoGyeEy427sx27Gvx5OoSgBKXQIFHsL8U3UrflwKBgD1B\nVvkyAlrXnX0MP2cdnzJ3Yp/OCZ/OvPs93Vm3NlykF5zpQ9AcX2EbkE4ugBYCi8xC\n5XJdiz8IOCrQ4x7A/0L7ZnU9QOpP1WUB7mPqXOwUXx8QpuR4NLOTv7VRUqsQKfNM\nmwYpJCnUuOkv6IGefEokwPOmg5lmTrsbp5DF4yjBAoGBANlq8SmZd1Il2JKtytut\n11os/0TRs9zSCQX7zSQNmDwaOBrcLN8QV4DgG1ZrISUypd4nlXIdzC2yOjrKMgbq\n9VLwNcjmzKj2zNWsaH5sYTt9pZ5gjCKwmfiNlHSu+ulqhLnycpbJzqsd2Fu1G2H3\nWRuQ9IF/g5OMzT7Lg29o9l8F\n-----END PRIVATE KEY-----\n",
+  "client_email": "healthace-calendar-event@healthace.iam.gserviceaccount.com",
+  "client_id": "115371695466351969850",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/healthace-calendar-event%40healthace.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
