@@ -66,7 +66,7 @@ public class EmergencyControllerTest {
             .andExpect(model().attributeExists("avaiRooms"));
     }
 
-     //1B. View emergency - unsuccess (no login)
+    //1B. View emergency - unsuccess (no login)
     @Test
     public void testInvalidViewEmergency() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/admins/viewEmergency"))

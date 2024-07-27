@@ -257,8 +257,6 @@ public class PatientControllerTest {
     // 1B. test patient view dashboard - GET - InValid
     @Test
     public void testInvalidViewDashboard() throws Exception {
-        Patient p1 = new Patient("p1", "123", "patient1", 20, "123St", "123");
-        
         mockMvc.perform(MockMvcRequestBuilders.get("/patients/getDashboard")) // no session_patient
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.view().name("loginPage"));
@@ -487,7 +485,6 @@ public class PatientControllerTest {
      // 3A. test patient delete appointment - POST - Case 2: patient not login
     @Test
     public void testInvalidDeleteAppointment() throws Exception {
-        Patient p1 = new Patient("p1", "123", "patient1", 20, "123St", "123");
         
         // Mock schedule before delete
         Schedule s1 = new Schedule("doctor1", "d1", Date.valueOf("2025-08-29"), Time.valueOf("10:00:00"), 10, Department.General);
@@ -519,8 +516,41 @@ public class PatientControllerTest {
         verify(scheduleRepo, times(0)).findAll();
     }
 
+    // 4A. test patient view past apt - GET - SUCCESS
+    @Test
+    public void testValidViewPastApt() throws Exception {
+        Patient p1 = new Patient("p1", "123456", "patient1", 20, "123St", "123");
+        PastAppointment pastApt = new PastAppointment("doctor1", "d1", "patient1", "p1", Date.valueOf("2023-05-08"), Time.valueOf("13:15:00"), 10, Department.valueOf("General"));
+        List<PastAppointment> pastAptList = new ArrayList<>();
+        pastAptList.add(pastApt);
+
+        List<PastAppointment> nonFeedbackPastAptList = new ArrayList<>();
+        nonFeedbackPastAptList.add(pastApt);
+        when(pastAppointmentRepo.findByPatientUsername(p1.getUsername())).thenReturn(pastAptList);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/patients/viewPastAppointment")
+                                            .sessionAttr("session_patient", p1)
+                        )
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.view().name("patients/viewPastAptPage"))
+                .andExpect(model().attribute("patient", p1))
+                .andExpect(model().attribute("nonFeedbackList", nonFeedbackPastAptList));  
+    }
+
+    // 4B. test patient view past apt - GET - INVALID (patient not log in)
+    @Test
+    public void testInvalidViewPastApt() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/patients/viewPastAppointment"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.view().name("loginPage"))
+                .andExpect(model().attributeDoesNotExist("patient"))
+                .andExpect(model().attributeDoesNotExist("nonFeedbackList"));  
+
+        verify(pastAppointmentRepo, times(0)).findByPatientUsername("p1");
+    }
+
     //------------------------------------Test Record--------------------------------------
-    // 1A. test patient view record - GET -case 1: success
+    // 1A. test patient view record - GET - case 1: success
     @Test 
     public void testValidGetRecord() throws Exception {
         Patient p1 = new Patient("p1", "123", "patient1", 20, "123St", "123");
@@ -597,73 +627,52 @@ public class PatientControllerTest {
     // 1A. test patient view feedback - GET - Case 1: SUCCESS
     @Test
     public void testValidViewFeedback() throws Exception {
-        Patient p1 = new Patient("p1", "123", "patient1", 20, "123St", "123");
-        PastAppointment pa1 = new PastAppointment("doctor2", "d2", "patient1", "p1", Date.valueOf("2023-05-08"), Time.valueOf("13:15:00"), 10, Department.valueOf("General"));
-        PastAppointment pa2 = new PastAppointment("doctor2", "d2", "patient1", "p1", Date.valueOf("2023-04-09"), Time.valueOf("13:15:00"), 10, Department.valueOf("General"));
-        Feedback f1 = new Feedback("doctor1", "d1", "patient1", "p1", Date.valueOf("2024-05-05"), Department.valueOf("General"), "Good doctor");
-        Feedback f2 = new Feedback("doctor1", "d1", "patient1", "p1", Date.valueOf("2024-06-06"), Department.valueOf("General"), "Good doctor");
+    Patient p1 = new Patient("p1", "123", "patient1", 20, "123St", "123");
+    Doctor d1 = new Doctor("d1", "123456", "doctor1", 20, "123", "123", Department.Dermatology);
+    Feedback f1 = new Feedback("doctor1", "d1", "patient1", "p1", Date.valueOf("2024-05-05"), Department.valueOf("General"), "Good doctor");
+    f1.setRate(4);
+    Feedback f2 = new Feedback("doctor1", "d1", "patient1", "p1", Date.valueOf("2024-06-06"), Department.valueOf("General"), "Good doctor");
+    f2.setRate(5);
 
-        List<PastAppointment> pastApt = new ArrayList<>();
-        pastApt.add(pa1);
-        pastApt.add(pa2);
+    List<Feedback> feedbackList = new ArrayList<>();
+    feedbackList.add(f1);
+    feedbackList.add(f2);
 
-        List<Feedback> feedbackList = new ArrayList<>();
-        feedbackList.add(f1);
-        feedbackList.add(f2);
+    when(doctorRepo.findByUsername(d1.getUsername())).thenReturn(d1);  
+    when(feedbackRepo.findByDoctorUsername(d1.getUsername())).thenReturn(feedbackList);  
 
-        when(pastAppointmentRepo.findByPatientUsername(p1.getUsername())).thenReturn(pastApt);  // can have many past apt
-        when(feedbackRepo.findAll()).thenReturn(feedbackList);  
+    mockMvc.perform(MockMvcRequestBuilders.get("/patients/viewFeedback")
+            .param("doctorUsername", d1.getUsername())
+            .sessionAttr("session_patient", p1))
+            .andExpect(status().isOk())
+            .andExpect(MockMvcResultMatchers.view().name("patients/viewFeedbackPage"))
+            .andExpect(model().attribute("doctor", d1))
+            .andExpect(model().attribute("feedbackList", hasSize(2)))
+            .andExpect(model().attribute("feedbackList", hasItem(allOf(
+                hasProperty("doctorUsername", is("d1")),
+                hasProperty("date", is(f1.getDate())),
+                hasProperty("rate", is(f1.getRate()))
+            ))));
+    
+    // Removed unnecessary verification
+    verify(doctorRepo, times(1)).findByUsername(d1.getUsername());
+    verify(feedbackRepo, times(1)).findByDoctorUsername(d1.getUsername());
+}
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/patients/viewFeedback").sessionAttr("session_patient", p1))
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.view().name("patients/viewFeedbackPage"))
-                .andExpect(model().attribute("nonFeedbackList", hasSize(2)))        // "nonFeedbackList" must be actual attributes name in controller
-                .andExpect(model().attribute("nonFeedbackList", hasItem(allOf(      // b/c this is an array list => check if it has item containing given info
-                    hasProperty("doctorUsername", is("d2")),
-                    hasProperty("date", is(pa1.getDate())),
-                    hasProperty("startTime", is(pa1.getStartTime()))
-                ))))
-
-                // order of has property doesnt matter 
-                .andExpect(model().attribute("feedbackList", hasItem(allOf(         // if just an obj => DONT USE "hasItem"
-                    hasProperty("patientUsername", is("p1")),
-                    hasProperty("doctorUsername", is("d1")),        
-                    hasProperty("date", is(f1.getDate()))
-                ))));
-        
-        // verify statements
-        verify(pastAppointmentRepo, times(1)).findByPatientUsername("p1");
-        verify(feedbackRepo, times(1)).findAll();
-    }
 
     // 1B. test patient view feedback - GET - Case 2: patient not log in
     @Test 
     public void testInvalidViewFeedback() throws Exception {
-        Patient p1 = new Patient("p1", "123", "patient1", 20, "123St", "123");
-        PastAppointment pa1 = new PastAppointment("doctor2", "d2", "patient1", "p1", Date.valueOf("2023-05-08"), Time.valueOf("13:15:00"), 10, Department.valueOf("General"));
-        PastAppointment pa2 = new PastAppointment("doctor2", "d2", "patient1", "p1", Date.valueOf("2023-04-09"), Time.valueOf("13:15:00"), 10, Department.valueOf("General"));
-        Feedback f1 = new Feedback("doctor1", "d1", "patient1", "p1", Date.valueOf("2024-05-05"), Department.valueOf("General"), "Good doctor");
-        Feedback f2 = new Feedback("doctor1", "d1", "patient1", "p1", Date.valueOf("2024-06-06"), Department.valueOf("General"), "Good doctor");
-
-        List<PastAppointment> pastApt = new ArrayList<>();
-        pastApt.add(pa1);
-        pastApt.add(pa2);
-
-        List<Feedback> feedbackList = new ArrayList<>();
-        feedbackList.add(f1);
-        feedbackList.add(f2);
-
-        when(pastAppointmentRepo.findByPatientUsername(p1.getUsername())).thenReturn(pastApt);  // can have many past apt
-        when(feedbackRepo.findAll()).thenReturn(feedbackList);  
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/patients/viewFeedback"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/patients/viewFeedback")
+                .param("doctorUsername", "someDoctorUsername"))     // if it requests param => must include eventho still not get any data from that
+                // must write for all parameters 
                 .andExpect(MockMvcResultMatchers.view().name("loginPage"))
-                .andExpect(model().attributeDoesNotExist("nonFeedbackList"))
-                .andExpect(model().attributeDoesNotExist("feedbackList"));
+                .andExpect(model().attributeDoesNotExist("feedbackList"))
+                .andExpect(model().attributeDoesNotExist("doctor"));
         
         // verify statements => b/c redirect to login after reach the repo call => 0 times
-        verify(pastAppointmentRepo, times(0)).findByPatientUsername("p1");
-        verify(feedbackRepo, times(0)).findAll();
+        verify(doctorRepo, times(0)).findByUsername("d1");
+        verify(feedbackRepo, times(0)).findByDoctorUsername("d1");
     }
 
     // 2A. test patient add feedback - GET - Case 1: SUCCESS (patient log in)
@@ -690,7 +699,6 @@ public class PatientControllerTest {
     // 2B. test patient add feedback - GET - Case 2: patient not log in
     @Test
     public void testInvalidGetFeedback() throws Exception {
-        Patient p1 = new Patient("p1", "123", "patient1", 20, "123St", "123");
         PastAppointment pastApt = new PastAppointment("doctor1", "d1", "patient1", "p1", Date.valueOf("2023-05-08"), Time.valueOf("13:15:00"), 10, Department.valueOf("General"));
         when(pastAppointmentRepo.findByPatientUsernameAndDoctorUsernameAndDate("p1", "d1", Date.valueOf("2023-05-08"))).thenReturn(pastApt);
         
@@ -707,56 +715,45 @@ public class PatientControllerTest {
         verify(pastAppointmentRepo, times(0)).findByPatientUsernameAndDoctorUsernameAndDate("p1", "d1", Date.valueOf("2023-05-08"));
     }
 
-    // 3A. test patient add feedback - POST - Case 1: SUCCESS (ie description not empty)
+    // 3A. test patient add feedback - POST - Case 1: SUCCESS (ie description not empty && rate not empty)
     @Test
-    public void testValidAddFeedback() throws Exception {
-        Patient p1 = new Patient("p1", "123", "patient1", 20, "123St", "123");
-        PastAppointment pastApt = new PastAppointment("doctor1", "d1", "patient1", "p1", Date.valueOf("2023-05-08"), Time.valueOf("13:15:00"), 10, Department.valueOf("General"));
-        Feedback f1 = new Feedback("doctor1", "d1", "patient1", "p1", Date.valueOf("2023-05-08"), Department.valueOf("General"), "Good doctor");
-        Feedback f2 = new Feedback("doctor1", "d1", "patient1", "p1", Date.valueOf("2023-05-15"), Department.valueOf("General"), "Nice doctor");
-       
-        Doctor doc = new Doctor("d1", "123", "doctor1", 22, "123", "123", Department.General);
-       
-        List<Feedback> feedbackList = new ArrayList<>();
-        feedbackList.add(f1);
-        feedbackList.add(f2);
+public void testValidAddFeedback() throws Exception {
+    Patient p1 = new Patient("p1", "123", "patient1", 20, "123St", "123");
+    PastAppointment pastApt = new PastAppointment("doctor1", "d1", "patient1", "p1", Date.valueOf("2023-05-08"), Time.valueOf("13:15:00"), 10, Department.valueOf("General"));
+    Feedback f1 = new Feedback("doctor1", "d1", "patient1", "p1", Date.valueOf("2023-05-08"), Department.valueOf("General"), "Good doctor");
+    f1.setRate(4);
+   
+    Doctor doc = new Doctor("d1", "123", "doctor1", 22, "123", "123", Department.General);
+   
+    List<Feedback> feedbackList = new ArrayList<>();
+    feedbackList.add(f1);
 
-        // Mocking necessary repository calls
-        when(pastAppointmentRepo.findByPatientUsernameAndDoctorUsernameAndDate("p1", "d1", Date.valueOf("2023-05-08"))).thenReturn(pastApt);
-        when(doctorRepo.findByUsername("d1")).thenReturn(doc);
-        when(feedbackRepo.findByPatientUsername("p1")).thenReturn(feedbackList);
+    // Mocking necessary repository calls
+    when(pastAppointmentRepo.findByPatientUsernameAndDoctorUsernameAndDate("p1", "d1", Date.valueOf("2023-05-08"))).thenReturn(pastApt);
+    when(doctorRepo.findByUsername("d1")).thenReturn(doc);
+    when(feedbackRepo.findByPatientUsername("p1")).thenReturn(feedbackList);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/patients/addFeedback")        // change to POST in PostMapping            .sessionAttr("session_patient", p1)
-            .sessionAttr("session_patient", p1)
-            .param("doctorUsername", "d1")
-            .param("patientUsername", "p1")
-            .param("date", "2023-05-08")
-            .param("feedbackStr", "Good doctor"))       // must match w/ attr value in RequestParam
+    mockMvc.perform(MockMvcRequestBuilders.post("/patients/addFeedback")
+        .sessionAttr("session_patient", p1)
+        .param("doctorUsername", "d1")
+        .param("patientUsername", "p1")
+        .param("date", "2023-05-08")
+        .param("feedbackStr", "Good doctor")
+        .param("rate", "4"))
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.view().name("patients/viewPastAptPage"))
+        .andExpect(model().attributeDoesNotExist("error0"))
+        .andExpect(model().attributeDoesNotExist("nonFeedbackPastApt"))
+        .andExpect(model().attribute("doctor", doc));
 
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.view().name("patients/viewFeedbackPage"))
-            // check if these attr DNE
-            .andExpect(model().attributeDoesNotExist("error0"))
-            .andExpect(model().attributeDoesNotExist("nonFeedbackPastApt"))
-            // get values of f1
-            .andExpect(model().attribute("feedbackList", hasSize(2)))
-            .andExpect(model().attribute("feedbackList", hasItem(allOf(
-                hasProperty("doctorUsername", is(f1.getDoctorUsername())),      
-                hasProperty("patientUsername", is(f1.getPatientUsername())),
-                hasProperty("date", is(f1.getDate())),
-                hasProperty("description", is(f1.getDescription()))         // property key must match with var in model
-            ))))
+    // Verify repository interactions
+    verify(pastAppointmentRepo, times(1)).findByPatientUsernameAndDoctorUsernameAndDate("p1", "d1", Date.valueOf("2023-05-08"));
+    verify(doctorRepo, times(1)).findByUsername("d1");
+    verify(feedbackRepo, times(1)).save(any(Feedback.class));
+    verify(feedbackRepo, times(1)).findByDoctorUsername("d1");
+    verify(pastAppointmentRepo, times(1)).save(any(PastAppointment.class));
+}
 
-            .andExpect(model().attributeExists("nonFeedbackList"));
-
-        // verify statements
-        verify(pastAppointmentRepo, times(1)).findByPatientUsernameAndDoctorUsernameAndDate("p1", "d1", Date.valueOf("2023-05-08"));
-        verify(doctorRepo, times(1)).findByUsername("d1");
-        verify(feedbackRepo, times(1)).save(any(Feedback.class));
-        verify(feedbackRepo, times(1)).findByPatientUsername("p1");
-        verify(pastAppointmentRepo, times(1)).save(any(PastAppointment.class));
-        verify(pastAppointmentRepo, times(1)).findByPatientUsername("p1");
-    }
 
     // 3B. test patient add feedback - POST - Case 2: empty description 
     @Test
@@ -800,6 +797,52 @@ public class PatientControllerTest {
         verify(pastAppointmentRepo, times(0)).save(any(PastAppointment.class));
         verify(pastAppointmentRepo, times(0)).findByPatientUsername("p1");
     }
+
+    // 3C. test patient add feedback - POST - case 3: empty rating
+    @Test
+    public void testAddFeedbackEmptyRate() throws Exception {
+        Patient p1 = new Patient("p1", "123", "patient1", 20, "123St", "123");
+        PastAppointment pastApt = new PastAppointment("doctor1", "d1", "patient1", "p1", Date.valueOf("2023-05-08"), Time.valueOf("13:15:00"), 10, Department.valueOf("General"));
+        Feedback f1 = new Feedback("doctor1", "d1", "patient1", "p1", Date.valueOf("2023-05-08"), Department.valueOf("General"), "Good doctor");
+        Feedback f2 = new Feedback("doctor1", "d1", "patient1", "p1", Date.valueOf("2023-05-15"), Department.valueOf("General"), "Nice doctor");
+       
+        Doctor doc = new Doctor("d1", "123", "doctor1", 22, "123", "123", Department.General);
+       
+        List<Feedback> feedbackList = new ArrayList<>();
+        feedbackList.add(f1);
+        feedbackList.add(f2);
+
+        // Mocking necessary repository calls
+        when(pastAppointmentRepo.findByPatientUsernameAndDoctorUsernameAndDate("p1", "d1", Date.valueOf("2023-05-08"))).thenReturn(pastApt);
+        when(doctorRepo.findByUsername("d1")).thenReturn(doc);
+        when(feedbackRepo.findByPatientUsername("p1")).thenReturn(feedbackList);
+
+        // param is unaffected by feedback obj above => based on user's input
+        mockMvc.perform(MockMvcRequestBuilders.post("/patients/addFeedback")        // change to POST in PostMapping         
+            .sessionAttr("session_patient", p1)
+            .param("doctorUsername", "d1")
+            .param("patientUsername", "p1")
+            .param("date", "2023-05-08")
+            .param("feedbackStr", "Good")
+            .param("rate", ""))    // empty field     
+            
+
+            .andExpect(MockMvcResultMatchers.status().is(400))
+            .andExpect(MockMvcResultMatchers.view().name("patients/addFeedbackPage"))
+            .andExpect(model().attributeExists("error0"))
+            .andExpect(model().attributeExists("nonFeedbackPastApt"))
+            .andExpect(model().attributeDoesNotExist("feedbackList"))
+            .andExpect(model().attributeDoesNotExist("nonFeedbackList"));
+
+        // verify statements
+        verify(pastAppointmentRepo, times(1)).findByPatientUsernameAndDoctorUsernameAndDate("p1", "d1", Date.valueOf("2023-05-08"));
+        verify(doctorRepo, times(0)).findByUsername("d1");
+        verify(feedbackRepo, times(0)).save(any(Feedback.class));
+        verify(feedbackRepo, times(0)).findByPatientUsername("p1");
+        verify(pastAppointmentRepo, times(0)).save(any(PastAppointment.class));
+        verify(pastAppointmentRepo, times(0)).findByPatientUsername("p1");
+    }
+
 
     // ----------------------------------------------------Edit information----------------------------------------------------------------
     
@@ -885,8 +928,49 @@ public class PatientControllerTest {
         verify(patientRepo, times(0)).save(any(Patient.class));
     }
 
+    // ----------------------------------------------------Test ratings----------------------------------------------------------------
+    // 1A. test patient view rating - GET - success
+    @Test
+    public void testValidViewRating() throws Exception {
+        Patient p1 = new Patient("p1", "123456", "patient1", 20, "123St", "123");
 
+        Doctor d1 = new Doctor("d1", "123456", "John Doe", 20, "123", "123", Department.Dermatology);
+        Doctor d2 = new Doctor("d2", "123456", "Jane Smith", 25, "123", "123", Department.Cardiology);
+
+        List<Doctor> doctors = Arrays.asList(d1, d2);
+        when(doctorRepo.findAll()).thenReturn(doctors);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/patients/viewRating")
+                .sessionAttr("session_patient", p1))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.view().name("patients/viewRatingPage"))
+                .andExpect(model().attribute("doctors", hasSize(2)))
+                .andExpect(model().attribute("doctors", hasItem(allOf(
+                    hasProperty("name", is("John Doe")),
+                    hasProperty("username", is("d1"))
+                ))))
+                .andExpect(model().attribute("doctors", hasItem(allOf(
+                    hasProperty("name", is("Jane Smith")),
+                    hasProperty("username", is("d2"))
+                ))));
+
+        // Verify that the findAll method was called once
+        verify(doctorRepo, times(1)).findAll();
+    }
+    
+    // 1B. test patient view rating - GET - invalid (ie patient not log in)
+    @Test
+    public void testInvalidViewRating() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/patients/viewRating"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.view().name("loginPage"))
+                .andExpect(model().attributeDoesNotExist("doctors"));
+
+        // Verify that no repository methods are called since the patient is not logged in
+        verify(doctorRepo, times(0)).findAll();
+    }
 }
+
 
 
 

@@ -120,6 +120,7 @@
                 <th>Name</th>
                 <th>Username</th>
                 <th>Department</th>
+                <th>Rate</th>
                 <th></th>
             </thead>
             <tbody>
@@ -135,6 +136,9 @@
                     </td>
                     <td>
                         <span th:text="${doc.department}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${doc.rate} + '/5'"></span>
                     </td>
                     <td>
                         <form action="/admins/deleteDoctor" method="post">

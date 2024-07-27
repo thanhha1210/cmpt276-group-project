@@ -135,7 +135,7 @@ public class PatientController {
         return "patients/viewSchedulePage";
     }
 
-    // Patient view past appointments (NOT ADD TEST)
+    // Patient view past appointments (added test)
     @GetMapping("/patients/viewPastAppointment")
     public String viewPastApt(HttpSession session, Model model) {
         Patient patient = (Patient) session.getAttribute("session_patient");
@@ -326,7 +326,7 @@ public class PatientController {
     //     return "patients/viewFeedbackPage";
     // }    
 
-    @GetMapping("/patients/viewFeedback")   // NOT ADD TEST
+    @GetMapping("/patients/viewFeedback")   // added test
     public String viewFeedback(@RequestParam String doctorUsername, HttpSession session, Model model) {
         Patient patient = (Patient) session.getAttribute("session_patient");
         if (patient == null) {
@@ -365,9 +365,6 @@ public class PatientController {
         List<Doctor> doctors = doctorRepo.findAll();
         Collections.sort(doctors, Comparator.comparing(Doctor::getName));
         model.addAttribute("doctors", doctors);
-        for (Doctor doc : doctors) {
-            System.out.println("Doctor: " + doc.getName() + ", Rate: " + doc.getRate());
-        }
         return "patients/viewRatingPage";
     }
 

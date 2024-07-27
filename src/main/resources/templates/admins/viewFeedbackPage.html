@@ -92,6 +92,7 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 10px;
+            align-items: center;
         }
         .info-item > h3 {
             min-width: 150px;
@@ -116,6 +117,15 @@
             font-size: 1em;
             cursor: pointer;
         }
+        .rating-container {
+            display: flex;
+            align-items: center; /* Align text and stars vertically */
+        }
+        .rating {
+            font-size: 2em; /* Adjust this value to make stars bigger */
+            color: #ffb800; /* Color of stars */
+            margin-left: 10px; /* Space between text and stars */
+        }
     </style>
 </head>
 <body>
@@ -139,6 +149,13 @@
         
         <div class="info-container" id="feedbackContainer">
             <div th:each="fb : ${feedbackList}" class="info">
+                <div class="info-item" style="margin-bottom: 0px;">
+                    <h3>Rate</h3>
+                    <div class="rating-container">
+                        <span class="rating" th:text="${#strings.repeat('★', fb.rate) + #strings.repeat('☆', 5 - fb.rate)}"></span>
+                    </div>
+                </div>
+
                 <div class="info-item">
                     <h3>Date</h3>
                     <span th:text="${fb.date}"></span>

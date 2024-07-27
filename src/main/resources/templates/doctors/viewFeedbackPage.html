@@ -118,6 +118,10 @@
             color: #ffb800; /* Color of stars */
             margin-left: 10px; /* Space between text and stars */
         }
+        .rate-title {
+            font-size: 1.6em;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -126,7 +130,8 @@
             <input type="submit" value="HOME" class="btn exit-btn">
         </form>
         <div>
-            <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px;">Patients' Feedback</h1>
+            <h1 style="font-weight: 700; font-size: 2.4em; margin-top: 12px; margin-bottom: 10px;">Patients' Feedback</h1>
+            <h2 class="rate-title" th:text="'Your rate: ' + ${doctor.rate} + '/5'"></h2>
         </div>
         <div></div>
     </header>
