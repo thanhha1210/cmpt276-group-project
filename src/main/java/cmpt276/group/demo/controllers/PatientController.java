@@ -39,7 +39,7 @@ import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class PatientController {
-    
+
     @Autowired
     private PatientRepository patientRepo;
     @Autowired
@@ -48,7 +48,7 @@ public class PatientController {
     private DoctorRepository doctorRepo;
     @Autowired
     private RecordRepository recordRepo;
-    @Autowired 
+    @Autowired
     private ScheduleRepository scheduleRepo;
     @Autowired
     private AppointmentRepository appointmentRepo;
@@ -58,8 +58,7 @@ public class PatientController {
     private EventRepository eventRepo;
     @Autowired
     private FeedbackRepository feedbackRepo;
-   
-    
+
     @GetMapping("/patients/signup")
     public String getSignupPage() {
         return "patients/signupPage";
@@ -75,9 +74,10 @@ public class PatientController {
         model.addAttribute("patient", patient);
         return "patients/mainPage";
     }
-    
-    //--------------------------------------------Manage schedule--------------------------------------------------------
-   
+
+    // --------------------------------------------Manage
+    // schedule--------------------------------------------------------
+
     // Patient go to view schedule page (added test)
     @GetMapping("/patients/viewSchedule")
     public String getSchedule(Model model, HttpSession session) {
@@ -99,31 +99,33 @@ public class PatientController {
         model.addAttribute("schedules", schedules);
         return "patients/viewSchedulePage";
     }
-    
-    // Patient books appointment  (added test)
+
+    // Patient books appointment (added test)
     @PostMapping("/patients/bookAppointment")
     public String bookAppointment(@RequestParam Map<String, String> sche, Model model, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");
-        
+
         if (patient == null) {
             return "loginPage";
         }
-        
+
         String doctorUsername = sche.get("doctorUsername");
         Date date = Date.valueOf(sche.get("date"));
         Time startTime = Time.valueOf(sche.get("startTime"));
         Schedule schedule = scheduleRepo.findByDoctorUsernameAndDateAndStartTime(doctorUsername, date, startTime);
         String patientUsername = patient.getUsername();
-        
-        // if patient already has an appointment => change it to schedule 
+
+        // if patient already has an appointment => change it to schedule
         Appointment oldApt = appointmentRepo.findByPatientUsername(patientUsername);
         if (oldApt != null) {
-            Schedule newSche = new Schedule(oldApt.getDoctorName(), oldApt.getDoctorUsername(), oldApt.getDate(), oldApt.getStartTime(), oldApt.getDuration(), oldApt.getDepartment());
+            Schedule newSche = new Schedule(oldApt.getDoctorName(), oldApt.getDoctorUsername(), oldApt.getDate(),
+                    oldApt.getStartTime(), oldApt.getDuration(), oldApt.getDepartment());
             scheduleRepo.save(newSche);
             appointmentRepo.delete(oldApt);
         }
 
-        Appointment apt = new Appointment(schedule.getDoctorName(), doctorUsername, patient.getName(), patientUsername, date, startTime, schedule.getDuration(), schedule.getDepartment());
+        Appointment apt = new Appointment(schedule.getDoctorName(), doctorUsername, patient.getName(), patientUsername,
+                date, startTime, schedule.getDuration(), schedule.getDepartment());
         appointmentRepo.save(apt);
 
         scheduleRepo.delete(schedule);
@@ -155,11 +157,10 @@ public class PatientController {
         model.addAttribute("nonFeedbackList", nonFeedbackPastApt);
         return "patients/viewPastAptPage";
     }
-    
 
     // Patient deletes appointment (added test)
     @PostMapping("/patients/deleteAppointment")
-    public String deleteAppointment(@RequestParam Map<String,String> apt, Model model, HttpSession session) {
+    public String deleteAppointment(@RequestParam Map<String, String> apt, Model model, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");
         if (patient == null) {
             return "loginPage";
@@ -169,7 +170,8 @@ public class PatientController {
         Time startTime = Time.valueOf(apt.get("startTime"));
         Appointment oldApt = appointmentRepo.findByDoctorUsernameAndDateAndStartTime(doctorUsername, date, startTime);
 
-        Schedule newSche = new Schedule(oldApt.getDoctorName(), doctorUsername, date, startTime, oldApt.getDuration(), oldApt.getDepartment());
+        Schedule newSche = new Schedule(oldApt.getDoctorName(), doctorUsername, date, startTime, oldApt.getDuration(),
+                oldApt.getDepartment());
         scheduleRepo.save(newSche);
         appointmentRepo.delete(oldApt);
         List<Schedule> schedules = scheduleRepo.findAll();
@@ -179,71 +181,73 @@ public class PatientController {
         model.addAttribute("schedules", schedules);
         return "patients/viewSchedulePage";
     }
-    
+
     // Helper function
     // function to change appointment to past appointment (USED IN LOCALHOST)
     /*
-    public void deleteSchedule() {
-        // Get the current date and time 
-        LocalDate currentDate = LocalDate.now();
-        LocalTime currentTime = LocalTime.now();
-
-        // Retrieve all appointments
-        List<Schedule> scheduleList = scheduleRepo.findAll();
-
-        // Loop through schedule and delete if pass the current time
-        for (Schedule schedule : scheduleList) {
-
-            // Get date and time of each schedule in a list
-            LocalDate scheDate = schedule.getDate().toLocalDate();
-            LocalTime scheTime = schedule.getStartTime().toLocalTime();
-            if (scheDate.isBefore(currentDate) || (scheDate.isEqual(currentDate) && scheTime.isBefore(currentTime))) {
-                scheduleRepo.delete(schedule);
-            }
-        }
-    }
-    */
-   
+     * public void deleteSchedule() {
+     * // Get the current date and time
+     * LocalDate currentDate = LocalDate.now();
+     * LocalTime currentTime = LocalTime.now();
+     * 
+     * // Retrieve all appointments
+     * List<Schedule> scheduleList = scheduleRepo.findAll();
+     * 
+     * // Loop through schedule and delete if pass the current time
+     * for (Schedule schedule : scheduleList) {
+     * 
+     * // Get date and time of each schedule in a list
+     * LocalDate scheDate = schedule.getDate().toLocalDate();
+     * LocalTime scheTime = schedule.getStartTime().toLocalTime();
+     * if (scheDate.isBefore(currentDate) || (scheDate.isEqual(currentDate) &&
+     * scheTime.isBefore(currentTime))) {
+     * scheduleRepo.delete(schedule);
+     * }
+     * }
+     * }
+     */
 
     // // function to change appointment to past appointment (USED IN LOCALHOST)
     /*
-     public void changeApt() {
-        // Get the current date
-        LocalDate currentDate = LocalDate.now();
-        LocalTime currentTime = LocalTime.now();
-        System.out.println(currentDate);
-        System.out.println(currentTime);
-        // Retrieve all appointments
-        List<Appointment> appointmentList = appointmentRepo.findAll();
+     * public void changeApt() {
+     * // Get the current date
+     * LocalDate currentDate = LocalDate.now();
+     * LocalTime currentTime = LocalTime.now();
+     * System.out.println(currentDate);
+     * System.out.println(currentTime);
+     * // Retrieve all appointments
+     * List<Appointment> appointmentList = appointmentRepo.findAll();
+     * 
+     * // Loop through appointments and update status
+     * for (Appointment apt : appointmentList) {
+     * 
+     * // Get date and startTime of each appointment in a list
+     * LocalDate aptDate = apt.getDate().toLocalDate();
+     * LocalTime aptTime =
+     * apt.getStartTime().toLocalTime().plusMinutes(apt.getDuration());
+     * System.out.println(aptDate);
+     * System.out.println(aptTime);
+     * if (aptDate.isBefore(currentDate) || (aptDate.isEqual(currentDate) &&
+     * aptTime.isBefore(currentTime))) {
+     * 
+     * // Create a new PastAppointment
+     * PastAppointment pastApt =
+     * new PastAppointment(apt.getDoctorName(), apt.getDoctorUsername(),
+     * apt.getPatientName(), apt.getPatientUsername(),
+     * apt.getDate(), apt.getStartTime(),
+     * apt.getDuration(), apt.getDepartment());
+     * 
+     * // Add to pastApt
+     * pastAppointmentRepo.save(pastApt);
+     * 
+     * // Delete from Apt
+     * appointmentRepo.delete(apt);
+     * }
+     * }
+     * }
+     * 
+     */
 
-        // Loop through appointments and update status
-        for (Appointment apt : appointmentList) {
-            
-            // Get date and startTime of each appointment in a list
-            LocalDate aptDate = apt.getDate().toLocalDate();
-            LocalTime aptTime = apt.getStartTime().toLocalTime().plusMinutes(apt.getDuration());
-            System.out.println(aptDate);
-            System.out.println(aptTime);
-            if (aptDate.isBefore(currentDate) || (aptDate.isEqual(currentDate) && aptTime.isBefore(currentTime))) {
-
-                // Create a new PastAppointment
-                PastAppointment pastApt = 
-                new PastAppointment(apt.getDoctorName(), apt.getDoctorUsername(),
-                                    apt.getPatientName(), apt.getPatientUsername(),
-                                    apt.getDate(), apt.getStartTime(),
-                                    apt.getDuration(), apt.getDepartment());
-
-                // Add to pastApt
-                pastAppointmentRepo.save(pastApt);
-
-                // Delete from Apt
-                appointmentRepo.delete(apt);
-            }
-        }
-    }
-
-    */
-    
     // USED ON RENDER
     public void changeApt() {
         LocalDateTime current = LocalDateTime.now().minusHours(7);
@@ -256,12 +260,12 @@ public class PatientController {
             LocalDateTime aptDateTime = LocalDateTime.of(appointmentDate, appointmentTime);
 
             if (aptDateTime.isBefore(current)) {
-                PastAppointment pastAppointment = 
-                new PastAppointment(appointment.getDoctorName(), appointment.getDoctorUsername(), 
-                                    appointment.getPatientName(), appointment.getPatientUsername(),
-                                    appointment.getDate(), appointment.getStartTime(),
-                                    appointment.getDuration(), appointment.getDepartment());
-                
+                PastAppointment pastAppointment = new PastAppointment(appointment.getDoctorName(),
+                        appointment.getDoctorUsername(),
+                        appointment.getPatientName(), appointment.getPatientUsername(),
+                        appointment.getDate(), appointment.getStartTime(),
+                        appointment.getDuration(), appointment.getDepartment());
+
                 // Add to pastAppointmentRepo
                 pastAppointmentRepo.save(pastAppointment);
 
@@ -278,16 +282,17 @@ public class PatientController {
         List<Schedule> scheduleList = scheduleRepo.findAll();
         for (Schedule sche : scheduleList) {
             // get sche local date time
-            LocalDateTime scheDateTime = LocalDateTime.of(sche.getDate().toLocalDate(), sche.getStartTime().toLocalTime());
+            LocalDateTime scheDateTime = LocalDateTime.of(sche.getDate().toLocalDate(),
+                    sche.getStartTime().toLocalTime());
             if (scheDateTime.isBefore(current)) {
                 scheduleRepo.delete(sche);
             }
         }
     }
 
-    //----------------------------------------Record----------------------------------------------
+    // ----------------------------------------Record----------------------------------------------
     // patient view record (added test)
-    @GetMapping("/patients/viewRecord") 
+    @GetMapping("/patients/viewRecord")
     public String getRecord(Model model, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");
         if (patient == null) {
@@ -299,34 +304,35 @@ public class PatientController {
         model.addAttribute("records", records);
         return "patients/viewRecordPage";
     }
-        
-    //-------------------------------------Feedback------------------------------------------------
-    // @GetMapping("/patients/viewFeedback")  // added test
+
+    // -------------------------------------Feedback------------------------------------------------
+    // @GetMapping("/patients/viewFeedback") // added test
     // public String getFeedback(Model model, HttpSession session) {
-    //     Patient patient = (Patient) session.getAttribute("session_patient");
-    //     if (patient == null) {
-    //         return "loginPage";
-    //     }
+    // Patient patient = (Patient) session.getAttribute("session_patient");
+    // if (patient == null) {
+    // return "loginPage";
+    // }
 
-    //     // list of past apt that are not add to feedback 
-    //     List<PastAppointment> pastAptList = pastAppointmentRepo.findByPatientUsername(patient.getUsername());
-    //     List<PastAppointment> nonFeedbackPastAptList = new ArrayList<>();
-    //     for (PastAppointment pastApt : pastAptList) {
-    //         if (!pastApt.isFeedback()) {
-    //             nonFeedbackPastAptList.add(pastApt);
-    //         }
-    //     }
+    // // list of past apt that are not add to feedback
+    // List<PastAppointment> pastAptList =
+    // pastAppointmentRepo.findByPatientUsername(patient.getUsername());
+    // List<PastAppointment> nonFeedbackPastAptList = new ArrayList<>();
+    // for (PastAppointment pastApt : pastAptList) {
+    // if (!pastApt.isFeedback()) {
+    // nonFeedbackPastAptList.add(pastApt);
+    // }
+    // }
 
-    //     Collections.sort(nonFeedbackPastAptList);
-    //     model.addAttribute("nonFeedbackList", nonFeedbackPastAptList);
+    // Collections.sort(nonFeedbackPastAptList);
+    // model.addAttribute("nonFeedbackList", nonFeedbackPastAptList);
 
-    //     List<Feedback> feedbackList = feedbackRepo.findAll();
-    //     Collections.sort(feedbackList);
-    //     model.addAttribute("feedbackList", feedbackList);
-    //     return "patients/viewFeedbackPage";
-    // }    
+    // List<Feedback> feedbackList = feedbackRepo.findAll();
+    // Collections.sort(feedbackList);
+    // model.addAttribute("feedbackList", feedbackList);
+    // return "patients/viewFeedbackPage";
+    // }
 
-    @GetMapping("/patients/viewFeedback")   // added test
+    @GetMapping("/patients/viewFeedback") // added test
     public String viewFeedback(@RequestParam String doctorUsername, HttpSession session, Model model) {
         Patient patient = (Patient) session.getAttribute("session_patient");
         if (patient == null) {
@@ -340,7 +346,7 @@ public class PatientController {
         return "patients/viewFeedbackPage";
     }
 
-    @GetMapping("/patients/addFeedback")  // added test
+    @GetMapping("/patients/addFeedback") // added test
     public String getAddFeedbackPage(HttpSession session, Model model, @RequestParam Map<String, String> formData) {
         Patient patient = (Patient) session.getAttribute("session_patient");
         if (patient == null) {
@@ -350,12 +356,13 @@ public class PatientController {
         String doctorUsername = formData.get("doctorUsername");
         String patientUsername = formData.get("patientUsername");
         Date date = Date.valueOf(formData.get("date"));
-        PastAppointment pastApt = pastAppointmentRepo.findByPatientUsernameAndDoctorUsernameAndDate(patientUsername, doctorUsername, date);
+        PastAppointment pastApt = pastAppointmentRepo.findByPatientUsernameAndDoctorUsernameAndDate(patientUsername,
+                doctorUsername, date);
         model.addAttribute("nonFeedbackPastApt", pastApt);
         return "patients/addFeedbackPage";
     }
 
-    @GetMapping("/patients/viewRating")     // NOT ADD TEST
+    @GetMapping("/patients/viewRating") // NOT ADD TEST
     public String viewDocRating(Model model, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");
         if (patient == null) {
@@ -368,8 +375,9 @@ public class PatientController {
         return "patients/viewRatingPage";
     }
 
-    @PostMapping("/patients/addFeedback")   // added test
-    public String addFeedbackPage(@RequestParam Map<String, String> formData, HttpSession session, Model model, HttpServletResponse response) {
+    @PostMapping("/patients/addFeedback") // added test
+    public String addFeedbackPage(@RequestParam Map<String, String> formData, HttpSession session, Model model,
+            HttpServletResponse response) {
         Patient patient = (Patient) session.getAttribute("session_patient");
         if (patient == null) {
             return "loginPage";
@@ -380,7 +388,8 @@ public class PatientController {
         Date date = Date.valueOf(formData.get("date"));
         String feedbackStr = formData.get("feedbackStr");
         String rateStr = formData.get("rate");
-        PastAppointment pastApt = pastAppointmentRepo.findByPatientUsernameAndDoctorUsernameAndDate(patientUsername, doctorUsername, date);
+        PastAppointment pastApt = pastAppointmentRepo.findByPatientUsernameAndDoctorUsernameAndDate(patientUsername,
+                doctorUsername, date);
 
         if (rateStr == null || rateStr.isEmpty() || feedbackStr.trim().isEmpty()) {
             model.addAttribute("nonFeedbackPastApt", pastApt);
@@ -391,33 +400,35 @@ public class PatientController {
 
         double rate = Double.parseDouble(rateStr);
         Doctor doc = doctorRepo.findByUsername(doctorUsername);
-        
-        // feedback rate is individual rate and doctor rate is the mean rate 
-        Feedback newFeedback = new Feedback(doc.getName(), doctorUsername, patient.getName(), patientUsername, date, doc.getDepartment(), feedbackStr);
+
+        // feedback rate is individual rate and doctor rate is the mean rate
+        Feedback newFeedback = new Feedback(doc.getName(), doctorUsername, patient.getName(), patientUsername, date,
+                doc.getDepartment(), feedbackStr);
         newFeedback.setRate(rate);
         feedbackRepo.save(newFeedback);
 
         // Update the doctor's mean rating
         // feedbacks here is updated (ie added new one to repo if any)
         List<Feedback> feedbacks = feedbackRepo.findByDoctorUsername(doctorUsername);
-        double mean = calcAvg(feedbacks);     // rate in parameter is new rate & update rate is avg rate
+        double mean = calcAvg(feedbacks); // rate in parameter is new rate & update rate is avg rate
         doc.setRate(mean);
         System.out.println("mean rate: " + doc.getRate());
         doctorRepo.save(doc);
 
-        // List<Feedback> feedbackList = feedbackRepo.findByPatientUsername(patientUsername);
+        // List<Feedback> feedbackList =
+        // feedbackRepo.findByPatientUsername(patientUsername);
         // Collections.sort(feedbackList);
         // model.addAttribute("feedbackList", feedbackList);
         model.addAttribute("doctor", doc);
 
-        // update past apt 
+        // update past apt
         pastApt.setIsFeedback(true);
         pastAppointmentRepo.save(pastApt);
-        
+
         List<PastAppointment> pastAptList = pastAppointmentRepo.findByPatientUsername(patientUsername);
         List<PastAppointment> nonFeedbackPastAptList = new ArrayList<>();
-        
-        // display only those are not added to feedback 
+
+        // display only those are not added to feedback
         for (PastAppointment apt : pastAptList) {
             if (!apt.isFeedback()) {
                 nonFeedbackPastAptList.add(apt);
@@ -442,7 +453,14 @@ public class PatientController {
         return Math.round(mean * 10.0) / 10.0;
     }
 
-    //---------------------------------------Edit Information-------------------------------------------
+    // ---------------------------------------Edit
+    // Information-------------------------------------------
+
+    // -----------------Open Nearby Maps-------------
+    @GetMapping("patients/nearbyHospital")
+    public String getNearbyHospital(Model model, HttpSession session) {
+        return "patients/nearbyHospitals";
+    }
 
     @GetMapping("patients/editInformation")
     public String getEditPage(Model model, HttpSession session) {
@@ -456,7 +474,8 @@ public class PatientController {
     }
 
     @PostMapping("patients/editInformation")
-    public String editSetting(Model model, @RequestParam Map<String, String> formData, HttpServletResponse response, HttpSession session) {
+    public String editSetting(Model model, @RequestParam Map<String, String> formData, HttpServletResponse response,
+            HttpSession session) {
         Patient p = (Patient) session.getAttribute("session_patient");
         if (p == null) {
             return "loginPage";
@@ -465,13 +484,14 @@ public class PatientController {
         String name = formData.get("name");
         String address = formData.get("address");
         String phone = formData.get("phone");
-        if (name.trim().equals("") || address.trim().equals("") || phone.trim().equals("") || formData.get("age").isEmpty()) {
+        if (name.trim().equals("") || address.trim().equals("") || phone.trim().equals("")
+                || formData.get("age").isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             model.addAttribute("error0", "Please enter all the form!");
             model.addAttribute("patient", p);
             return "patients/editInformationPage";
         }
-       
+
         int age = Integer.parseInt(formData.get("age"));
         if (age <= 0) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -479,7 +499,6 @@ public class PatientController {
             model.addAttribute("patient", p);
             return "patients/editInformationPage";
         }
-
 
         p.setName(name);
         p.setAge(age);
@@ -492,7 +511,5 @@ public class PatientController {
         model.addAttribute("patient", p);
         return "patients/editInformationPage";
     }
-
-
 
 }
