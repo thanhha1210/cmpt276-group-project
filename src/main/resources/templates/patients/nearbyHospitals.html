@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nearest Hospital Locator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+    h1 {
+      margin: 20px 0;
+    }
+
+    #map {
+      width: 80%;
+      height: 400px;
+      margin-bottom: 20px;
+    }
+
+    #hospital-info {
+      width: 80%;
+      text-align: left;
+    }
+    #hospital-info1 {
+      width: 80%;
+      text-align: left;
+    }
+    #hospital-info2 {
+      width: 80%;
+      text-align: left;
+    }
+
+    </style>
+</head>
+<body>
+    <h1>Find Nearest Hospital</h1>
+    <div id="map"></div>
+    <div id="hospital-info"></div>
+    <div id="hospital-info1"></div>
+    <div id="hospital-info2"></div>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAF7I8DUOKNtDHnJXIqgWAoWSe4md9KPzw&libraries=places"></script>
+    <script>
+      let map;
+      let service;
+      let infowindow;
+
+      function initMap() {
+          // Try HTML5 geolocation
+          if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(
+                  (position) => {
+                      const userLocation = new google.maps.LatLng(
+                          position.coords.latitude,
+                          position.coords.longitude
+                      );
+
+                      map = new google.maps.Map(document.getElementById("map"), {
+                          center: userLocation,
+                          zoom: 15,
+                      });
+
+                      const request = {
+                          location: userLocation,
+                          radius: "5000",
+                          type: ["hospital"],
+                      };
+
+                      service = new google.maps.places.PlacesService(map);
+                      service.nearbySearch(request, callback);
+                  },
+                  () => {
+                      handleLocationError(true, map.getCenter());
+                  }
+              );
+          } else {
+              // Browser doesn't support Geolocation
+              handleLocationError(false, map.getCenter());
+          }
+      }
+
+      function handleLocationError(browserHasGeolocation, pos) {
+          const errorInfo = browserHasGeolocation
+              ? "Error: The Geolocation service failed."
+              : "Error: Your browser doesn't support geolocation.";
+          document.getElementById("hospital-info").textContent = errorInfo;
+      }
+
+      function callback(results, status) {
+          if (status === google.maps.places.PlacesServiceStatus.OK) {
+              const nearestHospital = results[0];
+              createMarker(nearestHospital);
+              displayHospitalInfo(nearestHospital);
+              const nearestHospital1 = results[1];
+              createMarker(nearestHospital1);
+              displayHospitalInfo1(nearestHospital1);
+              const nearestHospital2 = results[2];
+              createMarker(nearestHospital2);
+              displayHospitalInfo2(nearestHospital2);
+
+          }
+      }
+
+      function createMarker(place) {
+          const marker = new google.maps.Marker({
+              map: map,
+              position: place.geometry.location,
+          });
+
+          google.maps.event.addListener(marker, "click", () => {
+              infowindow.setContent(place.name);
+              infowindow.open(map, marker);
+          });
+      }
+
+      function displayHospitalInfo(hospital) {
+          const infoDiv = document.getElementById("hospital-info");
+          infoDiv.innerHTML = `
+              <h2>Nearest Hospital</h2>
+              <p><strong>Name:</strong> ${hospital.name}</p>
+              <p><strong>Address:</strong> ${hospital.vicinity}</p>
+          `;
+      }
+      function displayHospitalInfo1(hospital) {
+          const infoDiv = document.getElementById("hospital-info1");
+          infoDiv.innerHTML = `
+              <h2>Second Nearest Hospital</h2>
+              <p><strong>Name:</strong> ${hospital.name}</p>
+              <p><strong>Address:</strong> ${hospital.vicinity}</p>
+          `;
+      }
+      function displayHospitalInfo2(hospital) {
+          const infoDiv = document.getElementById("hospital-info2");
+          infoDiv.innerHTML = `
+              <h2>Third Nearest Hospital</h2>
+              <p><strong>Name:</strong> ${hospital.name}</p>
+              <p><strong>Address:</strong> ${hospital.vicinity}</p>
+          `;
+      }
+
+      window.onload = initMap;
+
+    </script>
+</body>
+</html>
