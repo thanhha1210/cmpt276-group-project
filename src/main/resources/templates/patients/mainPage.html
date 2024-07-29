@@ -16,7 +16,6 @@
             font-size: 100%;
             font: inherit;
             vertical-align: baseline;
-            
         }
         table {
             border-collapse: collapse;
@@ -99,7 +98,7 @@
             display: flex;
             justify-content: center;
             margin-left: auto;
-            gap: 20px 30px;
+            gap: 30px;
         }
         /* Content */
         .content-main h2 {
@@ -221,8 +220,8 @@
         }
 
         #chat-window {
-            width: 300px;
-            height: 400px;
+            width: 350px;
+            height: 600px;
             background-color: white;
             border: 1px solid #ccc;
             border-radius: 10px;
@@ -245,9 +244,16 @@
         }
         #chat-input-container {
             display: flex;
-            padding: 10px;
+            flex-direction: column;
+            padding: 5px;
             border-top: 1px solid #ccc;
             background-color: #f9f9f9;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            border-radius: 10px;
+            box-sizing: border-box;
+            margin-top: 10px;
         }
 
         #chat-input {
@@ -255,49 +261,57 @@
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
+            width: calc(100% - 20px); /* Adjusted for padding */
         }
 
-        #chat-input + button {
-            margin-left: 10px;
+        #chat-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        #chat-buttons button {
+            flex: 1;
             padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
             border-radius: 5px;
             cursor: pointer;
+            border: none;
         }
-
-        #chat-input + button:hover {
-            background-color: #0056b3;
-        }
-
 
         #chat-messages {
             flex: 1;
-            padding: 10px;
+            padding: 5px;
             overflow-y: auto;
             overflow-x: hidden;
-            max-width: 300px;
-            max-height: 300px;
+            width: 100%; /* Ensure it matches the chat window width */
+            box-sizing: border-box; /* Include padding in the width */
+            max-height: calc(100% - 165px); 
         }
+
         #chat-messages .message-container {
             display: flex;
             align-items: flex-start;
             margin: 10px 0; /* Adjust the margin as needed */
+            width: 100%; /* Ensure messages do not exceed the container width */
+            box-sizing: border-box; /* Include padding in the width */
         }
 
         #chat-messages .message-container img {
-            margin-top:16px;
+            margin-top: 16px;
             width: 40px;
             height: 40px;
             margin-right: 20px; /* Adjust the space between the image and the message */
         }
 
         #chat-messages .message-container .message {
+            max-width: 80%; /* Adjust as necessary */
+            word-wrap: break-word; /* Wrap long words */
+            word-break: break-word; /* Break long words if necessary */
             background-color: #f1f1f1;
             border-radius: 5px;
             padding: 10px;
         }
+
         #chat-messages .message-container.user {
             justify-content: flex-end;
         }
@@ -307,55 +321,58 @@
             color: white;
         }
 
-        #chat-input {
-            width: calc(100% - 40x);
-            margin: 10px;
-            padding: 10px;
+        #input-wrapper {
+            display: flex;
+            align-items: center;
+            width: calc(100% - 20px); /* Adjust according to your padding */
+            margin: 10px auto;
             border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 5px;
+            background-color: #fff;
+        }
+
+        #chat-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 10px;
             border-radius: 5px;
         }
 
-        #chat-input + button {
-            margin: 10px;
-            padding: 10px;
+        #send-button {
             background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin-left: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #send-button:hover {
+            background-color: #0056b3;
+        }
+
+        #chat-messages .date-time-message {
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            margin: 10px 0;
+        }
+
+        /* New Button Styles */
+        #send-log-button {
+            padding: 10px;
+            background-color: #28a745;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
         }
 
-        #chat-input + button:hover {
-            background-color: #0056b3;
-        }
-
-        /* Dropdown Styles */
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #f9f9f9;
-            min-width: 190px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            z-index: 1;
-        }
-
-        .dropdown-content form {
-            display: block;
-        }
-
-        .dropdown-content .btn {
-            width: 100%;
-            text-align: left;
-            padding: 12px 10px;
-        }
-
-        .dropdown:hover .dropdown-content {
-            display: block;
+        #send-log-button:hover {
+            background-color: #218838;
         }
     </style>
 </head>
@@ -363,39 +380,27 @@
     <header>
         <div class="content">
             <nav class="navbar">
-                <div class="nav-item">
+                <div class="home">
                     <form action="/patients/getDashboard" method="get">
                         <button class="btn home-btn">Dashboard</button>
                     </form>
-                    <div class="dropdown">
-                        <button class="btn">Appointment</button>
-                        <div class="dropdown-content">
-                            <form action="/patients/viewSchedule" method="get">
-                                <button class="btn schedule-btn">Book</button>
-                            </form>
-                            <form action="/patients/viewPastAppointment" method="get">
-                                <button class="btn schedule-btn">Past Appointments</button>
-                            </form>
-                        </div>
-                    </div>
+                </div>
+                <div class="nav-item">
+                    <form action="/patients/viewSchedule" method="get">
+                        <button class="btn schedule-btn">Book appointment</button>
+                    </form>
                     <form action="/patients/viewRecord" method="get">
                         <button class="btn schedule-btn">Health record</button>
                     </form>
-                    <form action="/patients/viewRating" method="get">
-                        <button class="btn schedule-btn">Rating</button>
+                    <form action="/patients/viewFeedback" method="get">
+                        <button class="btn schedule-btn">Feedback</button>
                     </form>
                     <form action="/patients/viewEvent" method="get">
                         <button class="btn schedule-btn">Forum</button>
                     </form>
-      
                 </div>
                 
                 <div class="actions">
-                    <form action="/patients/editInformation" method="get">
-                        <button class="btn schedule-btn">
-                            <img src="/img/settings.svg" alt="setting">
-                        </button>
-                    </form>
                     <form action="/users/logout" method="get">
                         <button class="btn logout-btn">Log out</button>
                     </form>
@@ -469,8 +474,11 @@
                 <div id="chat-header">Your HealthAce Assistant</div>
                 <div id="chat-messages"></div>
                 <div id="chat-input-container">
-                    <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
-                    <button onclick="sendMessage()">Send</button>
+                    <button id="send-log-button" onclick="sendChatLog()">Email Chat Log</button>
+                    <div id="input-wrapper">
+                        <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
+                        <button onclick="sendMessage()" id="send-button">➤</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -481,29 +489,49 @@
     </footer>
 
     <script>
+        let chatLog = [];
+    
         function toggleChat() {
             const chatWindow = document.getElementById('chat-window');
             if (chatWindow.style.display === 'none') {
-                chatWindow.style.display = 'block';z
+                chatWindow.style.display = 'block';
+                addCurrentDateTime();
             } else {
                 chatWindow.style.display = 'none';
             }
         }
+    
+        function addCurrentDateTime() {
+            const chatMessages = document.getElementById('chat-messages');
+            const date = new Date();
+            const dateTimeString = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+            
+            const dateTimeElement = document.createElement('div');
+            dateTimeElement.classList.add('date-time-message');
+            dateTimeElement.textContent = dateTimeString;
+            
+            chatMessages.appendChild(dateTimeElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
 
+            // Add date and time to chat log
+            chatLog.push({ sender: 'system', message: dateTimeString });
+        }
+
+    
         function handleKeyPress(event) {
             if (event.key === 'Enter') {
                 sendMessage();
             }
         }
-
+    
         async function sendMessage() {
             const inputField = document.getElementById('chat-input');
             const message = inputField.value;
             if (message.trim() === '') return;
-
+    
             addMessageToChat('user', message);
             inputField.value = '';
-
+    
             try {
                 const response = await fetch('/api/chat', {
                     method: 'POST',
@@ -512,7 +540,7 @@
                     },
                     body: JSON.stringify({ message: message })
                 });
-
+    
                 const data = await response.json();
                 addMessageToChat('assistant', data.message);
             } catch (error) {
@@ -520,32 +548,60 @@
                 addMessageToChat('assistant', 'Sorry, something went wrong.');
             }
         }
-
+    
         function addMessageToChat(sender, message) {
             const chatMessages = document.getElementById('chat-messages');
             const messageContainer = document.createElement('div');
             messageContainer.classList.add('message-container');
-
+    
             if (sender === 'assistant') {
                 const img = document.createElement('img');
                 img.src = '/img/medical-robot.png';
                 img.alt = 'Robot';
                 messageContainer.appendChild(img);
-            }else if (sender === 'user') {
-            messageContainer.classList.add('user'); 
-        }
-            
-
+            } else if (sender === 'user') {
+                messageContainer.classList.add('user'); 
+            }
+    
             const messageElement = document.createElement('div');
             messageElement.classList.add('message');
             messageElement.textContent = message;
             messageContainer.appendChild(messageElement);
-
+    
             chatMessages.appendChild(messageContainer);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+            // Add message to chat log
+            chatLog.push({ sender, message });
+    
             if(sender === 'user'){
                 messageElement.style.color = 'white'; 
                 messageElement.style.backgroundColor = '#32302f'; 
+            }
+        }
+    
+        async function sendChatLog() {
+            const email = prompt('Please enter the desired email to send the chat log to:');
+            if (!email) return;
+    
+            try {
+                const response = await fetch('/api/sendChatLog', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, chatLog })
+                });
+    
+                const data = await response.json();
+                if (data.success) {
+                    alert('Thank you! Chat log has been sent. Check your spam folder if you do not see the email in your inbox.');
+                } else {
+                    alert('Uh-oh, something went wrong and we failed to send chat log. Try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while sending the chat log.');
             }
         }
     </script>
