@@ -76,7 +76,18 @@ public class AdminController {
         if (admin == null) {
             return "loginPage";
         }
-        model.addAttribute("doctors", doctorRepo.findAll());
+
+        List<Doctor> doctors = doctorRepo.findAll();
+        
+        // Custom sorting logic based on the compareTo method
+        Collections.sort(doctors, (doc1, doc2) -> {
+            if (doc1.getName().length() == doc2.getName().length()) {
+                return doc1.getName().compareTo(doc2.getName());
+            } else {
+                return Integer.compare(doc1.getName().length(), doc2.getName().length());
+            }
+        });
+        model.addAttribute("doctors", doctors);
         return "admins/viewDoctorPage";
     }
 
