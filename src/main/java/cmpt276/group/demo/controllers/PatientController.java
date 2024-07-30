@@ -75,8 +75,7 @@ public class PatientController {
         return "patients/mainPage";
     }
 
-    // --------------------------------------------Manage
-    // schedule--------------------------------------------------------
+    // --------------------------------------------Manage Schedule--------------------------------------------------------
 
     // Patient go to view schedule page (added test)
     @GetMapping("/patients/viewSchedule")
@@ -362,7 +361,7 @@ public class PatientController {
         return "patients/addFeedbackPage";
     }
 
-    @GetMapping("/patients/viewRating") // NOT ADD TEST
+    @GetMapping("/patients/viewRating") // added test
     public String viewDocRating(Model model, HttpSession session) {
         Patient patient = (Patient) session.getAttribute("session_patient");
         if (patient == null) {
@@ -370,7 +369,15 @@ public class PatientController {
         }
 
         List<Doctor> doctors = doctorRepo.findAll();
-        Collections.sort(doctors, Comparator.comparing(Doctor::getName));
+        
+        // Custom sorting logic based on the compareTo method
+        Collections.sort(doctors, (doc1, doc2) -> {
+            if (doc1.getName().length() == doc2.getName().length()) {
+                return doc1.getName().compareTo(doc2.getName());
+            } else {
+                return Integer.compare(doc1.getName().length(), doc2.getName().length());
+            }
+        });
         model.addAttribute("doctors", doctors);
         return "patients/viewRatingPage";
     }
@@ -388,8 +395,7 @@ public class PatientController {
         Date date = Date.valueOf(formData.get("date"));
         String feedbackStr = formData.get("feedbackStr");
         String rateStr = formData.get("rate");
-        PastAppointment pastApt = pastAppointmentRepo.findByPatientUsernameAndDoctorUsernameAndDate(patientUsername,
-                doctorUsername, date);
+        PastAppointment pastApt = pastAppointmentRepo.findByPatientUsernameAndDoctorUsernameAndDate(patientUsername, doctorUsername, date);
 
         if (rateStr == null || rateStr.isEmpty() || feedbackStr.trim().isEmpty()) {
             model.addAttribute("nonFeedbackPastApt", pastApt);
@@ -453,15 +459,17 @@ public class PatientController {
         return Math.round(mean * 10.0) / 10.0;
     }
 
-    // ---------------------------------------Edit
-    // Information-------------------------------------------
-
-    // -----------------Open Nearby Maps-------------
+    // ---------------------------------------Open Nearby Map-------------------------------------------
     @GetMapping("patients/nearbyHospital")
-    public String getNearbyHospital(Model model, HttpSession session) {
+    public String getNearbyHospital(HttpSession session) {
+        Patient p = (Patient) session.getAttribute("session_patient");
+        if (p == null) {
+            return "loginPage";
+        }
         return "patients/nearbyHospitals";
     }
 
+    // ---------------------------------------Edit Information-------------------------------------------
     @GetMapping("patients/editInformation")
     public String getEditPage(Model model, HttpSession session) {
         Patient p = (Patient) session.getAttribute("session_patient");
@@ -474,8 +482,7 @@ public class PatientController {
     }
 
     @PostMapping("patients/editInformation")
-    public String editSetting(Model model, @RequestParam Map<String, String> formData, HttpServletResponse response,
-            HttpSession session) {
+    public String editSetting(Model model, @RequestParam Map<String, String> formData, HttpServletResponse response, HttpSession session) {
         Patient p = (Patient) session.getAttribute("session_patient");
         if (p == null) {
             return "loginPage";
