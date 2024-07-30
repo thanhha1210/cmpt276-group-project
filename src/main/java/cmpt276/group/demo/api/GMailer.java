@@ -44,8 +44,8 @@ public class GMailer {
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
     private static final List<String> SCOPES = Collections.singletonList(GmailScopes.GMAIL_SEND);
     private static final String CREDENTIALS_FILE_PATH = "/gmail_credential.json";
-    private static final String REDIRECT_URI = "https://cmpt276-group-project.onrender.com/oauth2callback";
-
+    private static final String REDIRECT_URI = "http://localhost:8080/oauth2callback";
+    
     private static final Logger logger = LoggerFactory.getLogger(GMailer.class);
 
     private Credential credentials;
